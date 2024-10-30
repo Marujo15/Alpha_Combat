@@ -14,10 +14,10 @@ const poolConfig = {
 export const pool = new Pool(poolConfig);
 
 pool.on("error", (err) => {
-    console.error(`Erro inesperado na pool de conexões: ${err.message}`);
+    console.error(`Unexpected error in connection pool: ${err.message}`);
     process.exit(1);
 });
 
 export const query = (text, params) => pool.query(text, params);
 
-// Observação: QueryResultRow é uma interface que representa uma linha retornada pelo banco de dados, onde cada coluna é um par chave-valor.
+// Note: QueryResultRow is an interface that represents a row returned by the database, where each column is a key-value pair.

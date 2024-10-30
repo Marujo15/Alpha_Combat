@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 
-// Função para criar um hash seguro para a senha
+// Function to create a hashed password
 export async function hashPassword(password) {
     try {
         const salt = await bcrypt.genSalt(10);

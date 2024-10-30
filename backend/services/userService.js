@@ -97,7 +97,7 @@ export const userService = {
             const oldUser = await userRepository.getUserById(id);
 
             if (!oldUser) {
-                throw new Error("Usuário não existente");
+                throw new Error("User does not exist");
             }
 
             let username;
