@@ -1,9 +1,8 @@
-// rotas
+import express from 'express';
+import { userController } from '../controllers/userController.js';
 
-/* 
-getUserById
-getAllUsers
-createUser
-updateUser
-deleteUser
- */
+const router = express.Router();
+
+router.get('/', userController.getAllUsers);
+
+export default router;
