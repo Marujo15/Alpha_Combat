@@ -1,13 +1,10 @@
-import app, { startServer } from "./app.js";
-import { PORT } from "./config/index.js";
+import dotenv from "dotenv";
+dotenv.config();
 
-const port = PORT ? parseInt(PORT) : 3000;
+import app from "./app.js"
 
-const startApp = async () => {
-  await startServer();
-  app.listen(port, () => {
-    console.log(`Server running on the port ${port}`);
-  });
-};
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
-startApp();
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

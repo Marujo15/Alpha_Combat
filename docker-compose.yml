@@ -1,0 +1,50 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env.back
+    volumes:
+      - ./backend:/app
+    networks:
+      - network
+    depends_on:
+      - database
+
+  database:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env.db
+    volumes:
+      - database:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://backend:3000
+      - NODE_ENV=development
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - network
+    depends_on:
+      - backend
+
+networks:
+  network:
+    driver: bridge
+
+volumes:
+  database:
