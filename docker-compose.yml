@@ -22,6 +22,7 @@ services:
       - ./backend/.env.db
     volumes:
       - database:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - network
 
