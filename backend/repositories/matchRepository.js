@@ -8,7 +8,7 @@ export const matchRepository = {
                 WHERE player1_id = $1 OR player2_id = $1;
             `;
             const result = await pool.query(query, [userId]);
-            return result.rows[0];
+            return result.rows;
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Error fetching match' });

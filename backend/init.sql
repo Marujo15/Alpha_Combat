@@ -29,5 +29,6 @@ CREATE TABLE matches (
     player2_kills INT DEFAULT 0,
     player1_deaths INT DEFAULT 0,
     player2_deaths INT DEFAULT 0,
-    match_time INTERVAL DEFAULT '00:00:00'
+    match_time INTERVAL DEFAULT '00:00:00',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -83,14 +83,14 @@ export const matchController = {
             const matchId = req.params.matchId;
             const updates = { ...req.body };
 
-            const match = await matchService.getMatchByMatchId(matchId);
+            // const match = await matchService.getMatchByMatchId(matchId);
 
-            if (!match) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Error updating match',
-                });
-            }
+            // if (!match) {
+            //     return res.status(404).json({
+            //         success: false,
+            //         message: 'Error updating match',
+            //     });
+            // }
 
             const updatedmatch = await matchService.updateMatchByMatchId(
                 matchId,
