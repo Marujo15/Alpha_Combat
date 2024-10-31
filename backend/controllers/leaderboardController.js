@@ -1,52 +1,93 @@
 import { leaderboardService } from '../services/leaderboardService.js';
+import { formatTimePlayed } from '../utils/formatTimePlayed.js';
 
 export const leaderboardController = {
     getLeaderboardByUserId: async (req, res) => {
         try {
             const userId = req.params.userId;
             const leaderboard = await leaderboardService.getLeaderboardByUserId(userId);
-            res.status(200).json(leaderboard);
+
+            if (!leaderboard) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Leaderboard not found',
+                });
+            }
+
+            res.status(201).json({
+                success: true,
+                data: leaderboard,
+                message: 'Leaderboard retrieved successfully',
+            });
         } catch (error) {
-            res.status(400).json({ message: error.message });
+            console.error('Error fetching leaderboard:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error fetching leaderboard',
+            });
         }
     },
 
     getAllLeaderboards: async (_req, res) => {
         try {
             const leaderboards = await leaderboardService.getAllLeaderboards();
-            res.status(200).json(leaderboards);
-        } catch (error) {
-            res.status(400).json({ message: error.message });
-        }
-    },
 
-    createUserLeaderboard: async (req, res) => {
-        try {
-            const userId = req.user;
-            const leaderboard = await leaderboardService.createUserLeaderboard(userId);
-            res.status(201).json(leaderboard);
+            if (!leaderboards) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Error fetching leaderboards',
+                });
+            }
+
+            res.status(201).json({
+                success: true,
+                data: leaderboards,
+                message: 'Leaderboards retrieved successfully',
+            });
         } catch (error) {
-            res.status(400).json({ message: error.message });
+            console.error('Error fetching leaderboards:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error fetching leaderboards',
+            });
         }
     },
 
     updateLeaderboardByUserId: async (req, res) => {
         try {
             const userId = req.params.userId;
-            const leaderboard = await leaderboardService.updateLeaderboardByUserId(userId, req.body);
-            res.status(200).json(leaderboard);
-        } catch (error) {
-            res.status(400).json({ message: error.message });
-        }
-    },
+            const updates = {
+                victories: req.body.victories ? parseInt(req.body.victories, 10) : undefined,
+                defeats: req.body.defeats ? parseInt(req.body.defeats, 10) : undefined,
+                draws: req.body.draws ? parseInt(req.body.draws, 10) : undefined,
+                kills_count: req.body.kills_count ? parseInt(req.body.kills_count, 10) : undefined,
+                deaths_count: req.body.deaths_count ? parseInt(req.body.deaths_count, 10) : undefined,
+                time_played: formatTimePlayed(req.body.time_played),
+            };
+            console.log(updates.time_played)
+            const updatedLeaderboard = await leaderboardService.updateLeaderboardByUserId(
+                userId,
+                updates
+            );
 
-    deleteLeaderboardByUserId: async (req, res) => {
-        try {
-            const userId = req.params.userId;
-            const leaderboard = await leaderboardService.deleteLeaderboardByUserId(userId);
-            res.status(200).json(leaderboard);
+            if (!updatedLeaderboard) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Error updating leaderboard',
+                });
+            }
+
+            res.status(200).json({
+                success: true,
+                data: updatedLeaderboard,
+                message: 'Leaderboard updated successfully',
+            });
         } catch (error) {
-            res.status(400).json({ message: error.message });
+            console.error('Error updating leaderboards:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error updating leaderboards',
+            });
         }
     }
 }

@@ -28,78 +28,78 @@ export const leaderboardRepository = {
         }
     },
 
-    createUserLeaderboard: async (userId) => {
+    createLeaderboardEntry: async (userId) => {
+        const query = `
+            INSERT INTO leaderboards (user_id) 
+            VALUES ($1) 
+            RETURNING *;
+        `;
         try {
-            const query = `
-                INSERT INTO leaderboards (user_id)
-                VALUES ($1)
-                RETURNING *;
-            `;
             const result = await pool.query(query, [userId]);
             return result.rows[0];
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Error creating leaderboard' });
+            console.error("Error creating leaderboard entry:", error);
+            throw new ErrorApi({
+                message: "Failed to create leaderboard entry.",
+                status: 500,
+            });
         }
     },
     
-    updateLeaderboardByUserId: async (userId, leaderboard) => {
-        const { victory, defeat, score_time, all_time } = leaderboard;
-        
-        const updates = [];
-        const values = [userId];
-      
-        if (victories !== undefined) {
-          updates.push('victories = $' + (updates.length + 1));
-          values.push(victories);
+    updateLeaderboardByUserId: async (userId, updates) => {
+        const fields = [];
+        const values = [];
+    
+        if (updates.victories !== undefined) {
+            fields.push(`victories = victories + $${fields.length + 1}`);
+            values.push(updates.victories);
         }
-      
-        if (defeats !== undefined) {
-          updates.push('defeats = $' + (updates.length + 1));
-          values.push(defeats);
+        if (updates.defeats !== undefined) {
+            fields.push(`defeats = defeats + $${fields.length + 1}`);
+            values.push(updates.defeats);
         }
-      
-        if (score_time !== undefined) {
-          updates.push('score_time = $' + (updates.length + 1));
-          values.push(score_time);
+        if (updates.draws !== undefined) {
+            fields.push(`draws = draws + $${fields.length + 1}`);
+            values.push(updates.draws);
         }
-      
-        if (all_time !== undefined) {
-          updates.push('all_time = $' + (updates.length + 1));
-          values.push(all_time);
+        if (updates.kills_count !== undefined) {
+            fields.push(`kills_count = kills_count + $${fields.length + 1}`);
+            values.push(updates.kills_count);
         }
-      
-        if (updates.length === 0) {
-          return res.status(400).json({ error: 'No fields to update' });
+        if (updates.deaths_count !== undefined) {
+            fields.push(`deaths_count = deaths_count + $${fields.length + 1}`);
+            values.push(updates.deaths_count);
         }
-
+        if (updates.time_played !== undefined) {
+            fields.push(`time_played = time_played + $${fields.length + 1}`);
+            values.push(updates.time_played);
+        }
+    
+        if (fields.length === 0) {
+            throw new ErrorApi({
+                message: "No fields to update.",
+                status: 400,
+            });
+        }
+    
+        const query = `
+            UPDATE leaderboards
+            SET ${fields.join(', ')}
+            WHERE user_id = $${fields.length + 1}
+            RETURNING *;
+        `;
+    
+        values.push(userId);
+    
         try {
-            const query = `
-                UPDATE leaderboards
-                SET ${updates.join(', ')}
-                WHERE user_id = $1
-                RETURNING *;
-            `;
-            const result = await pool.query(query, [values]);
+            const result = await pool.query(query, values);
             return result.rows[0];
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Error updating leaderboard' });
-          }
-    },
-
-    deleteLeaderboardByUserId: async (userId) => {
-        try {
-            const query = `
-                DELETE FROM leaderboards
-                WHERE user_id = $1
-                RETURNING *;
-            `;
-            const result = await pool.query(query, [userId]);
-            return result.rows[0];
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Error deleting leaderboard' });
-          }
+            console.error("Error updating leaderboard:", error);
+            throw new ErrorApi({
+                message: "Failed to update leaderboard.",
+                status: 500,
+            });
+        }
     }
 }

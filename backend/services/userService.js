@@ -1,4 +1,5 @@
 import { userRepository } from "../repositories/userRepository.js";
+import { leaderboardRepository } from "../repositories/leaderboardRepository.js";
 import { validateEmail, validatePassword, validateName, } from "../utils/validation.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import { ErrorApi } from "../errors/ErrorApi.js";
@@ -35,6 +36,8 @@ export const userService = {
                 email,
                 hashedPassword,
             );
+
+            await leaderboardRepository.createLeaderboardEntry(user.id);
 
             return user;
         } catch (error) {

@@ -11,6 +11,9 @@ CREATE TABLE leaderboards (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     victories INT DEFAULT 0,
     defeats INT DEFAULT 0,
-    score_time TIMESTAMP,
-    all_time TIMESTAMP
+    draws INT DEFAULT 0,
+    matches INT DEFAULT 0,
+    kills_count INT DEFAULT 0,
+    deaths_count INT DEFAULT 0,
+    time_played INTERVAL DEFAULT '00:00:00'
 );
