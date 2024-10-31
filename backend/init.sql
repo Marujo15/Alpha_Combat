@@ -17,3 +17,18 @@ CREATE TABLE leaderboards (
     deaths_count INT DEFAULT 0,
     time_played INTERVAL DEFAULT '00:00:00'
 );
+
+CREATE TABLE matches (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    player1_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    player2_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    winner_id UUID REFERENCES users(id) ON DELETE SET NULL DEFAULT NULL,
+    defeated_id UUID REFERENCES users(id) ON DELETE SET NULL DEFAULT NULL,
+    draw BOOLEAN DEFAULT FALSE,
+    player1_kills INT DEFAULT 0,
+    player2_kills INT DEFAULT 0,
+    player1_deaths INT DEFAULT 0,
+    player2_deaths INT DEFAULT 0,
+    match_time INTERVAL DEFAULT '00:00:00',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

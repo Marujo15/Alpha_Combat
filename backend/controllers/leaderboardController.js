@@ -64,7 +64,6 @@ export const leaderboardController = {
                 deaths_count: req.body.deaths_count ? parseInt(req.body.deaths_count, 10) : undefined,
                 time_played: formatTimePlayed(req.body.time_played),
             };
-            console.log(updates.time_played)
             const updatedLeaderboard = await leaderboardService.updateLeaderboardByUserId(
                 userId,
                 updates
