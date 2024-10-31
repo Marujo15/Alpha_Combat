@@ -1,8 +1,11 @@
-// rotas
+import { Router } from "express";
+import { userController } from "../controllers/userController.js";
+import { authController } from "../controllers/authController.js";
 
-/* 
------> Oauth (implementa 1 primeiro)
-login
-logout
-register
- */
+const router = Router();
+
+router.post("/register", userController.createUser);
+router.post("/login", authController.authenticate);
+router.delete("/logout", authController.logout);
+
+export default router;
