@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import userRoutes from "./routes/userRoutes.js"
+import routes from "./routes/routes.js"
 
 dotenv.config();
 
@@ -21,6 +21,6 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/user", userRoutes);
+app.use("/api", routes);
 
 export default app;
