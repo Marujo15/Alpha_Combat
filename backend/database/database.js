@@ -1,13 +1,13 @@
 
 import pg from "pg";
 const { Pool } = pg
-import { DB_HOST, DB_NAME, SECRET_KEY, DB_PORT, DB_USER } from "../config/index.js";
+import { DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER } from "../config/index.js";
 
 const poolConfig = {
     user: DB_USER,
     host: DB_HOST,
     database: DB_NAME,
-    password: SECRET_KEY,
+    password: DB_PASSWORD,
     port: parseInt(DB_PORT, 10),
 };
 
