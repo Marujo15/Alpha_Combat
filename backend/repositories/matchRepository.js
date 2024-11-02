@@ -15,6 +15,20 @@ export const matchRepository = {
         }
     },
 
+    getMatchByMatchId: async (matchId) => {
+        try {
+            const query = `
+                SELECT * FROM matches
+                WHERE id = $1;
+            `;
+            const result = await pool.query(query, [matchId]);
+            return result.rows[0];
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Error fetching match' });
+        }
+    },
+
     getAllMatches: async () => {
         try {
             const query = `
@@ -67,8 +81,8 @@ export const matchRepository = {
             updates.player2_kills,
             updates.player1_deaths,
             updates.player2_deaths,
-            updates.winner_id,
-            updates.defeated_id,
+            updates.winner_id || null,
+            updates.defeated_id || null,
             updates.draw,
             updates.match_time,
             matchId
