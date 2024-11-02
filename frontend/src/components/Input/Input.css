@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+input {
+    background-color: #636769;
+    border: none;
+    color: white;
+    font-family: "Press Start 2P", system-ui;
+    font-size: xx-large;
+    height: 60px;
+    margin: 20px 0;
+    padding: 0 20px;
+    width: 450px;
+}
+
+input::placeholder {
+    color: white;
+    font-size: xx-large;
+    padding: 0 10px;
+}
+
+input:focus {
+    border: none;
+}
