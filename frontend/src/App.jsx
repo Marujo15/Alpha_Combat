@@ -1,31 +1,26 @@
-import { useState } from 'react'
-import './App.css'
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { UserProvider } from "./context/UserContext.jsx";
+import LandingPage from "./pages/LandingPage/LandingPage.jsx";
+// import GamePage from "./pages/GamePage.jsx";
+// import LoginPage from "./pages/LoginPage.jsx";
+// import RegisterPage from "./pages/RegisterPage.jsx";
+// import RoomsPage from "./pages/RoomsPage.jsx";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-        </a>
-        <a href="https://react.dev" target="_blank">
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Teste!
-      </p>
-    </>
-  )
-}
+    <UserProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          {/* <Route path="/game" element={<GamePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/rooms" element={<RoomsPage />} /> */}
+        </Routes>
+      </Router>
+    </UserProvider>
+  );
+};
 
-export default App
+export default App;
