@@ -27,6 +27,32 @@ export const matchController = {
         }
     },
 
+    getMatchByMatchId: async (req, res) => {
+        try {
+            const matchId = req.params.matchId;
+            const match = await matchService.getMatchByMatchId(matchId);
+
+            if (!match) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Match not found',
+                });
+            }
+
+            res.status(201).json({
+                success: true,
+                data: match,
+                message: 'Match retrieved successfully',
+            });
+        } catch (error) {
+            console.error('Error fetching match:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error fetching match',
+            });
+        }
+    },
+
     getAllMatches: async (_req, res) => {
         try {
             const matches = await matchService.getAllMatches();
@@ -83,14 +109,34 @@ export const matchController = {
             const matchId = req.params.matchId;
             const updates = { ...req.body };
 
-            // const match = await matchService.getMatchByMatchId(matchId);
+            const expectedKeys = [
+                'player1_kills',
+                'player2_kills',
+                'player1_deaths',
+                'player2_deaths',
+                'winner_id',
+                'defeated_id',
+                'draw',
+                'match_time'
+            ];
 
-            // if (!match) {
-            //     return res.status(404).json({
-            //         success: false,
-            //         message: 'Error updating match',
-            //     });
-            // }
+            const missingKeys = expectedKeys.filter(key => !(key in updates));
+            if (missingKeys.length > 0) {
+                console.error('Missing keys in updates:', missingKeys);
+                return res.status(400).json({
+                    success: false,
+                    message: `Missing keys in updates: ${missingKeys.join(', ')}`,
+                });
+            }
+
+            const match = await matchService.getMatchByMatchId(matchId);
+
+            if (!match) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Error updating match',
+                });
+            }
 
             const updatedmatch = await matchService.updateMatchByMatchId(
                 matchId,
@@ -124,7 +170,7 @@ export const matchController = {
                 });
             }
 
-            const deletedmatch = await matchService.deleteMatch(matchId);
+            await matchService.deleteMatch(matchId);
 
             res.status(200).json({
                 success: true,

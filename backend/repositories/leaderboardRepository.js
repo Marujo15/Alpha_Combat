@@ -62,6 +62,10 @@ export const leaderboardRepository = {
             fields.push(`draws = draws + $${fields.length + 1}`);
             values.push(updates.draws);
         }
+        if (updates.matches !== undefined) {
+            fields.push(`matches = matches + $${fields.length + 1}`);
+            values.push(updates.draws);
+        }
         if (updates.kills_count !== undefined) {
             fields.push(`kills_count = kills_count + $${fields.length + 1}`);
             values.push(updates.kills_count);
