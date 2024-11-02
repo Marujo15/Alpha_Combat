@@ -13,7 +13,7 @@ export const matchController = {
                 });
             }
 
-            res.status(201).json({
+            res.status(200).json({
                 success: true,
                 data: match,
                 message: 'Match retrieved successfully',
@@ -39,7 +39,7 @@ export const matchController = {
                 });
             }
 
-            res.status(201).json({
+            res.status(200).json({
                 success: true,
                 data: match,
                 message: 'Match retrieved successfully',
@@ -64,7 +64,7 @@ export const matchController = {
                 });
             }
 
-            res.status(201).json({
+            res.status(200).json({
                 success: true,
                 data: matches,
                 message: 'Matches retrieved successfully',
