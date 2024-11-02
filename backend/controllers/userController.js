@@ -42,6 +42,22 @@ export const userController = {
 
         try {
             const userId = req.params.userId;
+            const userIdOnToken = req.user
+
+            if (!userIdOnToken) {
+                throw new ErrorApi({
+                    message: "User not authenticated",
+                    status: 401,
+                });
+            }
+
+            if (userIdOnToken !== userId) {
+                throw new ErrorApi({
+                    message: "You are not authorized to access this user",
+                    status: 403,
+                });
+            }
+
             const user = await userService.getUserById(userId);
 
             response.data = user;
@@ -141,10 +157,30 @@ export const userController = {
 
     deleteUser: async (req, res) => {
         try {
-            const userId = req.params.userId
+            const userId = req.params.userId;
+            const userIdOnToken = req.user
+
+            if (!userIdOnToken) {
+                throw new ErrorApi({
+                    message: "User not authenticated",
+                    status: 401,
+                });
+            }
+
+            if (userIdOnToken !== userId) {
+                throw new ErrorApi({
+                    message: "You are not authorized to access this user",
+                    status: 403,
+                });
+            }
+
             const deletedUser = await userService.deleteUser(userId);
-            if (deletedUser) res.json({ message: "User deleted successfully" });
-            else res.status(404).json({ error: "User not found" });
+
+            if (deletedUser) {
+                res.json({ message: "User deleted successfully" })
+            } else {
+                res.status(404).json({ error: "User not found" })
+            };
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
