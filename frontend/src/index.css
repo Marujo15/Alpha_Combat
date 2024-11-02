@@ -1,10 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  font-family: "Press Start 2P", system-ui;
   font-weight: 400;
+  font-style: normal;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  color: rgba(194, 50, 50, 0.87);
   background-color: #242424;
 
   font-synthesis: none;
@@ -15,7 +17,6 @@
 
 body {
   align-items: center;
-  background-color: red;
   display: flex;
   flex-direction: column;
   justify-content: center;
