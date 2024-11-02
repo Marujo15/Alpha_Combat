@@ -1,0 +1,21 @@
+form {
+    align-items: center;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    height: 70vh;
+    justify-content: center;
+    min-width: 500px;
+    width: 30vw;
+}
+
+a {
+    color: yellow;
+}
+
+h1 {
+    color: white;
+    margin: 100px 0 0 0;
+}

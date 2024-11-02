@@ -1,0 +1,9 @@
+.logo {
+    background-color: black;
+    border-radius: 100px;
+    height: 200px;
+    left: calc(50% - 100px);
+    position: absolute;
+    top: 50px;
+    width: 200px;
+}

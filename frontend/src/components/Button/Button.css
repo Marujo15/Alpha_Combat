@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+button {
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.login-btn {
+    background-color: yellow;
+    border: 2px solid black;
+    border-radius: 10px;
+    color: black;
+    padding: 10px 20px;
+}
+
+.google-btn {
+    height: 50px;
+    width: 350px;
+}

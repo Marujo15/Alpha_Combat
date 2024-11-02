@@ -5,16 +5,15 @@ input {
     border: none;
     color: white;
     font-family: "Press Start 2P", system-ui;
-    font-size: xx-large;
-    height: 60px;
-    margin: 20px 0;
+    font-size: medium;
+    height: 50px;
     padding: 0 20px;
-    width: 450px;
+    width: 300px;
 }
 
 input::placeholder {
     color: white;
-    font-size: xx-large;
+    font-size: medium;
     padding: 0 10px;
 }
 
