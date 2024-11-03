@@ -11,26 +11,14 @@
     width: 100vw;
 }
 
-.container {
-    align-items: center;
+.dash-page-main-div {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    justify-content: center;
+    gap: 10px;
 }
 
-.title {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-}
-
-.userInfo {
-    text-align: center;
-}
-
-.button {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 1rem;
+.start-game-btn, .ranking-btn, .tutorial-btn {
+    font-size: large;
+    height: 60px;
+    width: 400px;
 }

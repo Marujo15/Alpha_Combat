@@ -1,0 +1,57 @@
+#root {
+    align-items: center;
+    background-color: lightblue;
+    background-image: url('../../../public/assets/background.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: center;
+    width: 100vw;
+}
+
+.waiting-page-container {
+    align-items: center;
+    background-color: rgba(0,0,0,0.7);
+    border-radius: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 90vh;
+    justify-content: center;
+    width: 90vw;
+}
+
+/* .scoreboard-div {
+    background-color: #C3C9CD;
+    border-radius: 30px;
+    height: 15vh;
+    width: 20vw;
+} */
+
+/* .time-div {
+    background-color: #C3C9CD;
+    border-radius: 20px;
+    height: 10vh;
+    width: 15vw;
+}
+
+.msg-div {
+    color: yellow;
+    display: flex;
+    font-size: xx-large;
+    flex-direction: column;
+    justify-content: center;
+    height: 40vh;
+} */
+
+.cancel-btn {
+    background-image: url('../../../public/assets/cancel-btn.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 80px;
+    width: 188px;
+}
