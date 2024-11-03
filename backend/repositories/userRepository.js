@@ -28,7 +28,7 @@ export const userRepository = {
             `;
 
         try {
-            const result = await pool.query(query, [username, email, password]);
+            const result = await pool.query(query, [username, email, password || null]);
 
             return result.rows[0];
         } catch (error) {
@@ -62,7 +62,8 @@ export const userRepository = {
         try {
             const result = await pool.query(query, [email]);
 
-            return result.rows;
+            console.log("Result from getUserByEmail:", result.rows);
+            return result.rows[0];
         } catch (error) {
             throw new ErrorApi({
                 message: "Failed to locate the user by email.",

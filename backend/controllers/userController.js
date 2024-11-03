@@ -112,6 +112,7 @@ export const userController = {
 
         try {
             const { username, email, password } = req.body;
+            console.log(username, email, password);
             const user = await userService.createUser(
                 username,
                 email,
