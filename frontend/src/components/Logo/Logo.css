@@ -4,6 +4,11 @@
     height: 200px;
     left: calc(50% - 100px);
     position: absolute;
+    text-align: center;
     top: 50px;
     width: 200px;
+}
+
+.logo img {
+    width: 100%;
 }
