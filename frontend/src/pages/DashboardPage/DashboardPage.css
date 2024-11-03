@@ -12,13 +12,29 @@
 }
 
 .dash-page-main-div {
+    align-items: center;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     gap: 10px;
 }
 
 .start-game-btn, .ranking-btn, .tutorial-btn {
+    background-image: url('../../../public/assets/btn-background2.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
     font-size: large;
-    height: 60px;
-    width: 400px;
+    height: 70px;
+    width: 310px;
+}
+
+.logout-btn {
+    background-image: url('../../../public/assets/cancel-btn.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 165px;
 }
