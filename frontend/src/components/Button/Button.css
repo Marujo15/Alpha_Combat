@@ -5,10 +5,31 @@ button {
     border: 2px solid black;
     border-radius: 10px;
     color: black;
+    cursor: pointer;
     padding: 10px 20px;
     font-family: "Press Start 2P", system-ui;
     font-weight: 400;
     font-style: normal;
+    transition: transform 0.2s ease-in-out;
+}
+
+button:hover {
+    animation: tilt 0.5s ease-in-out;
+}
+
+@keyframes tilt {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(-2deg);
+    }
+    50% {
+        transform: rotate(2deg);
+    }
+    75% {
+        transform: rotate(-2deg);
+    }
 }
 
 .google-btn {

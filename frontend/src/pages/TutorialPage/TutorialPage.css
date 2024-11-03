@@ -1,0 +1,83 @@
+#root {
+    align-items: center;
+    background-color: lightblue;
+    background-image: url('../../../public/assets/background.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: center;
+    width: 100vw;
+}
+
+.tutorial-container {
+    align-items: center;
+    background-color: rgba(0,0,0,0.7);
+    border-radius: 100px;
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    justify-content: space-around;
+    text-align: center;
+    width: 90vw;
+}
+
+.tutorial-container h1 {
+    margin: 0;
+}
+
+.controls-div {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 200px;
+    justify-content: center;
+}
+
+.direction-controls-div {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    justify-content: center;
+}
+
+.arrow-keys {
+    width: 80px;
+}
+
+.second-arrow-keys-div {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+}
+
+.arrow-keys-div {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100px;
+}
+
+.shoot-key-div {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.shoot-key-img {
+    width: 250px;
+}
+
+.menu-btn {
+    background-image: url('../../../public/assets/menu-btn-background.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 165px;
+}
