@@ -10,3 +10,13 @@
     justify-content: center;
     width: 100vw;
 }
+
+.google-btn {
+    background-image: url('../../../public/assets/btn-backgorund.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 330px;
+}

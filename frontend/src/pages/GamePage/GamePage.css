@@ -8,5 +8,100 @@
     flex-direction: column;
     height: 100vh;
     justify-content: center;
+    overflow: hidden;
     width: 100vw;
+}
+
+.game-page-container {
+    align-items: center;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100vh;
+    justify-content: space-between;
+    padding: 2vh;
+    width: 100vw;
+}
+
+.top-page-div {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 8vw;
+    justify-content: center;
+    width: 100%;
+}
+
+.player-img {
+    background-color: lightgray;
+    border-radius: calc(14vh / 2);
+    height: 12vh;
+    width: 12vh;
+}
+
+.player1-info-div, .player2-info-div {
+    align-items: center;
+    background-color: #093217;
+    border-radius: 4vw;
+    display: flex;
+    flex-direction: row;
+    font-size: 0.8vw;
+    gap: 2vw;
+    justify-content: center;
+    width: 20vw;
+}
+
+.player1-info, .player2-info {
+    padding: 2vh 0;
+}
+
+.match-info-div {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+}
+
+.score-div {
+    align-items: center;
+    background-color: #C3C9CD;
+    border-radius: 20px;
+    color: black;
+    display: flex;
+    flex-direction: row;
+    font-size: 3vw;
+    height: 10vh;
+    justify-content: center;
+    width: 16vw;
+}
+
+.game-page-time-div {
+    align-items: center;
+    background-color: #C3C9CD;
+    border-radius: 10px;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    font-size: 1.6vw;
+    height: 6vh;
+    justify-content: center;
+    width: 12vw;
+}
+
+.game-div {
+    background-color: darkgreen;
+    height: 70vh;
+    width: 80%;
+}
+
+.giveup-btn {
+    background-image: url('../../../public/assets/cancel-btn.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: 0.8vw;
+    height: 70px;
+    width: 165px;
 }

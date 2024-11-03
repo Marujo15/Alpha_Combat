@@ -23,14 +23,14 @@
     width: 90vw;
 }
 
-.scoreboard-div {
+/* .scoreboard-div {
     background-color: #C3C9CD;
     border-radius: 30px;
     height: 15vh;
     width: 20vw;
-}
+} */
 
-.time-div {
+/* .time-div {
     background-color: #C3C9CD;
     border-radius: 20px;
     height: 10vh;
@@ -44,7 +44,7 @@
     flex-direction: column;
     justify-content: center;
     height: 40vh;
-}
+} */
 
 .cancel-btn {
     background-image: url('../../../public/assets/cancel-btn.png');

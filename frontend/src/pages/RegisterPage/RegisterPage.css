@@ -17,3 +17,13 @@
     gap: 20px;
     justify-content: center;
 }
+
+.login-btn {
+    background-image: url('../../../public/assets/btn-background.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 165px;
+}
