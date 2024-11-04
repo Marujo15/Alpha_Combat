@@ -16,7 +16,7 @@ const RankingPage = () => {
                 <div className='ranking-div'></div>
                 <div className='ranking-div'></div>
             </div>
-            <Button className={'back-btn'} text='Back' onClick={() => navigate('/dashboard')}>VOLTAR</Button>
+            <Button className={'rp-back-btn'} text='Back' onClick={() => navigate('/dashboard')}>VOLTAR</Button>
         </div>
     );
 };

@@ -25,7 +25,7 @@ const LoginPage = () => {
     };
 
     return (
-        <div>
+        <div className='login-page-container'>
             <Logo />
             <Form title={"LOGIN"} onSubmit={handleSubmit}>
                 <Input type="text" placeholder="EMAIL" />

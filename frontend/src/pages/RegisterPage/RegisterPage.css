@@ -1,7 +1,6 @@
-#root {
+.register-container {
     align-items: center;
-    background-color: lightblue;
-    background-image: url('../../../public/assets/background.png');
+    background-image: url('../../../assets/main-background.png');
     background-repeat: no-repeat;
     background-size: cover;
     display: flex;
@@ -11,13 +10,6 @@
     width: 100vw;
 }
 
-.register-container{
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
 .register-btns {
     display: flex;
     flex-direction: row;
@@ -25,8 +17,38 @@
     justify-content: center;
 }
 
-.login-btn {
-    background-image: url('../../../public/assets/btn-background.png');
+.register-btn {
+    background-image: url('../../../assets/yellow-btn-background.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 165px;
+}
+
+.register-btn:hover {
+    background-image: url('../../../assets/yellow-btn-background-hover.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 165px;
+}
+
+.r-back-btn {
+    background-image: url('../../../assets/yellow-btn-background.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 165px;
+}
+
+.r-back-btn:hover {
+    background-image: url('../../../assets/yellow-btn-background-hover.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;

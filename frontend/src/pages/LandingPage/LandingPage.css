@@ -1,7 +1,6 @@
-#root {
+.landing-page-container {
     align-items: center;
-    background-color: lightblue;
-    background-image: url('../../../public/assets/background.png');
+    background-image: url('../../../assets/main-background.png');
     background-repeat: no-repeat;
     background-size: cover;
     display: flex;
@@ -9,14 +8,6 @@
     height: 100vh;
     justify-content: center;
     width: 100vw;
-}
-
-.container {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    justify-content: center;
 }
 
 .title {
@@ -33,4 +24,18 @@
     font-size: 1rem;
     cursor: pointer;
     margin-top: 1rem;
+}
+
+.go-to-login-btn {
+    background-image: url('../../../assets/yellow-btn-background.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 160px;
+}
+
+.go-to-login-btn:hover {
+    background-image: url('../../../assets/yellow-btn-background-hover.png');
 }

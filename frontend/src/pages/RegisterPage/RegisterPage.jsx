@@ -63,8 +63,8 @@ const RegisterPage = () => {
                 <Input type="text" placeholder="EMAIL" onChange={(e) => setEmail(e.target.value)} />
                 <Input type="email" placeholder="SENHA" onChange={(e) => setPassword(e.target.value)} />
                 <div className="register-btns">
-                    <Button type="submit" className={"back-btn"} onClick={() => {navigate('/')}}>VOLTAR</Button>
-                    <Button type="submit" className={"login-btn"} onClick={handleRegister}>ENTRAR</Button>
+                    <Button type="submit" className={"r-back-btn"} onClick={() => {navigate('/')}}>VOLTAR</Button>
+                    <Button type="submit" className={"register-btn"} onClick={handleRegister}>ENTRAR</Button>
                 </div>
             </Form>
             {error && <p className="error-message">{error}</p>}

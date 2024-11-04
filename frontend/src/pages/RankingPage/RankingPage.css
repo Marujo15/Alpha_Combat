@@ -1,23 +1,14 @@
-#root {
+.ranking-page-container {
     align-items: center;
-    background-color: lightblue;
-    background-image: url('../../../public/assets/background.png');
+    background-image: url('../../../assets/main-background.png');
     background-repeat: no-repeat;
     background-size: cover;
     display: flex;
     flex-direction: column;
+    gap: 2rem;
     height: 100vh;
     justify-content: center;
     width: 100vw;
-}
-
-.ranking-page-container {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    height: 60vh;
-    justify-content: space-around;
-    margin-top: 20vh;
 }
 
 .rankings-div {
@@ -26,6 +17,7 @@
     flex-direction: row;
     height: 40vh;
     justify-content: space-around;
+    margin-top: 4rem;
     width: 90vw;
 }
 
@@ -42,8 +34,18 @@
     width: 20%;
 }
 
-.back-btn {
-    background-image: url('../../../public/assets/btn-background.png');
+.rp-back-btn {
+    background-image: url('../../../assets/yellow-btn-background.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 165px;
+}
+
+.rp-back-btn:hover {
+    background-image: url('../../../assets/yellow-btn-background-hover.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
