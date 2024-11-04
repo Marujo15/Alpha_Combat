@@ -1,7 +1,6 @@
-#root {
+.dash-page-main-div {
     align-items: center;
-    background-color: lightblue;
-    background-image: url('../../../public/assets/background.png');
+    background-image: url('../../../assets/main-background.png');
     background-repeat: no-repeat;
     background-size: cover;
     display: flex;
@@ -20,7 +19,7 @@
 }
 
 .start-game-btn, .ranking-btn, .tutorial-btn {
-    background-image: url('../../../public/assets/btn-background2.png');
+    background-image: url('../../../assets/large-yellow-btn-background.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -29,12 +28,20 @@
     width: 310px;
 }
 
+.start-game-btn:hover, .ranking-btn:hover, .tutorial-btn:hover {
+    background-image: url('../../../assets/large-yellow-btn-background-hover.png');
+}
+
 .logout-btn {
-    background-image: url('../../../public/assets/cancel-btn.png');
+    background-image: url('../../../assets/red-btn-background.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
     font-size: large;
     height: 70px;
     width: 165px;
+}
+
+.logout-btn:hover {
+    background-image: url('../../../assets/red-btn-background-hover.png');
 }

@@ -1,17 +1,17 @@
-#root {
+.waiting-page-container {
     align-items: center;
-    background-color: lightblue;
-    background-image: url('../../../public/assets/background.png');
+    background-image: url('../../../assets/main-background.png');
     background-repeat: no-repeat;
     background-size: cover;
     display: flex;
     flex-direction: column;
+    gap: 3rem;
     height: 100vh;
     justify-content: center;
     width: 100vw;
 }
 
-.waiting-page-container {
+/* .waiting-page-container {
     align-items: center;
     background-color: rgba(0,0,0,0.7);
     border-radius: 100px;
@@ -21,7 +21,7 @@
     height: 90vh;
     justify-content: center;
     width: 90vw;
-}
+} */
 
 /* .scoreboard-div {
     background-color: #C3C9CD;
@@ -46,12 +46,22 @@
     height: 40vh;
 } */
 
-.cancel-btn {
-    background-image: url('../../../public/assets/cancel-btn.png');
+.w-cancel-btn {
+    background-image: url('../../../assets/yellow-btn-background.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
     font-size: large;
-    height: 80px;
-    width: 188px;
+    height: 70px;
+    width: 180px;
+}
+
+.w-cancel-btn:hover {
+    background-image: url('../../../assets/yellow-btn-background-hover.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 180px;
 }

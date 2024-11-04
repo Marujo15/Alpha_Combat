@@ -9,14 +9,14 @@ const DashboardPage = () => {
     const navigate = useNavigate();
     const { user, logout } = useContext(UserContext);
 
-    useEffect(() => {
-        if (!user) {
-          navigate("/login");
-        }
+    // useEffect(() => {
+    //     if (!user) {
+    //       navigate("/login");
+    //     }
 
-        console.log("User logged in:", user);
-      }
-    , [user, navigate]);
+    //     console.log("User logged in:", user);
+    //   }
+    // , [user, navigate]);
 
     const handleStartGame = () => {
         console.log("Starting game...");
