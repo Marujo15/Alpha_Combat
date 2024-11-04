@@ -1,12 +1,117 @@
 import { useEffect, useRef, useState } from "react";
-const GamePage = () => {
+import "./GamePage.css";
+
+class TankInterpolator {
+  constructor() {
+    this.tankBuffers = new Map();
+    this.interpolationDelay = 100;
+  }
+
+  addState(tankId, state, timestamp) {
+    if (!this.tankBuffers.has(tankId)) {
+      this.tankBuffers.set(tankId, []);
+    }
+    const buffer = this.tankBuffers.get(tankId);
+    buffer.push({ state, timestamp });
+
+    const bufferDuration = 1000;
+    const cutoff = timestamp - bufferDuration;
+    this.tankBuffers.set(
+      tankId,
+      buffer.filter((item) => item.timestamp > cutoff)
+    );
+  }
+
+  interpolate(tankId, renderTimestamp) {
+    const buffer = this.tankBuffers.get(tankId);
+    if (!buffer || buffer.length < 2) return null;
+
+    const targetTime = renderTimestamp - this.interpolationDelay;
+    let beforeState = null;
+    let afterState = null;
+
+    for (let i = 0; i < buffer.length; i++) {
+      if (buffer[i].timestamp > targetTime) {
+        afterState = buffer[i];
+        beforeState = buffer[i - 1];
+        break;
+      }
+    }
+
+    if (!beforeState || !afterState) {
+      return buffer[buffer.length - 1]?.state;
+    }
+
+    const totalTime = afterState.timestamp - beforeState.timestamp;
+    const currentTime = targetTime - beforeState.timestamp;
+    const t = Math.max(0, Math.min(1, currentTime / totalTime));
+
+    return {
+      x: beforeState.state.x + (afterState.state.x - beforeState.state.x) * t,
+      y: beforeState.state.y + (afterState.state.y - beforeState.state.y) * t,
+      angle: this.interpolateAngle(
+        beforeState.state.angle,
+        afterState.state.angle,
+        t
+      ),
+      color: beforeState.state.color,
+    };
+  }
+
+  interpolateAngle(a1, a2, t) {
+    const shortestAngle =
+      ((((a2 - a1) % (Math.PI * 2)) + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+    return a1 + shortestAngle * t;
+  }
+}
+
+class TankPredictor {
+  constructor() {
+    this.pendingMoves = [];
+  }
+
+  predictMovement(tank, actions, moveNumber, speed = 5, rotationSpeed = 0.1) {
+    const predictedState = {
+      x: tank.x,
+      y: tank.y,
+      angle: tank.angle,
+      color: tank.color,
+    };
+
+    if (actions.forward) {
+      predictedState.x += Math.cos(predictedState.angle) * speed;
+      predictedState.y += Math.sin(predictedState.angle) * speed;
+    }
+    if (actions.backward) {
+      predictedState.x -= Math.cos(predictedState.angle) * speed;
+      predictedState.y -= Math.sin(predictedState.angle) * speed;
+    }
+    if (actions.left) {
+      predictedState.angle -= rotationSpeed;
+    }
+    if (actions.right) {
+      predictedState.angle += rotationSpeed;
+    }
+
+    predictedState.x = Math.max(0, Math.min(1000, predictedState.x));
+    predictedState.y = Math.max(0, Math.min(600, predictedState.y));
+
+    this.pendingMoves.push({
+      actions,
+      moveNumber,
+      predictedState: { ...predictedState },
+    });
+
+    return predictedState;
+  }
+}
+
+const TankGame = () => {
   const canvasRef = useRef(null);
-  const ws = new WebSocket("ws://localhost:3000");
-  const animationFrameRef = useRef(null);
-  const lastUpdateTime = useRef(0);
   const [gameStatus, setGameStatus] = useState("Conectando ao servidor...");
-  const [roomId, setRoomId] = useState(null);
-  const [gameState, setGameState] = useState({
+  const [roomInfo, setRoomInfo] = useState("");
+  const wsRef = useRef(null);
+  const gameStateRef = useRef({
     localTankId: null,
     isFirstTank: false,
     gameStarted: false,
@@ -14,318 +119,261 @@ const GamePage = () => {
     bullets: new Map(),
     keys: {},
     moveNumber: 0,
-    pendingMoves: [],
-    lastProcessedMove: 0,
   });
+  const interpolatorRef = useRef(new TankInterpolator());
+  const predictorRef = useRef(new TankPredictor());
+  const lastUpdateTimeRef = useRef(performance.now());
+  const animationFrameRef = useRef(null);
 
-  const updateTankPosition = (tank, actions, deltaTime) => {
-    const speed = 200; // pixels per second
-    const rotationSpeed = 3; // radians per second
-    const distance = speed * deltaTime;
+  const drawTank = (ctx, tank) => {
+    ctx.save();
+    ctx.translate(tank.x, tank.y);
+    ctx.rotate(tank.angle);
 
-    if (actions.forward) {
-      tank.x += Math.cos(tank.angle) * distance;
-      tank.y += Math.sin(tank.angle) * distance;
-    }
-    if (actions.backward) {
-      tank.x -= Math.cos(tank.angle) * distance;
-      tank.y -= Math.sin(tank.angle) * distance;
-    }
-    if (actions.left) tank.angle -= rotationSpeed * deltaTime;
-    if (actions.right) tank.angle += rotationSpeed * deltaTime;
+    ctx.fillStyle = tank.color;
+    ctx.fillRect(-20, -10, 30, 20);
+    ctx.fillRect(-40, -30, 68, 20);
+    ctx.fillRect(-40, 10, 68, 20);
+    ctx.fillRect(0, -2.5, 20, 5);
 
-    // Keep tank within bounds
-    tank.x = Math.max(20, Math.min(980, tank.x));
-    tank.y = Math.max(30, Math.min(570, tank.y));
+    ctx.restore();
   };
 
-  const validateAndReconcile = (serverState) => {
-    const localTank = gameState.tanks.get(gameState.localTankId);
-    const serverTank = serverState.tanks.find(
-      (t) => t.id === gameState.localTankId
-    );
+  const drawBullet = (ctx, bullet) => {
+    ctx.beginPath();
+    ctx.arc(bullet.x, bullet.y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = "white";
+    ctx.fill();
+  };
 
-    if (!localTank || !serverTank) return;
+  const render = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const serverMoveNumber = serverState.moveNumber;
-    const pendingMove = gameState.pendingMoves.find(
-      (move) => move.moveNumber === serverMoveNumber
-    );
-
-    if (pendingMove) {
-      if (
-        Math.abs(pendingMove.x - serverTank.x) > 0.1 ||
-        Math.abs(pendingMove.y - serverTank.y) > 0.1 ||
-        Math.abs(pendingMove.angle - serverTank.angle) > 0.1
-      ) {
-        console.log("Starting reconciliation from move:", serverMoveNumber);
-
-        // Reset to server state
-        localTank.x = serverTank.x;
-        localTank.y = serverTank.y;
-        localTank.angle = serverTank.angle;
-
-        // Get moves to reapply
-        const movesToReapply = gameState.pendingMoves.filter(
-          (move) => move.moveNumber > serverMoveNumber
-        );
-
-        // Clear pending moves and add the server-confirmed move
-        setGameState((prev) => ({
-          ...prev,
-          pendingMoves: [
-            {
-              actions: pendingMove.actions,
-              moveNumber: serverMoveNumber,
-              x: serverTank.x,
-              y: serverTank.y,
-              angle: serverTank.angle,
-            },
-          ],
-        }));
-
-        // Reapply pending moves
-        movesToReapply.forEach((move) => {
-          updateTankPosition(localTank, move.actions, 1 / 60);
-          gameState.pendingMoves.push({
-            actions: move.actions,
-            moveNumber: move.moveNumber,
-            x: localTank.x,
-            y: localTank.y,
-            angle: localTank.angle,
-          });
-        });
-
-        console.log("Reconciliation complete");
+    gameStateRef.current.tanks.forEach((tank) => {
+      if (tank.id === gameStateRef.current.localTankId) {
+        drawTank(ctx, tank);
       } else {
-        // Remove processed moves
-        setGameState((prev) => ({
-          ...prev,
-          pendingMoves: prev.pendingMoves.filter(
-            (move) => move.moveNumber > serverMoveNumber
-          ),
-          lastProcessedMove: serverMoveNumber,
-        }));
+        const interpolatedState = interpolatorRef.current.interpolate(
+          tank.id,
+          performance.now()
+        );
+        if (interpolatedState) {
+          drawTank(ctx, interpolatedState);
+        }
       }
-    } else {
-      // If we don't have the move, just update to server state
-      localTank.x = serverTank.x;
-      localTank.y = serverTank.y;
-      localTank.angle = serverTank.angle;
-      setGameState((prev) => ({
-        ...prev,
-        pendingMoves: prev.pendingMoves.filter(
-          (move) => move.moveNumber > serverMoveNumber
-        ),
-      }));
+    });
+
+    gameStateRef.current.bullets.forEach((bullet) => drawBullet(ctx, bullet));
+  };
+
+  const processInputs = () => {
+    if (!gameStateRef.current.localTankId || !gameStateRef.current.gameStarted)
+      return;
+
+    const controls = gameStateRef.current.isFirstTank
+      ? { forward: "w", backward: "s", left: "a", right: "d", shoot: " " }
+      : {
+          forward: "ArrowUp",
+          backward: "ArrowDown",
+          left: "ArrowLeft",
+          right: "ArrowRight",
+          shoot: "Enter",
+        };
+
+    const actions = {
+      forward: gameStateRef.current.keys[controls.forward] || false,
+      backward: gameStateRef.current.keys[controls.backward] || false,
+      left: gameStateRef.current.keys[controls.left] || false,
+      right: gameStateRef.current.keys[controls.right] || false,
+    };
+
+    if (Object.values(actions).some((value) => value)) {
+      const moveNumber = ++gameStateRef.current.moveNumber;
+      const localTank = gameStateRef.current.tanks.get(
+        gameStateRef.current.localTankId
+      );
+
+      const predictedState = predictorRef.current.predictMovement(
+        localTank,
+        actions,
+        moveNumber
+      );
+
+      Object.assign(localTank, predictedState);
+
+      wsRef.current.send(
+        JSON.stringify({
+          type: "move",
+          actions,
+          moveNumber,
+        })
+      );
     }
 
-    // Update other tanks and bullets
-    serverState.tanks.forEach((tank) => {
-      if (tank.id !== gameState.localTankId) {
-        gameState.tanks.set(tank.id, tank);
-      }
-    });
+    if (gameStateRef.current.keys[controls.shoot]) {
+      wsRef.current.send(JSON.stringify({ type: "shoot" }));
+      gameStateRef.current.keys[controls.shoot] = false;
+    }
+  };
 
-    gameState.bullets.clear();
-    serverState.bullets.forEach((bullet) => {
-      gameState.bullets.set(bullet.id, bullet);
-    });
+  const gameLoop = (currentTime) => {
+    const deltaTime = currentTime - lastUpdateTimeRef.current;
+
+    if (deltaTime >= 1000 / 60) {
+      processInputs();
+      render();
+      lastUpdateTimeRef.current = currentTime;
+    }
+
+    animationFrameRef.current = requestAnimationFrame(gameLoop);
   };
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
     canvas.width = 1000;
     canvas.height = 600;
 
-    ws.onopen = () => {
+    wsRef.current = new WebSocket("ws://localhost:3000");
+
+    wsRef.current.onopen = () => {
+      console.log("Conectado ao servidor");
       setGameStatus("Conectado! Aguardando outro jogador...");
     };
 
-    const handleMessage = (message) => {
+    wsRef.current.onclose = () => {
+      console.log("Desconectado do servidor");
+      setGameStatus(
+        "Desconectado do servidor. Recarregue a página para reconectar."
+      );
+      gameStateRef.current.gameStarted = false;
+    };
+
+    wsRef.current.onmessage = (message) => {
       const data = JSON.parse(message.data);
+      const serverTimestamp = performance.now();
 
       switch (data.type) {
         case "spawn":
-          setGameState((prev) => ({
-            ...prev,
-            localTankId: data.tank.id,
-            isFirstTank: data.isFirstTank,
-          }));
-          setRoomId(data.roomId);
-          gameState.tanks.set(data.tank.id, data.tank);
+          gameStateRef.current.localTankId = data.tank.id;
+          gameStateRef.current.isFirstTank = data.isFirstTank;
+          gameStateRef.current.tanks.set(data.tank.id, data.tank);
           setGameStatus(
             data.isFirstTank
               ? "Você é o tanque verde. Aguardando segundo jogador..."
               : "Você é o tanque azul. Preparando para iniciar..."
           );
+          setRoomInfo(`Sala: ${data.roomId}`);
           break;
 
         case "gameStart":
-          setGameState((prev) => ({ ...prev, gameStarted: true }));
+          gameStateRef.current.gameStarted = true;
           setGameStatus("Partida iniciada! Boa sorte!");
           break;
 
-        case "gameEnd":
-          setGameState((prev) => ({ ...prev, gameStarted: false }));
-          setGameStatus("Partida encerrada! O outro jogador saiu.");
-          break;
-
         case "update":
-          validateAndReconcile(data.gameState);
+          data.gameState.tanks.forEach((serverTank) => {
+            if (serverTank.id !== gameStateRef.current.localTankId) {
+              interpolatorRef.current.addState(
+                serverTank.id,
+                serverTank,
+                serverTimestamp
+              );
+            }
+          });
+
+          if (gameStateRef.current.localTankId) {
+            const serverTank = data.gameState.tanks.find(
+              (t) => t.id === gameStateRef.current.localTankId
+            );
+            if (serverTank) {
+              const localTank = gameStateRef.current.tanks.get(
+                gameStateRef.current.localTankId
+              );
+              Object.assign(localTank, serverTank);
+
+              predictorRef.current.pendingMoves =
+                predictorRef.current.pendingMoves.filter(
+                  (move) => move.moveNumber > data.lastProcessedMove
+                );
+
+              predictorRef.current.pendingMoves.forEach((move) => {
+                if (move.actions.forward) {
+                  localTank.x += Math.cos(localTank.angle) * 5;
+                  localTank.y += Math.sin(localTank.angle) * 5;
+                }
+                if (move.actions.backward) {
+                  localTank.x -= Math.cos(localTank.angle) * 5;
+                  localTank.y -= Math.sin(localTank.angle) * 5;
+                }
+                if (move.actions.left) {
+                  localTank.angle -= 0.1;
+                }
+                if (move.actions.right) {
+                  localTank.angle += 0.1;
+                }
+
+                localTank.x = Math.max(0, Math.min(canvas.width, localTank.x));
+                localTank.y = Math.max(0, Math.min(canvas.height, localTank.y));
+              });
+            }
+          }
+
+          gameStateRef.current.bullets.clear();
+          data.gameState.bullets.forEach((bullet) => {
+            gameStateRef.current.bullets.set(bullet.id, bullet);
+          });
           break;
 
         case "newBullet":
-          gameState.bullets.set(data.bullet.id, data.bullet);
+          gameStateRef.current.bullets.set(data.bullet.id, data.bullet);
           break;
 
         case "playerLeft":
-          gameState.tanks.delete(data.tankId);
+          gameStateRef.current.tanks.delete(data.tankId);
           setGameStatus("O outro jogador saiu. Aguardando novo jogador...");
           break;
       }
     };
 
-    ws.onmessage = handleMessage;
-
-    ws.onclose = () => {
-      setGameStatus(
-        "Desconectado do servidor. Recarregue a página para reconectar."
-      );
-      setGameState((prev) => ({ ...prev, gameStarted: false }));
-    };
-
     const handleKeyDown = (e) => {
-      gameState.keys[e.key] = true;
+      gameStateRef.current.keys[e.key] = true;
     };
 
     const handleKeyUp = (e) => {
-      gameState.keys[e.key] = false;
+      gameStateRef.current.keys[e.key] = false;
     };
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
 
-    const drawTank = (tank) => {
-      ctx.save();
-      ctx.translate(tank.x, tank.y);
-      ctx.rotate(tank.angle);
-
-      ctx.fillStyle = tank.color;
-      ctx.fillRect(-20, -10, 30, 20);
-      ctx.fillRect(-40, -30, 68, 20);
-      ctx.fillRect(-40, 10, 68, 20);
-      ctx.fillRect(0, -2.5, 20, 5);
-
-      ctx.restore();
-    };
-
-    const drawBullet = (bullet) => {
-      ctx.beginPath();
-      ctx.arc(bullet.x, bullet.y, 3, 0, Math.PI * 2);
-      ctx.fillStyle = "white";
-      ctx.fill();
-    };
-
-    const gameLoop = (timestamp) => {
-      const deltaTime = (timestamp - lastUpdateTime.current) / 1000;
-      lastUpdateTime.current = timestamp;
-
-      if (gameState.gameStarted && gameState.localTankId) {
-        const localTank = gameState.tanks.get(gameState.localTankId);
-        if (localTank) {
-          const controls = gameState.isFirstTank
-            ? { forward: "w", backward: "s", left: "a", right: "d", shoot: " " }
-            : {
-                forward: "ArrowUp",
-                backward: "ArrowDown",
-                left: "ArrowLeft",
-                right: "ArrowRight",
-                shoot: "Enter",
-              };
-
-          const actions = {
-            forward: gameState.keys[controls.forward] || false,
-            backward: gameState.keys[controls.backward] || false,
-            left: gameState.keys[controls.left] || false,
-            right: gameState.keys[controls.right] || false,
-          };
-
-          // Predict movement locally
-          updateTankPosition(localTank, actions, deltaTime);
-
-          // Send move to server
-          const moveNumber = gameState.moveNumber + 1;
-          ws.send(
-            JSON.stringify({
-              type: "move",
-              actions,
-              moveNumber,
-            })
-          );
-
-          // Store pending move
-          setGameState((prev) => ({
-            ...prev,
-            moveNumber,
-            pendingMoves: [
-              ...prev.pendingMoves,
-              {
-                actions,
-                moveNumber,
-                x: localTank.x,
-                y: localTank.y,
-                angle: localTank.angle,
-              },
-            ],
-          }));
-
-          if (gameState.keys[controls.shoot]) {
-            ws.send(
-              JSON.stringify({
-                type: "shoot",
-                moveNumber,
-              })
-            );
-            gameState.keys[controls.shoot] = false;
-          }
-        }
-      }
-
-      // Render
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      gameState.tanks.forEach((tank) => drawTank(tank));
-      gameState.bullets.forEach((bullet) => drawBullet(bullet));
-
-      animationFrameRef.current = requestAnimationFrame(gameLoop);
-    };
-
-    // Start game loop
-    lastUpdateTime.current = performance.now();
-    gameLoop(lastUpdateTime.current);
+    lastUpdateTimeRef.current = performance.now();
+    animationFrameRef.current = requestAnimationFrame(gameLoop);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
-      if (ws) ws.close();
-      if (animationFrameRef.current) {
+      if (wsRef.current) wsRef.current.close();
+      if (animationFrameRef.current)
         cancelAnimationFrame(animationFrameRef.current);
-      }
     };
   }, []);
 
   return (
-    <div className="game-container">
-      <div className="card">
-        <div className="status-container">
-          <div className="status-text">{gameStatus}</div>
-          {roomId && <div className="room-text">Sala: {roomId}</div>}
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+      <div className="bg-gray-800 p-4 rounded-lg shadow-lg w-full max-w-4xl">
+        <div className="text-center mb-4">
+          <div className="text-white text-xl mb-2">{gameStatus}</div>
+          <div className="text-gray-400 text-sm">{roomInfo}</div>
         </div>
-        <canvas ref={canvasRef} className="game-canvas" />
+        <canvas
+          ref={canvasRef}
+          className="bg-black rounded-lg mx-auto max-w-full"
+        />
       </div>
     </div>
   );
 };
 
-export default GamePage;
+export default TankGame;

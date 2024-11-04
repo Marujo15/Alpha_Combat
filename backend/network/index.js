@@ -1,8 +1,10 @@
-// import { onConnect } from "./game/onConection.js";
-import { onMessage } from "./game/onMessage.js";
+import { v4 as uuidv4 } from "uuid";
+import WebSocket from "ws";
 
-export function initWebSocket(wss, server) {
-    // Classe para gerenciar uma sala individual
+export const initWebSocket = (wss) => {
+    const TICK_RATE = 60;
+    const TANK_SPEED = 300; // Pixels per second
+
     class GameRoom {
         constructor(id) {
             this.id = id;
@@ -11,7 +13,7 @@ export function initWebSocket(wss, server) {
             this.players = new Set();
             this.isRunning = false;
             this.gameLoopInterval = null;
-            this.lastProcessedMoves = new Map(); // Rastreia último movimento processado por tank
+            this.lastProcessedInputs = new Map();
         }
 
         addPlayer(ws) {
@@ -25,15 +27,14 @@ export function initWebSocket(wss, server) {
                 x: isFirstTank ? 100 : 900,
                 y: 300,
                 angle: isFirstTank ? 0 : Math.PI,
-                color: isFirstTank ? 'green' : 'blue',
-                lastMoveNumber: 0
+                color: isFirstTank ? 'green' : 'blue'
             };
 
             this.tanks.set(tankId, tank);
             this.players.add(ws);
+            this.lastProcessedInputs.set(tankId, 0);
             ws.tankId = tankId;
             ws.roomId = this.id;
-            this.lastProcessedMoves.set(tankId, 0);
 
             ws.send(JSON.stringify({
                 type: "spawn",
@@ -52,7 +53,7 @@ export function initWebSocket(wss, server) {
         removePlayer(ws) {
             this.players.delete(ws);
             this.tanks.delete(ws.tankId);
-            this.lastProcessedMoves.delete(ws.tankId);
+            this.lastProcessedInputs.delete(ws.tankId);
 
             this.broadcast({
                 type: "playerLeft",
@@ -66,53 +67,40 @@ export function initWebSocket(wss, server) {
             return false;
         }
 
-        updateTankPosition(tank, action, deltaTime = 1 / 60) {
-            const speed = 200; // pixels per second
-            const rotationSpeed = 3; // radians per second
-            const distance = speed * deltaTime;
-
-            if (action.forward) {
-                tank.x += Math.cos(tank.angle) * distance;
-                tank.y += Math.sin(tank.angle) * distance;
-            }
-            if (action.backward) {
-                tank.x -= Math.cos(tank.angle) * distance;
-                tank.y -= Math.sin(tank.angle) * distance;
-            }
-            if (action.left) tank.angle -= rotationSpeed * deltaTime;
-            if (action.right) tank.angle += rotationSpeed * deltaTime;
-
-            // Colisão com bordas
-            const collisionWidth = 68;
-            const collisionHeight = 50;
-            tank.x = Math.max(collisionWidth / 2, Math.min(1000 - collisionWidth / 2, tank.x));
-            tank.y = Math.max(collisionHeight / 2, Math.min(600 - collisionHeight / 2, tank.y));
-
-            return tank;
-        }
-
-        validateAndProcessMove(tankId, moveData) {
+        processInput(tankId, actions, moveNumber, deltaTime) {
             const tank = this.tanks.get(tankId);
             if (!tank) return false;
 
-            const lastProcessed = this.lastProcessedMoves.get(tankId);
+            const lastProcessed = this.lastProcessedInputs.get(tankId);
+            if (moveNumber <= lastProcessed) return false;
 
-            // Ignora movimentos antigos ou fora de ordem
-            if (moveData.moveNumber <= lastProcessed) {
-                return false;
+            this.lastProcessedInputs.set(tankId, moveNumber);
+
+            const moveAmount = TANK_SPEED * (deltaTime / 1000); // Convert to seconds
+
+            if (actions.forward) {
+                tank.x += Math.cos(tank.angle) * moveAmount;
+                tank.y += Math.sin(tank.angle) * moveAmount;
+            }
+            if (actions.backward) {
+                tank.x -= Math.cos(tank.angle) * moveAmount;
+                tank.y -= Math.sin(tank.angle) * moveAmount;
+            }
+            if (actions.left) {
+                tank.angle -= 0.1;
+            }
+            if (actions.right) {
+                tank.angle += 0.1;
             }
 
-            // Atualiza a posição do tank
-            this.updateTankPosition(tank, moveData.actions);
-
-            // Atualiza o último movimento processado
-            this.lastProcessedMoves.set(tankId, moveData.moveNumber);
-            tank.lastMoveNumber = moveData.moveNumber;
+            // Collision with boundaries
+            tank.x = Math.max(0, Math.min(1000, tank.x));
+            tank.y = Math.max(0, Math.min(600, tank.y));
 
             return true;
         }
 
-        createBullet(tankId, moveNumber) {
+        createBullet(tankId) {
             const tank = this.tanks.get(tankId);
             const bullet = {
                 id: uuidv4(),
@@ -121,8 +109,7 @@ export function initWebSocket(wss, server) {
                 angle: tank.angle,
                 speed: 10,
                 tankId: tankId,
-                createdAt: Date.now(),
-                moveNumber
+                createdAt: Date.now()
             };
             this.bullets.set(bullet.id, bullet);
             this.broadcast({
@@ -131,19 +118,19 @@ export function initWebSocket(wss, server) {
             });
         }
 
-        updateBullet(bullet) {
-            bullet.x += Math.cos(bullet.angle) * bullet.speed;
-            bullet.y += Math.sin(bullet.angle) * bullet.speed;
+        updateBullets(deltaTime) {
+            for (const [bulletId, bullet] of this.bullets.entries()) {
+                bullet.x += Math.cos(bullet.angle) * bullet.speed;
+                bullet.y += Math.sin(bullet.angle) * bullet.speed;
 
-            if (Date.now() - bullet.createdAt > 1500) {
-                this.bullets.delete(bullet.id);
-                return false;
+                if (Date.now() - bullet.createdAt > 1500) {
+                    this.bullets.delete(bulletId);
+                    continue;
+                }
+
+                if (bullet.x < 3 || bullet.x > 997) bullet.angle = Math.PI - bullet.angle;
+                if (bullet.y < 3 || bullet.y > 597) bullet.angle = -bullet.angle;
             }
-
-            if (bullet.x < 3 || bullet.x > 997) bullet.angle = Math.PI - bullet.angle;
-            if (bullet.y < 3 || bullet.y > 597) bullet.angle = -bullet.angle;
-
-            return true;
         }
 
         broadcast(message) {
@@ -156,31 +143,26 @@ export function initWebSocket(wss, server) {
         }
 
         gameLoop() {
-            // Atualiza todas as balas
-            for (const bullet of this.bullets.values()) {
-                this.updateBullet(bullet);
-            }
+            const timestamp = Date.now();
+            this.updateBullets();
 
-            // Prepara o estado do jogo para envio
-            const updates = {
-                tanks: Array.from(this.tanks.values()).map(tank => ({
-                    ...tank,
-                    moveNumber: tank.lastMoveNumber // Inclui o número do último movimento
-                })),
+            const worldState = {
+                tanks: Array.from(this.tanks.values()),
                 bullets: Array.from(this.bullets.values()),
-                moveNumber: Math.max(...Array.from(this.lastProcessedMoves.values())) // Maior moveNumber processado
+                timestamp
             };
 
             this.broadcast({
-                type: "update",
-                gameState: updates
+                type: "worldState",
+                worldState,
+                lastProcessedInputs: Array.from(this.lastProcessedInputs.entries())
             });
         }
 
         startGame() {
             if (!this.isRunning) {
                 this.isRunning = true;
-                this.gameLoopInterval = setInterval(() => this.gameLoop(), 1000 / 60);
+                this.gameLoopInterval = setInterval(() => this.gameLoop(), 1000 / TICK_RATE);
                 this.broadcast({ type: "gameStart" });
             }
         }
@@ -249,7 +231,18 @@ export function initWebSocket(wss, server) {
         roomManager.joinRoom(ws);
 
         ws.on("message", (message) => {
-            onMessage(ws, message, roomManager);
+            const data = JSON.parse(message);
+            const room = roomManager.getRoom(ws.roomId);
+            if (!room) return;
+
+            switch (data.type) {
+                case "move":
+                    room.processInput(ws.tankId, data.actions, data.moveNumber, data.deltaTime);
+                    break;
+                case "shoot":
+                    room.createBullet(ws.tankId);
+                    break;
+            }
         });
 
         ws.on("close", () => {
@@ -257,4 +250,3 @@ export function initWebSocket(wss, server) {
         });
     });
 }
-
