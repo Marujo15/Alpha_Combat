@@ -5,16 +5,14 @@ import { hashPassword } from "../utils/hashPassword.js";
 import { ErrorApi } from "../errors/ErrorApi.js";
 
 export const userService = {
-    createUser: async (username, email, password, isGoogleUser = false) => {
-        console.log(`userService1: ${username}, ${email}, ${password}, ${isGoogleUser}`)
+    createUser: async (username, email, password, authProvider) => {
+        //agora para criar um novo usuário será preciso passar o authProvider como parâmetro
         try {
-            // Validação do nome de usuário
             const result1 = await validateName(username);
             if (!result1.passed) {
                 throw new Error(result1.error || 'Name validation failed');
             }
     
-            // Validação do email
             const result2 = await validateEmail(email);
             if (!result2.passed) {
                 throw new Error(result2.error || 'E-mail validation failed');
@@ -22,15 +20,13 @@ export const userService = {
     
             let hashedPassword = null;
     
-            if (!isGoogleUser) {
-                // Validação da senha para usuários não Google
-                console.log(`userService2: ${password}`)
+            if (authProvider == 'local') {
+            //se o authProvider for 'local' a validação de senha (as regras para a criação da senha) terá de ser feita
                 const result3 = validatePassword(password);
                 if (!result3.passed) {
                     throw new Error(result3.error || 'Password validation failed');
                 }
     
-                // Hash da senha
                 hashedPassword = await hashPassword(password);
     
                 if (!hashedPassword) {
@@ -39,14 +35,16 @@ export const userService = {
                         status: 500,
                     });
                 }
+            } else { 
+                hashedPassword = password;
+                //senão, se for uma autenticação com o Google oAuth, a senha registrada no banco de dados será a senha aleatória hasheada feita no authService mesmo
             }
-    
-            console.log(`userService3: ${username}, ${email}, ${hashedPassword}`)
 
             const user = await userRepository.createUser(
                 username,
                 email,
                 hashedPassword,
+                authProvider,
             );
     
             await leaderboardRepository.createLeaderboardEntry(user.id);

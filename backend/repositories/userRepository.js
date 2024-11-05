@@ -19,16 +19,18 @@ export const userRepository = {
         username,
         email,
         password,
+        authProvider
     ) => {
-
+        //foi adicionado o parâmetro authProvider para criar um novo usuário (ele pode ser 'local' ou 'google')
+        
         const query = `
-            INSERT INTO users (username, email, password) 
-            VALUES ($1, $2, $3) 
-            RETURNING id, username, email
+            INSERT INTO users (username, email, password, authProvider) 
+            VALUES ($1, $2, $3, $4) 
+            RETURNING id, username, email, authProvider
             `;
 
         try {
-            const result = await pool.query(query, [username, email, password || null]);
+            const result = await pool.query(query, [username, email, password, authProvider]);
 
             return result.rows[0];
         } catch (error) {
@@ -61,8 +63,6 @@ export const userRepository = {
 
         try {
             const result = await pool.query(query, [email]);
-
-            console.log("Result from getUserByEmail:", result.rows);
             return result.rows[0];
         } catch (error) {
             throw new ErrorApi({

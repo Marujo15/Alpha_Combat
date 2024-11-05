@@ -112,11 +112,17 @@ export const userController = {
 
         try {
             const { username, email, password } = req.body;
-            console.log(username, email, password);
+            let authProvider;
+            if(!req.body.authProvider) {
+                //se não houver um authProvider no corpo da requisição, significa que é 'local'
+               authProvider = 'local';
+            }
+
             const user = await userService.createUser(
                 username,
                 email,
-                password
+                password,
+                authProvider
             );
 
             response.data = user;
