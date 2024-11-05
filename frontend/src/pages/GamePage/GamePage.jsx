@@ -36,7 +36,7 @@ const GamePage = () => {
                 </div>
             </div>
             <div className='game-div'></div>
-            <Button className={'giveup-btn'} text='giveup' onClick={() => {handleGiveupBtn}}>DESISTIR</Button>
+            <Button className={'giveup-btn'} text='giveup' onClick={() => {handleGiveupBtn}}></Button>
         </div>
     );
 };

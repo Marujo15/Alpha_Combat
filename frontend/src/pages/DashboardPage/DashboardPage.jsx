@@ -37,7 +37,7 @@ const DashboardPage = () => {
             <Button type="submit" className={"start-game-btn"} onClick={() => {handleStartGame}}>INICIAR PARTIDA</Button>
             <Button type="submit" className={"ranking-btn"} onClick={() => navigate('/rankings')}>RANKINGS</Button>
             <Button type="submit" className={"tutorial-btn"} onClick={() => navigate('/tutorial')}>COMO JOGAR</Button>
-            <Button type="submit" className={"logout-btn"} onClick={handleLogout}>SAIR</Button>
+            <Button type="submit" className={"logout-btn"} onClick={handleLogout}></Button>
         </div>
     );
 };

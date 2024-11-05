@@ -1,5 +1,6 @@
 .landing-page-container {
     align-items: center;
+    background-color: #4c7bbf;
     background-image: url('../../../assets/landing-page.png');
     background-repeat: no-repeat;
     background-size: contain;
@@ -9,10 +10,11 @@
     min-height: 100vh;
     justify-content: center;
     width: 100vw;
-    overflow-y: auto; /* Permite rolagem vertical se necessário */
+    overflow-y: auto;
 }
 
 .title {
+    padding-top: 25vh;
     font-size: 2rem;
     margin-bottom: 1rem;
 }
@@ -27,6 +29,13 @@
     cursor: pointer;
     margin-top: 1rem;
 }
+
+.about {
+    padding-top: 25vh;
+    max-width: 58%;
+    line-height: 1.6;
+}
+
 
 .go-to-login-btn {
     background-image: url('../../../assets/yellow-btn-play.png');

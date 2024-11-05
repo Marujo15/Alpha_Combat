@@ -35,7 +35,7 @@ const TutorialPage = () => {
                     <img className="shoot-key-img" src="../../../assets/space-key-background.png" alt="Tecla espaço" />
                 </div>
             </div>
-            <Button type='submit' className={'menu-btn'} onClick={() => navigate('/dashboard')}>MENU</Button>
+            <Button type='submit' className={'menu-btn'} onClick={() => navigate('/dashboard')}></Button>
         </div>
     );
 };

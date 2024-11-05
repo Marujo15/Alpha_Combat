@@ -31,7 +31,7 @@ const LoginPage = () => {
             <Form title={"LOGIN"} onSubmit={handleSubmit}>
                 <Input type="text" placeholder="EMAIL" />
                 <Input type="email" placeholder="SENHA" />
-                <Button type="submit" className={"login-btn"}>ENTRAR</Button>
+                <Button type="submit" className={"login-btn"}></Button>
                 <a href="/register">CRIAR CONTA</a>
                 <GoogleSignInButton></GoogleSignInButton>
             </Form>

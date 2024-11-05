@@ -8,7 +8,7 @@ const WaitingPage = () => {
             {/* <div className='scoreboard-div'></div>
             <div className='time-div'></div> */}
             <div className='msg-div'>AGUARDANDO OUTRO PLAYER</div>
-            <Button className={'w-cancel-btn'} text='Back' onClick={() => {navigate('/dashboard')}}>CANCELAR</Button>
+            <Button className={'w-cancel-btn'} text='Back' onClick={() => {navigate('/dashboard')}}></Button>
         </div>
     );
 };

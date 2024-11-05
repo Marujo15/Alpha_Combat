@@ -47,7 +47,7 @@
 } */
 
 .w-cancel-btn {
-    background-image: url('../../../assets/yellow-btn-background.png');
+    background-image: url('../../../assets/red-btn-cancelar.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -57,7 +57,7 @@
 }
 
 .w-cancel-btn:hover {
-    background-image: url('../../../assets/yellow-btn-background-hover.png');
+    background-image: url('../../../assets/red-btn-cancelar-hover.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;

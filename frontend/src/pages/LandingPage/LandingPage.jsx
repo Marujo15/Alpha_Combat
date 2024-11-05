@@ -8,9 +8,9 @@ const LandingPage = () => {
 
     return (
         <div className="landing-page-container">
-            <h1 className="title">Alpha Combat</h1>
+            <h1 className="title">ALPHA COMBAT</h1>
             <Button className="go-to-login-btn" onClick={() => navigate('/login')}></Button>
-            <p>O Alpha Combat é um jogo muiltplayer feito para jogar com seu amigo</p>
+            <p className='about'>PREPARE-SE PARA A ADRENALINA DE ALPHA COMBAT! EM UM DUELO MULTIPLAYER ELETRIZANTE, VOCÊ ASSUME O CONTROLE DE UM TANQUE DE GUERRA COM UM ÚNICO OBJETIVO: DESTRUIR O INIMIGO ANTES QUE ELE DESTRUA VOCÊ. COM GRÁFICOS IMERSIVOS E MAPAS REPLETOS DE OBSTÁCULOS ESTRATÉGICOS, CADA PARTIDA EXIGE HABILIDADE, PRECISÃO E UMA BOA DOSE DE ESTRATÉGIA. SÓ OS MELHORES SOBREVIVEM EM ALPHA COMBAT!</p>
         </div>
     );
 };
