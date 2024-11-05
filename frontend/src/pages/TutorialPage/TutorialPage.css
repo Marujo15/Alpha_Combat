@@ -1,0 +1,75 @@
+.tutorial-container {
+    align-items: center;
+    background-attachment: fixed;
+    background-image: url('../../../assets/tutorial-background.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: space-around;
+    width: 100vw;
+}
+
+.tutorial-container h1 {
+    margin: 0;
+}
+
+.controls-div {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 200px;
+    justify-content: center;
+}
+
+.direction-controls-div {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    justify-content: center;
+}
+
+.arrow-keys {
+    width: 80px;
+}
+
+.second-arrow-keys-div {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+}
+
+.arrow-keys-div {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100px;
+}
+
+.shoot-key-div {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.shoot-key-img {
+    width: 250px;
+}
+
+.menu-btn {
+    background-image: url('../../../assets/yellow-btn-background.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 160px;
+}
+
+.menu-btn:hover {
+    background-image: url('../../../assets/yellow-btn-background-hover.png');
+}

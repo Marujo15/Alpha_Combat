@@ -25,14 +25,14 @@ const LoginPage = () => {
     };
 
     return (
-        <div>
+        <div className='login-page-container'>
             <Logo />
             <Form title={"LOGIN"} onSubmit={handleSubmit}>
                 <Input type="text" placeholder="EMAIL" />
                 <Input type="email" placeholder="SENHA" />
                 <Button type="submit" className={"login-btn"}>ENTRAR</Button>
                 <a href="/register">CRIAR CONTA</a>
-                <Button type="google-auth" className={"google-btn"}>AUTENTICAÇÃO GOOGLE</Button>
+                <Button type="submit" className={"google-btn"}>AUTENTICAÇÃO GOOGLE</Button>
             </Form>
         </div>
     );

@@ -1,0 +1,47 @@
+.dash-page-main-div {
+    align-items: center;
+    background-image: url('../../../assets/main-background.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: center;
+    width: 100vw;
+}
+
+.dash-page-main-div {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
+
+.start-game-btn, .ranking-btn, .tutorial-btn {
+    background-image: url('../../../assets/large-yellow-btn-background.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 310px;
+}
+
+.start-game-btn:hover, .ranking-btn:hover, .tutorial-btn:hover {
+    background-image: url('../../../assets/large-yellow-btn-background-hover.png');
+}
+
+.logout-btn {
+    background-image: url('../../../assets/red-btn-background.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 165px;
+}
+
+.logout-btn:hover {
+    background-image: url('../../../assets/red-btn-background-hover.png');
+}

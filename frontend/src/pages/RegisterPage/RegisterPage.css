@@ -1,0 +1,80 @@
+.register-container {
+    align-items: center;
+    background-image: url('../../../assets/main-background.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: center;
+    width: 100vw;
+}
+
+.register-btns {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+}
+
+.register-btn {
+    background-image: url('../../../assets/yellow-btn-background.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 165px;
+}
+
+.register-btn:hover {
+    background-image: url('../../../assets/yellow-btn-background-hover.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 165px;
+}
+
+.r-back-btn {
+    background-image: url('../../../assets/yellow-btn-background.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 165px;
+}
+
+.r-back-btn:hover {
+    background-image: url('../../../assets/yellow-btn-background-hover.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 165px;
+}
+
+.success-message, .error-message {
+    align-items: center;
+    background-color: #10A37F;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    color: white;
+    display: flex;
+    flex-direction: row;
+    height: 40px;
+    justify-content: center;
+    padding: 0 2rem;
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    white-space: nowrap;
+    width: auto;
+}
+
+.error-message {
+    background-color: lightcoral;
+}
