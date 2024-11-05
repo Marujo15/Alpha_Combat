@@ -2,19 +2,6 @@ import { ErrorApi } from "../errors/ErrorApi.js";
 import { userRepository } from "../repositories/userRepository.js";
 
 export async function validateEmail(email) {
-    const existingEmail = await userRepository.getUserByEmail(email);
-    const regex = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
-
-    if (existingEmail.length > 0) {
-        return {
-            passed: false,
-            error: new ErrorApi({
-                message: "Email already registered.",
-                status: 409,
-            }),
-        };
-    }
-
     if (!email) {
         return {
             passed: false,
@@ -35,6 +22,19 @@ export async function validateEmail(email) {
         };
     }
 
+    const existingEmail = await userRepository.getUserByEmail(email);
+
+    if (existingEmail && existingEmail.length > 0) {
+        return {
+            passed: false,
+            error: new ErrorApi({
+                message: "Email already registered.",
+                status: 409,
+            }),
+        };
+    }
+
+    const regex = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
     if (!regex.test(email)) {
         return {
             passed: false,

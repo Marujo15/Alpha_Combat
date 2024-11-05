@@ -4,52 +4,67 @@ import { ErrorApi } from "../errors/ErrorApi.js";
 
 export const authController = {
     authenticate: async (req, res) => {
-        const { email, password } = req.body;
-
-
-        if (!email || !password) {
-            res.status(400).json({ error: "Email and password are required" });
-            return;
-        }
+        const { email, password, token } = req.body;
 
         try {
-            const user = await userService.getUserByEmail(email);
+            if (token) {
+                const { auth, token: jwtToken, id, user } = await authService.authenticateWithGoogle(token);
 
-            const { auth, token, id } = await authService.authenticateUser(
-                email,
-                password
-            );
+                if (!auth) {
+                    res.status(400).json({ error: "Invalid Google token" });
+                    return;
+                }
 
-            if (!auth) {
-                res.status(400).json({ error: "Invalid email and/or password" });
-                return;
+                const maxAge = 5 * 24 * 60 * 60 * 1000;
+
+                res.cookie("session_id", jwtToken, { maxAge, httpOnly: true });
+
+                res.status(200).json({
+                    auth,
+                    token: jwtToken,
+                    id,
+                    message: "User successfully authenticated with Google!",
+                    user: {
+                        id: user.id,
+                        username: user.username,
+                        email: user.email,
+                    },
+                });
+            } else if (email && password) {
+                const { auth, token: jwtToken, id } = await authService.authenticateUser(email, password);
+
+                if (!auth) {
+                    res.status(400).json({ error: "Invalid email and/or password" });
+                    return;
+                }
+
+                const user = await userService.getUserByEmail(email);
+
+                const maxAge = 5 * 24 * 60 * 60 * 1000;
+
+                res.cookie("session_id", jwtToken, { maxAge, httpOnly: true });
+
+                res.status(200).json({
+                    auth,
+                    token: jwtToken,
+                    id,
+                    message: "User successfully authenticated!",
+                    user: {
+                        id: user.id,
+                        username: user.username,
+                        email: user.email,
+                    },
+                });
+            } else {
+                res.status(400).json({ error: "Email and password or token are required" });
             }
-
-            const maxAge = 5 * 24 * 60 * 60 * 1000;
-
-            res.cookie("session_id", token, { maxAge, httpOnly: true });
-
-            res.status(200).json({
-                auth,
-                token,
-                id,
-                message: "User successfully authenticated!",
-                user: {
-                    id: user.id,
-                    username: user.username,
-                    password: user.password,
-                },
-            });
-            return;
         } catch (error) {
             if (error instanceof ErrorApi) {
                 res.status(error.status).json({ error: error.message });
                 return;
             }
 
-            res
-                .status(500)
-                .json({ error: "Failed to authenticate user, server error" });
+            res.status(500).json({ error: "Failed to authenticate user, server error" });
             return;
         }
     },
