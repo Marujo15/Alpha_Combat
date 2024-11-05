@@ -1,4 +1,47 @@
-.game-page-container {
+.game-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: rgb(17, 24, 39);
+    font-family: Arial, sans-serif;
+}
+
+.game-card {
+    background-color: rgb(31, 41, 55);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 56rem;
+}
+
+.status-container {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.game-status {
+    color: white;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.room-info {
+    color: rgb(156, 163, 175);
+    font-size: 0.875rem;
+}
+
+.game-canvas {
+    background-color: black;
+    border-radius: 0.5rem;
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+/* .game-page-container {
     align-items: center;
     background-image: url('../../../assets/main-background.png');
     background-repeat: no-repeat;
