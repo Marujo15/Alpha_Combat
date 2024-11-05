@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import Button from '../../components/Button/Button';
+// import Button from '../../components/Button/Button';
 import './GamePage.css';
 
 class TankInterpolator {
