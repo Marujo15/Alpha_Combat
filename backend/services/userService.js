@@ -5,42 +5,53 @@ import { hashPassword } from "../utils/hashPassword.js";
 import { ErrorApi } from "../errors/ErrorApi.js";
 
 export const userService = {
-    createUser: async (username, email, password) => {
+    createUser: async (username, email, password, authProvider) => {
+        //agora para criar um novo usuário será preciso passar o authProvider como parâmetro
         try {
             const result1 = await validateName(username);
             if (!result1.passed) {
-                throw result1.error;
+                throw new Error(result1.error || 'Name validation failed');
             }
-
+    
             const result2 = await validateEmail(email);
             if (!result2.passed) {
-                throw result2.error;
+                throw new Error(result2.error || 'E-mail validation failed');
             }
-
-            const result3 = validatePassword(password);
-            if (!result3.passed) {
-                throw result3.error;
-            }
-
-            const hashedPassword = await hashPassword(password);
-
-            if (!hashedPassword) {
-                throw new ErrorApi({
-                    message: "Failed to hash password.",
-                    status: 500,
-                });
+    
+            let hashedPassword = null;
+    
+            if (authProvider == 'local') {
+            //se o authProvider for 'local' a validação de senha (as regras para a criação da senha) terá de ser feita
+                const result3 = validatePassword(password);
+                if (!result3.passed) {
+                    throw new Error(result3.error || 'Password validation failed');
+                }
+    
+                hashedPassword = await hashPassword(password);
+    
+                if (!hashedPassword) {
+                    throw new ErrorApi({
+                        message: "Failed to hash password.",
+                        status: 500,
+                    });
+                }
+            } else { 
+                hashedPassword = password;
+                //senão, se for uma autenticação com o Google oAuth, a senha registrada no banco de dados será a senha aleatória hasheada feita no authService mesmo
             }
 
             const user = await userRepository.createUser(
                 username,
                 email,
                 hashedPassword,
+                authProvider,
             );
-
+    
             await leaderboardRepository.createLeaderboardEntry(user.id);
-
+    
             return user;
         } catch (error) {
+            console.error("Error in userService.createUser:", error);
             throw error;
         }
     },
@@ -72,14 +83,14 @@ export const userService = {
         try {
             const user = await userRepository.getUserByEmail(email);
 
-            if (!user || !(user.length > 0)) {
+            if (!user) {
                 throw new ErrorApi({
                     message: "User not found",
                     status: 404,
                 });
             }
 
-            return user[0];
+            return user;
         } catch (error) {
             throw error;
         }

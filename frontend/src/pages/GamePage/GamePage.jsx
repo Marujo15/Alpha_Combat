@@ -107,7 +107,7 @@ class TankPredictor {
   }
 }
 
-const TankGame = () => {
+const GamePage = () => {
   const canvasRef = useRef(null);
   const [gameStatus, setGameStatus] = useState("Conectando ao servidor...");
   const [roomInfo, setRoomInfo] = useState("");
