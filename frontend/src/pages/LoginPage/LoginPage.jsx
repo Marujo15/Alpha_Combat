@@ -4,6 +4,7 @@ import Logo from '../../components/Logo/Logo.jsx';
 import Form from '../../components/Form/Form';
 import Input from '../../components/Input/Input.jsx';
 import Button from '../../components/Button/Button.jsx';
+import GoogleSignInButton from '../../components/GoogleSignInButton/GoogleSignInButton.jsx';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -32,7 +33,7 @@ const LoginPage = () => {
                 <Input type="email" placeholder="SENHA" />
                 <Button type="submit" className={"login-btn"}>ENTRAR</Button>
                 <a href="/register">CRIAR CONTA</a>
-                <Button type="submit" className={"google-btn"}>AUTENTICAÇÃO GOOGLE</Button>
+                <GoogleSignInButton></GoogleSignInButton>
             </Form>
         </div>
     );
