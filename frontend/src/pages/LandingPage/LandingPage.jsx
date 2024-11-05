@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/Button/Button.jsx';
-import Logo from '../../components/Logo/Logo.jsx';
 import './LandingPage.css';
 
 const LandingPage = () => {
@@ -9,9 +8,9 @@ const LandingPage = () => {
 
     return (
         <div className="landing-page-container">
-            <Logo />
-            <h1 className="title">Welcome to the Landing Page</h1>
-            <Button className="go-to-login-btn" onClick={() => navigate('/login')}>Entrar</Button>
+            <h1 className="title">Alpha Combat</h1>
+            <Button className="go-to-login-btn" onClick={() => navigate('/login')}></Button>
+            <p>O Alpha Combat é um jogo muiltplayer feito para jogar com seu amigo</p>
         </div>
     );
 };
