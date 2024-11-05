@@ -8,10 +8,10 @@ const LandingPage = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="container">
+        <div className="landing-page-container">
             <Logo />
             <h1 className="title">Welcome to the Landing Page</h1>
-            <Button className="login-btn" onClick={() => navigate('/login')}>Entrar</Button>
+            <Button className="go-to-login-btn" onClick={() => navigate('/login')}>Entrar</Button>
         </div>
     );
 };

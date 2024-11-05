@@ -1,7 +1,7 @@
-#root {
+.login-page-container {
     align-items: center;
     background-color: lightblue;
-    background-image: url('../../../public/assets/background.png');
+    background-image: url('../../../assets/main-background.png');
     background-repeat: no-repeat;
     background-size: cover;
     display: flex;
@@ -11,8 +11,22 @@
     width: 100vw;
 }
 
+.login-btn {
+    background-image: url('../../../assets/yellow-btn-background.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 160px;
+}
+
+.login-btn:hover {
+    background-image: url('../../../assets/yellow-btn-background-hover.png');
+}
+
 .google-btn {
-    background-image: url('../../../public/assets/btn-backgorund.png');
+    background-image: url('../../../assets/btn-backgorund.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;

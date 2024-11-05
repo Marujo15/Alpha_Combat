@@ -13,26 +13,26 @@ const TutorialPage = () => {
                 <div className='direction-controls-div'>
                     <div>
                         <p>CIMA</p>
-                        <img className="arrow-keys" src="../../../public/assets/up-key.png" alt="Seta para cima" />
+                        <img className="arrow-keys" src="../../../assets/up-key-background.png" alt="Seta para cima" />
                     </div>
                     <div className='second-arrow-keys-div'>
                         <div className='arrow-keys-div'>
-                            <img className="arrow-keys" src="../../../public/assets/left-key.png" alt="Seta para esquerda" />
+                            <img className="arrow-keys" src="../../../assets/left-key-background.png" alt="Seta para esquerda" />
                             <p>ESQUERDA</p>
                         </div>
                         <div className='arrow-keys-div'>
-                            <img className="arrow-keys" src="../../../public/assets/down-key.png" alt="Seta para baixo" />
+                            <img className="arrow-keys" src="../../../assets/down-key-background.png" alt="Seta para baixo" />
                             <p>BAIXO</p>
                         </div>
                         <div className='arrow-keys-div'>
-                            <img className="arrow-keys" src="../../../public/assets/right-key.png" alt="Seta para direita" />
+                            <img className="arrow-keys" src="../../../assets/right-key-background.png" alt="Seta para direita" />
                             <p>DIREITA</p>
                         </div>
                     </div>
                 </div>
                 <div className='shoot-key-div'>
                     <p>ATIRAR</p>
-                    <img className="shoot-key-img" src="../../../public/assets/shoot-key.png" alt="Tecla espaço" />
+                    <img className="shoot-key-img" src="../../../assets/space-key-background.png" alt="Tecla espaço" />
                 </div>
             </div>
             <Button type='submit' className={'menu-btn'} onClick={() => navigate('/dashboard')}>MENU</Button>

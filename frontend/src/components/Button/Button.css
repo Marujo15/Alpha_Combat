@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 button {
-    background-color: yellow;
-    border: 2px solid black;
+    background-color: transparent;
+    border: none;
     border-radius: 10px;
     color: black;
     cursor: pointer;
