@@ -128,11 +128,21 @@
 }
 
 .giveup-btn {
-    background-image: url('../../../assets/red-btn-background.png');
+    background-image: url('../../../assets/red-btn-desistir.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
     font-size: 0.8vw;
     height: 70px;
     width: 165px;
-} */
+}
+
+.giveup-btn:hover {
+    background-image: url('../../../assets/red-btn-desistir-hover.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    font-size: large;
+    height: 70px;
+    width: 180px;
+}

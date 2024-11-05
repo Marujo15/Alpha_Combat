@@ -19,7 +19,6 @@
 }
 
 .start-game-btn, .ranking-btn, .tutorial-btn {
-    background-image: url('../../../assets/large-yellow-btn-background.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -28,12 +27,34 @@
     width: 310px;
 }
 
-.start-game-btn:hover, .ranking-btn:hover, .tutorial-btn:hover {
-    background-image: url('../../../assets/large-yellow-btn-background-hover.png');
+.start-game-btn {
+    background-image: url('../../../assets/yellow-btn-iniciarpartida.png');
 }
 
+.start-game-btn:hover {
+    background-image: url('../../../assets/yellow-btn-iniciarpartida-hover.png');
+}
+
+.ranking-btn {
+    background-image: url('../../../assets/yellow-btn-ranking.png');
+}
+
+.ranking-btn:hover {
+    background-image: url('../../../assets/yellow-btn-ranking-hover.png');
+}
+
+.tutorial-btn {
+    background-image: url('../../../assets/yellow-btn-comojogar.png');
+}
+
+.tutorial-btn:hover {
+    background-image: url('../../../assets/yellow-btn-comojogar-hover.png');
+}
+
+
+
 .logout-btn {
-    background-image: url('../../../assets/red-btn-background.png');
+    background-image: url('../../../assets/red-btn-sair.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -43,5 +64,5 @@
 }
 
 .logout-btn:hover {
-    background-image: url('../../../assets/red-btn-background-hover.png');
+    background-image: url('../../../assets/red-btn-sair-hover.png');
 }

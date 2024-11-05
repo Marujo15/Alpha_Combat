@@ -12,7 +12,7 @@
 }
 
 .login-btn {
-    background-image: url('../../../assets/yellow-btn-background.png');
+    background-image: url('../../../assets/yellow-btn-entrar.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -22,7 +22,7 @@
 }
 
 .login-btn:hover {
-    background-image: url('../../../assets/yellow-btn-background-hover.png');
+    background-image: url('../../../assets/yellow-btn-entrar-hover.png');
 }
 
 .google-btn {

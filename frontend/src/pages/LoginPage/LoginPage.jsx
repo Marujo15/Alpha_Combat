@@ -4,6 +4,7 @@ import Logo from '../../components/Logo/Logo.jsx';
 import Form from '../../components/Form/Form';
 import Input from '../../components/Input/Input.jsx';
 import Button from '../../components/Button/Button.jsx';
+import GoogleSignInButton from '../../components/GoogleSignInButton/GoogleSignInButton.jsx';
 import './LoginPage.css';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
@@ -101,6 +102,7 @@ const LoginPage = () => {
                         onError={handleGoogleLoginError}
                     />
                 </div>
+                <GoogleSignInButton></GoogleSignInButton>
             </Form>
         </div>
     );

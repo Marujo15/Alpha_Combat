@@ -61,7 +61,7 @@
 }
 
 .menu-btn {
-    background-image: url('../../../assets/yellow-btn-background.png');
+    background-image: url('../../../assets/yellow-btn-menu.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -71,5 +71,5 @@
 }
 
 .menu-btn:hover {
-    background-image: url('../../../assets/yellow-btn-background-hover.png');
+    background-image: url('../../../assets/yellow-btn-menu-hover.png');
 }

@@ -1,16 +1,20 @@
 .landing-page-container {
     align-items: center;
-    background-image: url('../../../assets/main-background.png');
+    background-color: #4c7bbf;
+    background-image: url('../../../assets/landing-page.png');
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: contain;
+    background-position: center;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
     justify-content: center;
     width: 100vw;
+    overflow-y: auto;
 }
 
 .title {
+    padding-top: 25vh;
     font-size: 2rem;
     margin-bottom: 1rem;
 }
@@ -26,8 +30,15 @@
     margin-top: 1rem;
 }
 
+.about {
+    padding-top: 25vh;
+    max-width: 58%;
+    line-height: 1.6;
+}
+
+
 .go-to-login-btn {
-    background-image: url('../../../assets/yellow-btn-background.png');
+    background-image: url('../../../assets/yellow-btn-play.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -37,5 +48,5 @@
 }
 
 .go-to-login-btn:hover {
-    background-image: url('../../../assets/yellow-btn-background-hover.png');
+    background-image: url('../../../assets/yellow-btn-play-hover.png');
 }
