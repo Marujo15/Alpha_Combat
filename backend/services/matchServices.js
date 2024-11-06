@@ -39,9 +39,9 @@ export const matchService = {
         }
     },
 
-    createMatch: async (player1_id, player2_id) => {
+    createMatch: async (player1_id) => {
         try {
-            const match = await matchRepository.createMatch(player1_id, player2_id);
+            const match = await matchRepository.createMatch(player1_id);
             return match;
         } catch (error) {
             throw new ErrorApi({
@@ -57,46 +57,60 @@ export const matchService = {
 
             if (!updatedMatch) {
                 throw new ErrorApi({
-                    message: "Match not founded.",
+                    message: "Failed to update match.",
                     status: 500,
                 });
             }
 
-            let updatesPlayer1 = {};
-            let updatesPlayer2 = {};
+            const shouldUpdateLeaderboard = [ 
+                'matches',
+                'player1_kills', 'player2_kills', 'player3_kills', 'player4_kills',
+                'player1_deaths', 'player2_deaths', 'player3_deaths', 'player4_deaths',
+                'match_time'
+            ].some(key => updates[key] !== undefined);
 
-            if (updates.draw) {
-                updatesPlayer1.draws = 1;
-                updatesPlayer2.draws = 1;
-            } else {
-                if (updates.winner_id === updatedMatch.player1_id) {
-                    updatesPlayer1.victories = 1;
-                    updatesPlayer2.defeats = 1;
-                } else if (updates.winner_id === updatedMatch.player2_id) {
-                    updatesPlayer1.defeats = 1;
-                    updatesPlayer2.victories = 1;
+            if (shouldUpdateLeaderboard) {
+                const players = [
+                    { id: updatedMatch.player1_id, matches: updates.matches, kills: updates.player1_kills, deaths: updates.player1_deaths },
+                    { id: updatedMatch.player2_id, matches: updates.matches, kills: updates.player2_kills, deaths: updates.player2_deaths },
+                    { id: updatedMatch.player3_id, matches: updates.matches, kills: updates.player3_kills, deaths: updates.player3_deaths },
+                    { id: updatedMatch.player4_id, matches: updates.matches, kills: updates.player4_kills, deaths: updates.player4_deaths },
+                ];
+
+                const match_time = updates.match_time;
+                const updatedLeaderboards = [];
+
+                for (const player of players) {
+                    if (player.id) {
+                        const updatesPlayer = {
+                            matches: player.matches,
+                            kills_count: player.kills,
+                            deaths_count: player.deaths,
+                            time_played: match_time,
+                        };
+                        const updatedLeaderboard = await leaderboardRepository.updateLeaderboardByUserId(player.id, updatesPlayer);
+                        if (!updatedLeaderboard) {
+                            throw new ErrorApi({
+                                message: `Failed to update leaderboard for player ${player.id}.`,
+                                status: 500,
+                            });
+                        }
+                        updatedLeaderboards.push(updatedLeaderboard);
+                    }
                 }
+
+                return {
+                    updatedMatch,
+                    updatedLeaderboards,
+                };
             }
 
-            const { player1_kills, player1_deaths, match_time } = updates;
-            updatesPlayer1 = { ...updatesPlayer1, matches: 1, kills_count: player1_kills, deaths_count: player1_deaths, time_played: match_time };
-            const updatedLeaderboardPlayer1 = await leaderboardRepository.updateLeaderboardByUserId(updatedMatch.player1_id, updatesPlayer1);
-
-            const { player2_kills, player2_deaths } = updates;
-            updatesPlayer2 = { ...updatesPlayer2, matches: 1, kills_count: player2_kills, deaths_count: player2_deaths, time_played: match_time };
-            const updatedLeaderboardPlayer2 = await leaderboardRepository.updateLeaderboardByUserId(updatedMatch.player2_id, updatesPlayer2);
-
-            if (!updatedLeaderboardPlayer1 || !updatedLeaderboardPlayer2) {
-                throw new ErrorApi({
-                    message: "Failed to update leaderboard.",
-                    status: 500,
-                });
-            }
-
-            const matchEndedReturn = { updatedMatch, updatedLeaderboardPlayer1, updatedLeaderboardPlayer2 };
-
-            return matchEndedReturn;
+            return {
+                updatedMatch,
+                updatedLeaderboards: [],
+            };
         } catch (error) {
+            console.error('Error updating match and leaderboards:', error);
             throw new ErrorApi({
                 message: "Failed to update match.",
                 status: 500,

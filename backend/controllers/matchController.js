@@ -80,8 +80,8 @@ export const matchController = {
 
     createMatch: async (req, res) => {
         try {
-            const { player1_id, player2_id } = req.body;
-            const newMatch = await matchService.createMatch(player1_id, player2_id);
+            const { player1_id } = req.body;
+            const newMatch = await matchService.createMatch(player1_id);
 
             if (!newMatch) {
                 return res.status(404).json({
@@ -109,50 +109,18 @@ export const matchController = {
             const matchId = req.params.matchId;
             const updates = { ...req.body };
 
-            const expectedKeys = [
-                'player1_kills',
-                'player2_kills',
-                'player1_deaths',
-                'player2_deaths',
-                'winner_id',
-                'defeated_id',
-                'draw',
-                'match_time'
-            ];
-
-            const missingKeys = expectedKeys.filter(key => !(key in updates));
-            if (missingKeys.length > 0) {
-                console.error('Missing keys in updates:', missingKeys);
-                return res.status(400).json({
-                    success: false,
-                    message: `Missing keys in updates: ${missingKeys.join(', ')}`,
-                });
-            }
-
-            const match = await matchService.getMatchByMatchId(matchId);
-
-            if (!match) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Error updating match',
-                });
-            }
-
-            const updatedmatch = await matchService.updateMatchByMatchId(
-                matchId,
-                updates
-            );
+            const updatedMatch = await matchService.updateMatchByMatchId(matchId, updates);
 
             res.status(200).json({
                 success: true,
-                data: updatedmatch,
+                data: updatedMatch,
                 message: 'Match updated successfully',
             });
         } catch (error) {
-            console.error('Error updating matches:', error);
+            console.error('Error updating match:', error);
             res.status(500).json({
                 success: false,
-                message: 'Error updating matches',
+                message: 'Error updating match',
             });
         }
     },
