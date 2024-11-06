@@ -1,4 +1,5 @@
 import { pool } from '../database/database.js';
+import { ErrorApi } from '../errors/ErrorApi.js';
 
 export const matchRepository = {
     getMatchesByUserId: async (userId) => {
@@ -42,14 +43,14 @@ export const matchRepository = {
         }
     },
 
-    createMatch: async (player1_id, player2_id) => {
+    createMatch: async (player1_id) => {
         const query = `
-            INSERT INTO matches (player1_id, player2_id) 
-            VALUES ($1, $2) 
+            INSERT INTO matches (player1_id) 
+            VALUES ($1) 
             RETURNING *;
         `;
         try {
-            const result = await pool.query(query, [player1_id, player2_id]);
+            const result = await pool.query(query, [player1_id]);
             return result.rows[0];
         } catch (error) {
             console.error("Error creating match entry:", error);
@@ -61,40 +62,83 @@ export const matchRepository = {
     },
     
     updateMatchByMatchId: async (matchId, updates) => {
+        const fields = [];
+        const values = [];
+
+        if (updates.player2_id !== undefined) {
+            fields.push(`player2_id = $${fields.length + 1}`);
+            values.push(updates.player2_id);
+        }
+        if (updates.player3_id !== undefined) {
+            fields.push(`player3_id = $${fields.length + 1}`);
+            values.push(updates.player3_id);
+        }
+        if (updates.player4_id !== undefined) {
+            fields.push(`player4_id = $${fields.length + 1}`);
+            values.push(updates.player4_id);
+        }
+        if (updates.player1_kills !== undefined) {
+            fields.push(`player1_kills = $${fields.length + 1}`);
+            values.push(updates.player1_kills);
+        }
+        if (updates.player2_kills !== undefined) {
+            fields.push(`player2_kills = $${fields.length + 1}`);
+            values.push(updates.player2_kills);
+        }
+        if (updates.player3_kills !== undefined) {
+            fields.push(`player3_kills = $${fields.length + 1}`);
+            values.push(updates.player3_kills);
+        }
+        if (updates.player4_kills !== undefined) {
+            fields.push(`player4_kills = $${fields.length + 1}`);
+            values.push(updates.player4_kills);
+        }
+        if (updates.player1_deaths !== undefined) {
+            fields.push(`player1_deaths = $${fields.length + 1}`);
+            values.push(updates.player1_deaths);
+        }
+        if (updates.player2_deaths !== undefined) {
+            fields.push(`player2_deaths = $${fields.length + 1}`);
+            values.push(updates.player2_deaths);
+        }
+        if (updates.player3_deaths !== undefined) {
+            fields.push(`player3_deaths = $${fields.length + 1}`);
+            values.push(updates.player3_deaths);
+        }
+        if (updates.player4_deaths !== undefined) {
+            fields.push(`player4_deaths = $${fields.length + 1}`);
+            values.push(updates.player4_deaths);
+        }
+        if (updates.match_time !== undefined) {
+            fields.push(`match_time = $${fields.length + 1}`);
+            values.push(updates.match_time);
+        }
+
+        if (fields.length === 0) {
+            throw new ErrorApi({
+                message: 'No valid fields to update',
+                status: 400,
+            });
+        }
+
         const query = `
             UPDATE matches
-            SET
-                player1_kills = $1,
-                player2_kills = $2,
-                player1_deaths = $3,
-                player2_deaths = $4,
-                winner_id = $5,
-                defeated_id = $6,
-                draw = $7,
-                match_time = $8
-            WHERE id = $9
+            SET ${fields.join(', ')}
+            WHERE id = $${fields.length + 1}
             RETURNING *;
         `;
-    
-        const values = [
-            updates.player1_kills,
-            updates.player2_kills,
-            updates.player1_deaths,
-            updates.player2_deaths,
-            updates.winner_id || null,
-            updates.defeated_id || null,
-            updates.draw,
-            updates.match_time,
-            matchId
-        ];
-    
+        values.push(matchId);
+
+        console.log('Query:', query);
+        console.log('Values:', values);
+
         try {
             const result = await pool.query(query, values);
             return result.rows[0];
         } catch (error) {
-            console.error("Error updating match:", error);
+            console.error('Error updating match:', error.message);
             throw new ErrorApi({
-                message: "Failed to update match.",
+                message: `Failed to update match: ${error.message}`,
                 status: 500,
             });
         }
