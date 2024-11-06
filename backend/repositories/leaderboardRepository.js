@@ -51,8 +51,6 @@ export const leaderboardRepository = {
         const fields = [];
         const values = [];
 
-        console.log("leaderrepository", updates);
-
         if (updates.matches !== undefined) {
             fields.push(`matches = matches + $${fields.length + 1}`);
             values.push(updates.matches);
@@ -84,10 +82,6 @@ export const leaderboardRepository = {
             RETURNING *;
         `;
         values.push(userId);
-
-        console.log("================================================================")
-        console.log('Query:', query);
-        console.log('Values:', values);
 
         try {
             const result = await pool.query(query, values);

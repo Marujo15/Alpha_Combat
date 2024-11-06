@@ -129,9 +129,6 @@ export const matchRepository = {
         `;
         values.push(matchId);
 
-        console.log('Query:', query);
-        console.log('Values:', values);
-
         try {
             const result = await pool.query(query, values);
             return result.rows[0];
