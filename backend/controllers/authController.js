@@ -20,6 +20,7 @@ export const authController = {
 
                 const maxAge = 5 * 24 * 60 * 60 * 1000;
 
+                console.log(`jwtToken aaa ${jwtToken}`);
                 res.cookie("session_id", jwtToken, { maxAge, httpOnly: true });
 
                 if(password == null || password == '') {
@@ -120,8 +121,8 @@ export const authController = {
         try {
            //como conseguir o id do usuário autenticado via Google oAuth???
 
-           const authHeader = req.headers['authorization'];
-            const token = authHeader && authHeader.split(' ')[1];
+            const token = req.cookies.session_id;
+            console.log(`token aaaaaaaaaa: ${token}`);
 
             if (!token) {
                 return res.status(401).json({ message: 'Access token is missing or invalid' });
