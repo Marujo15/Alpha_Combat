@@ -62,8 +62,8 @@ export const matchService = {
                 });
             }
 
-            // Verifique se há dados de kills, deaths ou match_time para atualizar o leaderboard
-            const shouldUpdateLeaderboard = [
+            const shouldUpdateLeaderboard = [ 
+                'matches',
                 'player1_kills', 'player2_kills', 'player3_kills', 'player4_kills',
                 'player1_deaths', 'player2_deaths', 'player3_deaths', 'player4_deaths',
                 'match_time'
@@ -71,10 +71,10 @@ export const matchService = {
 
             if (shouldUpdateLeaderboard) {
                 const players = [
-                    { id: updatedMatch.player1_id, kills: updates.player1_kills, deaths: updates.player1_deaths },
-                    { id: updatedMatch.player2_id, kills: updates.player2_kills, deaths: updates.player2_deaths },
-                    { id: updatedMatch.player3_id, kills: updates.player3_kills, deaths: updates.player3_deaths },
-                    { id: updatedMatch.player4_id, kills: updates.player4_kills, deaths: updates.player4_deaths },
+                    { id: updatedMatch.player1_id, matches: updates.matches, kills: updates.player1_kills, deaths: updates.player1_deaths },
+                    { id: updatedMatch.player2_id, matches: updates.matches, kills: updates.player2_kills, deaths: updates.player2_deaths },
+                    { id: updatedMatch.player3_id, matches: updates.matches, kills: updates.player3_kills, deaths: updates.player3_deaths },
+                    { id: updatedMatch.player4_id, matches: updates.matches, kills: updates.player4_kills, deaths: updates.player4_deaths },
                 ];
 
                 const match_time = updates.match_time;
@@ -83,7 +83,7 @@ export const matchService = {
                 for (const player of players) {
                     if (player.id) {
                         const updatesPlayer = {
-                            macthes: player.matches,
+                            matches: player.matches,
                             kills_count: player.kills,
                             deaths_count: player.deaths,
                             time_played: match_time,
