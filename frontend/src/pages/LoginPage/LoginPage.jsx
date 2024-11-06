@@ -12,7 +12,7 @@ import { GoogleLogin } from '@react-oauth/google';
 const LoginPage = () => {
     const { user, login, logout } = useContext(UserContext);
     const [email, setEmail] = useState('');
-    const [senha, setSenha] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ const LoginPage = () => {
                 },
                 body: JSON.stringify({
                     email: email,
-                    password: senha,
+                    password: password,
                 }),
                 credentials: 'include',
             });
@@ -90,8 +90,8 @@ const LoginPage = () => {
                 <Input
                     type="password"
                     placeholder="SENHA"
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                 />
                 <Button type="submit" className="login-btn">ENTRAR</Button>
                 {error && <p className="error-message">{error}</p>}

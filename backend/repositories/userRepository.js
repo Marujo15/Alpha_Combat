@@ -4,7 +4,7 @@ import { ErrorApi } from "../errors/ErrorApi.js";
 export const userRepository = {
     getAllUsers: async () => {
         try {
-            const { rows } = await pool.query(`SELECT id, username, email, created_at FROM users`);
+            const { rows } = await pool.query(`SELECT id, username, email, created_at, authProvider FROM users`);
             return rows;
         } catch (error) {
 
