@@ -41,6 +41,20 @@ services:
       - network
     depends_on:
       - backend
+    
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - network
+
 
 networks:
   network:

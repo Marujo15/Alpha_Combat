@@ -9,9 +9,6 @@ import routes from "./routes/routes.js"
 
 dotenv.config();
 
-console.log("CORS Origin:", process.env.CORS_ORIGIN);
-const corsOrigin = process.env.CORS_ORIGIN || "*";
-
 const app = express();
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
@@ -20,7 +17,11 @@ initWebSocket(wss)
 
 app.use(
   cors({
-    origin: corsOrigin,
+    origin:
+    [
+      'http://208.167.252.106', 
+      'http://alpha03.alphaedtech.org.br'
+    ],
     credentials: true,
   })
 );

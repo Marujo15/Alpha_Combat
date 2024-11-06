@@ -7,6 +7,7 @@ import Button from '../../components/Button/Button.jsx';
 import './SetPass.css'
 
 const SetPass = ({ title, children, onSubmit }) => {
+    const apiUrl = import.meta.env.VITE_API_URL;
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
@@ -28,7 +29,7 @@ const SetPass = ({ title, children, onSubmit }) => {
             const decodedToken = JSON.parse(atob(token.split('.')[1]));
             const userId = decodedToken.id;
             
-            const response = await fetch(`http://localhost:3000/api/users`, {
+            const response = await fetch(`${apiUrl}/api/users`, {
               method: 'PATCH',
               headers: {
                 'Content-Type': 'application/json',

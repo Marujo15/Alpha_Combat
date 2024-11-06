@@ -17,7 +17,7 @@ export const authController = {
                 }
 
                 const maxAge = 5 * 24 * 60 * 60 * 1000;
-
+                
                 res.cookie("session_id", jwtToken, { maxAge, httpOnly: true });
 
                 if(user.password == null || user.password == ''){
