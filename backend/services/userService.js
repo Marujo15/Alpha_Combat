@@ -159,5 +159,30 @@ export const userService = {
             });
         }
     },
+
+    updateUserPassword: async (userId, hashedPassword) => {
+        try {
+            const oldUser = await userRepository.getUserById(userId);
+
+            if (!oldUser) {
+                throw new Error("User does not exist");
+            }
+
+            if (hashedPassword) {
+                const result = validatePassword(hashedPassword);
+                if (!result.passed) {
+                    throw result.error;
+                }
+            }
+
+            const updatedPasswordUser = await userRepository.updateUserPassword(userId, hashedPassword);
+            return updatedPasswordUser;
+        } catch (error) {
+            throw new ErrorApi({
+                message: error.message,
+                status: 500,
+            });
+        }
+    }
 }
 

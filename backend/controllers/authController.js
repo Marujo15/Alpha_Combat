@@ -94,4 +94,21 @@ export const authController = {
             return;
         }
     },
+
+    setPassword: async (req, res, next) => {
+        try {
+            const userId = req.user.id;
+            const { password } = req.body;
+      
+            if (!password) {
+              return res.status(400).json({ message: 'You must set a password to be able to log in locally as well.' });
+            }
+      
+            await authService.setPassword(userId, password);
+      
+            res.status(200).json({ message: 'Password set successfully.' });
+          } catch (error) {
+            next(error);
+        }
+    }
 };

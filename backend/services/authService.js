@@ -91,4 +91,25 @@ export const authService = {
             });
         }
     },
+
+    setPassword: async (userId, password) => {
+        try {
+          const user = await userRepository.getUserById(userId);
+    
+          if (!user) {
+            throw new ErrorApi({ message: 'User not found.', status: 404 });
+          }
+    
+          if (user.password) {
+            throw new ErrorApi({ message: 'Password already defined.', status: 400 });
+          }
+    
+          const hashedPassword = await hashPassword(password);
+          await userService.updateUserPassword(userId, hashedPassword);
+    
+          return true;
+        } catch (error) {
+          throw error;
+        }
+      },
 }
