@@ -7,6 +7,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { userService } from "./userService.js";
 import { generateRandomPassHash } from "../utils/generateRandomPassHash.js";
 import { hashPassword } from "../utils/hashPassword.js";
+import { generateNickname } from "../utils/generateNickName.js";
 
 const client = new OAuth2Client('911355440047-ou9u9fjvti6gqk0vdrhifog3h9q5epdm.apps.googleusercontent.com');
 
@@ -55,7 +56,8 @@ export const authService = {
 
             const payload = ticket.getPayload();
             const userEmail = payload.email;
-            const username = payload.name;
+            const name = payload.name;
+            const username = generateNickname(name);
 
             let user = await userRepository.getUserByEmail(userEmail);
             
