@@ -120,6 +120,24 @@ export const authController = {
         try {
            //como conseguir o id do usuário autenticado via Google oAuth???
 
+           const authHeader = req.headers['authorization'];
+            const token = authHeader && authHeader.split(' ')[1];
+
+            if (!token) {
+                return res.status(401).json({ message: 'Access token is missing or invalid' });
+            }
+
+            // Verificar e decodificar o token
+            let decoded;
+            try {
+                decoded = jwt.verify(token, SECRET_KEY);
+            } catch (error) {
+                return res.status(403).json({ message: 'Invalid token' });
+            }
+
+            // Extrair o userId do token decodificado
+            const userId = decoded.id;
+            
             const { password } = req.body;
             console.log("senha:" + password)
 

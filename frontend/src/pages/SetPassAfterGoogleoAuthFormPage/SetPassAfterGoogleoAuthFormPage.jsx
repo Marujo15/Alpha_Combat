@@ -27,8 +27,8 @@ const SetPassAfterGoogleoAuthFormPage = ({ title, children, onSubmit }) => {
 
             const decodedToken = JSON.parse(atob(token.split('.')[1]));
             const userId = decodedToken.id;
-            console.log("user id aqui aaa" + userId);
-
+            console.log("user id aqui aaa: ", userId);
+//AAAAAAAAAAAAAAa
             const response = await fetch('http://localhost:3000/api/auth/set-password', {
               method: 'POST',
               headers: {
@@ -39,14 +39,11 @@ const SetPassAfterGoogleoAuthFormPage = ({ title, children, onSubmit }) => {
             });
 
             const data = await response.json();
-
-            console.log("resposta legível aaaaa:" + data);
       
             if (response.ok) {
               setSuccessMessage('Password set successfully.');
             } else {
-              const errorData = await response.json();
-              setError(errorData.message || 'Error setting password.');
+              setError('Error setting password.');
             }
         } catch (error) {
         console.error('Request error:', error);
