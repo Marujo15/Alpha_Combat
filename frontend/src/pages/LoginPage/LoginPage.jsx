@@ -50,26 +50,41 @@ const LoginPage = () => {
         }
     };
 
-    const handleGoogleLoginSuccess = (credentialResponse) => {
-        fetch('http://localhost:3000/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: credentialResponse.credential }),
-            credentials: 'include',
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.auth) {
-                    login(data.user);
-                    navigate('/dashboard');
-                } else {
-                    setError(data.error || 'Failed to login with Google');
-                }
-            })
-            .catch((error) => {
-                setError('An error occurred during login with Google');
-                console.error(error);
+    const handleGoogleLoginSuccess = async (credentialResponse) => {
+        try {
+            const response = await fetch('http://localhost:3000/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: credentialResponse.credential }),
+                credentials: 'include',
             });
+        
+            const data = await response.json();
+        
+        
+            if (data.auth) {
+                login(data.user);
+        
+                localStorage.setItem('token', data.token);
+        
+                if (data.needsPassword) {
+                    console.log('usuário precisa definir senha. redirecionando para /set-password.');
+                    navigate('/set-password');
+                    // se o usuário precisar definir uma senha, redireciona para a página set-password
+                } else {
+                    console.log('usuário não precisa definir senha. redirecionando para /dashboard.');
+                    navigate('/dashboard');
+                    //caso contrário, redireciona para o dashboard
+                }
+            } else {
+                console.log('falha na autenticação:', data.error);
+                setError(data.error || 'Failed to login with Google');
+            }
+        } catch (error) {
+            console.error('Erro na requisição:', error);
+            setError('An error occurred during login with Google');
+        }
+        
     };
 
     const handleGoogleLoginError = () => {
@@ -102,7 +117,6 @@ const LoginPage = () => {
                         onError={handleGoogleLoginError}
                     />
                 </div>
-                <GoogleSignInButton></GoogleSignInButton>
             </Form>
         </div>
     );

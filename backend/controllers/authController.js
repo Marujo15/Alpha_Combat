@@ -1,6 +1,7 @@
 import { userService } from "../services/userService.js";
 import { authService } from "../services/authService.js";
 import { ErrorApi } from "../errors/ErrorApi.js";
+import { SECRET_KEY } from "../config/index.js";
 
 export const authController = {
     authenticate: async (req, res) => {
@@ -9,6 +10,8 @@ export const authController = {
         try {
             if (token) {
                 const { auth, token: jwtToken, id, user } = await authService.authenticateWithGoogle(token);
+
+                console.log("o id é passado para cá:" + id);
 
                 if (!auth) {
                     res.status(400).json({ error: "Invalid Google token" });
@@ -19,17 +22,35 @@ export const authController = {
 
                 res.cookie("session_id", jwtToken, { maxAge, httpOnly: true });
 
-                res.status(200).json({
-                    auth,
-                    token: jwtToken,
-                    id,
-                    message: "User successfully authenticated with Google!",
-                    user: {
-                        id: user.id,
-                        username: user.username,
-                        email: user.email,
-                    },
-                });
+                if(password == null || password == '') {
+                    //para verificar se precisa ser criada uma senha
+                    res.status(200).json({
+                        auth,
+                        token: jwtToken,
+                        id,
+                        message: "User successfully authenticated with Google, but needs to define a password",
+                        needsPassword: true,
+                        user: {
+                            id: user.id,
+                            username: user.username,
+                            email: user.email,
+                        },
+                    });
+                } else {
+                    res.status(200).json({
+                        auth,
+                        token: jwtToken,
+                        id,
+                        message: "User successfully authenticated!",
+                        needsPassword: false,
+                        user: {
+                            id: user.id,
+                            username: user.username,
+                            email: user.email,
+                        },
+                    });
+                }
+
             } else if (email && password) {
                 const { auth, token: jwtToken, id } = await authService.authenticateUser(email, password);
 
@@ -97,9 +118,12 @@ export const authController = {
 
     setPassword: async (req, res, next) => {
         try {
-            const userId = req.user.id;
+           //como conseguir o id do usuário autenticado via Google oAuth???
+
             const { password } = req.body;
-      
+            console.log("senha:" + password)
+
+
             if (!password) {
               return res.status(400).json({ message: 'You must set a password to be able to log in locally as well.' });
             }
