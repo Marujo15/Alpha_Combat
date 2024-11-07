@@ -28,6 +28,7 @@ export const authController = {
                         id: user.id,
                         username: user.username,
                         email: user.email,
+                        token: user.token,
                     },
                 });
             } else if (email && password) {
@@ -53,6 +54,7 @@ export const authController = {
                         id: user.id,
                         username: user.username,
                         email: user.email,
+                        token: user.token,
                     },
                 });
             } else {

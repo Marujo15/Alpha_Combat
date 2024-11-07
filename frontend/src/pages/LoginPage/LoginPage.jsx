@@ -36,7 +36,11 @@ const LoginPage = () => {
 
             if (response.ok) {
                 if (data.auth) {
-                    login(data.user);
+                    const userData = {
+                        user: data.user,
+                        token: data.token
+                    };
+                    login(userData);
                     navigate('/dashboard');
                 } else {
                     setError(data.error || 'Failed to login');
@@ -93,7 +97,7 @@ const LoginPage = () => {
                     value={senha}
                     onChange={(e) => setSenha(e.target.value)}
                 />
-                <Button type="submit" className="login-btn">ENTRAR</Button>
+                <Button type="submit" className="login-btn"></Button>
                 {error && <p className="error-message">{error}</p>}
                 <a href="/register">CRIAR CONTA</a>
                 <div className="google-btn">
@@ -102,7 +106,6 @@ const LoginPage = () => {
                         onError={handleGoogleLoginError}
                     />
                 </div>
-                <GoogleSignInButton></GoogleSignInButton>
             </Form>
         </div>
     );
