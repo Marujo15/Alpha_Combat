@@ -30,7 +30,14 @@
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
+    display: flex;
+    flex-direction: row;
     font-size: large;
     height: 70px;
+    justify-content: center;
     width: 330px;
+}
+
+.haAclf {
+    background: rgba(0, 0, 0, 0.8);
 }

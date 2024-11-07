@@ -1,7 +1,7 @@
 .tutorial-container {
     align-items: center;
     background-attachment: fixed;
-    background-image: url('../../../assets/tutorial-background.png');
+    background-image: url('../../../assets/main-background.png');
     background-repeat: no-repeat;
     background-size: cover;
     display: flex;
@@ -9,6 +9,18 @@
     height: 100vh;
     justify-content: space-around;
     width: 100vw;
+}
+
+.tutorial-div {
+    align-items: center;
+    background-color: rgba(0,0,0,0.6);
+    border: none;
+    border-radius: 10rem;
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    justify-content: space-around;
+    width: 90vw;
 }
 
 .tutorial-container h1 {

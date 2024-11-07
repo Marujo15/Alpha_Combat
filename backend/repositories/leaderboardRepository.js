@@ -19,7 +19,9 @@ export const leaderboardRepository = {
     getAllLeaderboards: async () => {
         try {
             const query = `
-                SELECT * FROM leaderboards;
+                SELECT u.username, l.matches, l.kills_count, l.deaths_count, l.time_played
+                FROM leaderboards l
+                JOIN users u ON l.user_id = u.id;
             `;
             const result = await pool.query(query);
             return result.rows;
