@@ -3,13 +3,7 @@
 button {
     background-color: transparent;
     border: none;
-    border-radius: 10px;
-    color: black;
     cursor: pointer;
-    padding: 10px 20px;
-    font-family: "Press Start 2P", system-ui;
-    font-weight: 400;
-    font-style: normal;
     transition: transform 0.2s ease-in-out;
 }
 

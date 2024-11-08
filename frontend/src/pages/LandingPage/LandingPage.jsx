@@ -8,9 +8,15 @@ const LandingPage = () => {
 
     return (
         <div className="landing-page-container">
-            <h1 className="title">ALPHA COMBAT</h1>
-            <Button className="go-to-login-btn" onClick={() => navigate('/login')}></Button>
-            <p className='about'>PREPARE-SE PARA A ADRENALINA DE ALPHA COMBAT! EM UM DUELO MULTIPLAYER ELETRIZANTE, VOCÊ ASSUME O CONTROLE DE UM TANQUE DE GUERRA COM UM ÚNICO OBJETIVO: DESTRUIR O INIMIGO ANTES QUE ELE DESTRUA VOCÊ. COM GRÁFICOS IMERSIVOS E MAPAS REPLETOS DE OBSTÁCULOS ESTRATÉGICOS, CADA PARTIDA EXIGE HABILIDADE, PRECISÃO E UMA BOA DOSE DE ESTRATÉGIA. SÓ OS MELHORES SOBREVIVEM EM ALPHA COMBAT!</p>
+            <div>
+                <h1 className="title">ALPHA COMBAT</h1>
+            </div>
+            <div>
+                <Button className="go-to-login-btn" onClick={() => navigate('/login')}></Button>
+            </div>
+            <div className='about'>
+                <p>PREPARE-SE PARA A ADRENALINA DE ALPHA COMBAT! EM UM DUELO MULTIPLAYER ELETRIZANTE, VOCÊ ASSUME O CONTROLE DE UM TANQUE DE GUERRA COM UM ÚNICO OBJETIVO: DESTRUIR O INIMIGO ANTES QUE ELE DESTRUA VOCÊ. COM GRÁFICOS IMERSIVOS E MAPAS REPLETOS DE OBSTÁCULOS ESTRATÉGICOS, CADA PARTIDA EXIGE HABILIDADE, PRECISÃO E UMA BOA DOSE DE ESTRATÉGIA. SÓ OS MELHORES SOBREVIVEM EM ALPHA COMBAT!</p>
+            </div>
         </div>
     );
 };

@@ -1,12 +1,13 @@
 .login-page-container {
     align-items: center;
-    background-color: lightblue;
+    background-color: #3B6BA4;
     background-image: url('../../../assets/main-background.png');
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: contain;
+    background-position: center;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
     justify-content: center;
     width: 100vw;
 }
