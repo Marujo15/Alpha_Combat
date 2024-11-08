@@ -6,14 +6,14 @@ const WaitingPage = () => {
     return (
         <div className='waiting-page-container'>
             <div className='waiting-page-div'>
-                <p>Sala #12345</p>
+                <p className='room-id-title'>Sala #12345</p>
                 <div>
                     Quadros das pessoas aguardando
                 </div>
                 <div className='waiting-buttons-div'>
-                    <Button type="submit" className={"sair-btn"} onClick={() => navigate('/dashboard')}></Button>
-                    <Button type="submit" className={"iniciar-partida-btn"} onClick={() => {}}></Button>
-                    <Button type="submit" className={"pronto-btn"} onClick={() => {}}></Button>
+                    <Button type="submit" className={"leave-btn"} onClick={() => navigate('/dashboard')}></Button>
+                    <Button type="submit" className={"start-match-btn"} onClick={() => {}}></Button>
+                    <Button type="submit" className={"ready-btn"} onClick={() => {}}></Button>
                 </div>
             </div>
             {/* <div className='scoreboard-div'></div>

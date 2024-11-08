@@ -2,7 +2,7 @@
     align-items: center;
     background-color: #3B6BA4;
     background-image: url('../../../assets/main-background.png');
-    background-repeat: no-repeat;
+    background-repeat: repeat;
     background-size: contain;
     background-position: center;
     display: flex;
@@ -28,8 +28,10 @@
     border-radius: 10rem;
     display: flex;
     flex-direction: column;
+    gap: 3rem;
     height: 90vh;
-    justify-content: space-around;
+    justify-content: center;
+    padding: 1rem;
     width: 70vw;
 }
 
@@ -92,18 +94,4 @@
 
 .create-room-btn:hover {
     background-image: url('../../../assets/yellow-btn-criar-sala-hover.png');
-}
-
-.logout-btn {
-    background-image: url('../../../assets/red-btn-sair.png');
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
-    font-size: large;
-    height: 70px;
-    width: 165px;
-}
-
-.logout-btn:hover {
-    background-image: url('../../../assets/red-btn-sair-hover.png');
 }

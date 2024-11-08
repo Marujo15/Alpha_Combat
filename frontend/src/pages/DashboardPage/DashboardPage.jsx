@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/UserContext';
 import Logo from '../../components/Logo/Logo.jsx';
 import Button from '../../components/Button/Button.jsx';
+import Input from '../../components/Input/Input.jsx';
 import './DashboardPage.css';
 
 const DashboardPage = () => {
@@ -34,15 +35,15 @@ const DashboardPage = () => {
     return (
         <div className='dash-page-main-div'>
             <div className='dash-page-div'>
-                <div className='find-game-div'>
+                {/* <div className='find-game-div'> */}
                     <p className='text'>ENCONTRAR JOGO</p>
                     <Button type="submit" className={"create-room-btn"} onClick={() => {DashboardPage}}></Button>
-                </div>
-                <div className='code-name-div'>
+                {/* </div> */}
+                {/* <div className='code-name-div'> */}
                     <p className='text'>OU INSIRA UM CÓDIGO:</p>
-                    <p>INPUT</p>
+                    <Input className="room-id-input" type="text" placeholder={"CÓDIGO DA SALA"} onChange={(e) => setRoomId(e.target.value)}></Input>
                     <Button type="submit" className={"start-game-btn"} onClick={() => {handleStartGame}}></Button>
-                </div>
+                {/* </div> */}
                 <div>
                     <Button type="submit" className={"ranking-btn"} onClick={() => navigate('/rankings')}></Button>
                     <Button type="submit" className={"tutorial-btn"} onClick={() => navigate('/tutorial')}></Button>
