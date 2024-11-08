@@ -9,7 +9,7 @@ const LandingPage = () => {
     return (
         <div className="landing-page-container">
             <div>
-                <h1 className="title">ALPHA COMBAT</h1>
+                {/* <h1 className="title">ALPHA COMBAT</h1> */}
             </div>
             <div>
                 <Button className="go-to-login-btn" onClick={() => navigate('/login')}></Button>

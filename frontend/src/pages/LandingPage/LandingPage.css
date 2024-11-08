@@ -2,19 +2,20 @@
     align-items: center;
     background-color: #3B6BA4;
     background-image: url('../../../assets/landing-page.png');
-    background-repeat: no-repeat;
+    background-repeat: repeat;
     background-size: contain;
     background-position: center;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     justify-content: center;
+    width: 100vw;
 }
 
 .title {
-    margin-top: 35vh;
     font-size: 3rem;
     margin-bottom: 1rem;
+    margin-top: 35vh;
     text-shadow: 
     -4px -4px 0 black,
     4px -4px 0 black,
@@ -28,9 +29,11 @@
 
 .about {
     margin-top: 24vh;
-    text-align: center;
     max-width: 56%;
     line-height: 1.6;
+    position: absolute;
+    text-align: center;
+    top: 53vh;
 }
 
 .go-to-login-btn {

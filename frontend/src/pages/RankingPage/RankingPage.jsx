@@ -66,7 +66,7 @@ const RankingPage = () => {
             <Logo />
             <div className='rankings-div'>
                 <div className='ranking-div'>
-                    <h2>Most Kills</h2>
+                    <h2>Abates</h2>
                     <div className='ranking-list'>
                         {mostKills.map((entry, index) => (
                             <div key={index} className='ranking-item'>
@@ -76,7 +76,7 @@ const RankingPage = () => {
                     </div>
                 </div>
                 <div className='ranking-div'>
-                    <h2>Most Deaths</h2>
+                    <h2>Mortes</h2>
                     <div className='ranking-list'>
                         {mostDeaths.map((entry, index) => (
                             <div key={index} className='ranking-item'>
@@ -86,7 +86,7 @@ const RankingPage = () => {
                     </div>
                 </div>
                 <div className='ranking-div'>
-                    <h2>Matches Played</h2>
+                    <h2>Partidas</h2>
                     <div className='ranking-list'>
                         {mostMatchesPlayed.map((entry, index) => (
                             <div key={index} className='ranking-item'>
@@ -96,7 +96,7 @@ const RankingPage = () => {
                     </div>
                 </div>
                 <div className='ranking-div'>
-                    <h2>Time Played</h2>
+                    <h2>Tempo de Jogo</h2>
                     <div className='ranking-list'>
                         {mostTimePlayed.map((entry, index) => (
                             <div key={index} className='ranking-item'>
