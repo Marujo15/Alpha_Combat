@@ -1,14 +1,27 @@
 .waiting-page-container {
     align-items: center;
+    background-color: #3B6BA4;
     background-image: url('../../../assets/main-background.png');
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: contain;
+    background-position: center;
     display: flex;
     flex-direction: column;
-    gap: 3rem;
-    height: 100vh;
+    min-height: 100vh;
     justify-content: center;
-    width: 100vw;
+    width: 100%;
+}
+
+.waiting-page-div {
+    align-items: center;
+    background-color: rgba(0,0,0,0.6);
+    border: none;
+    border-radius: 10rem;
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    justify-content: space-around;
+    width: 70vw;
 }
 
 /* .waiting-page-container {
@@ -46,8 +59,7 @@
     height: 40vh;
 } */
 
-.w-cancel-btn {
-    background-image: url('../../../assets/red-btn-cancelar.png');
+.sair-btn, .iniciar-partida-btn, .pronto-btn {
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -56,12 +68,26 @@
     width: 180px;
 }
 
-.w-cancel-btn:hover {
-    background-image: url('../../../assets/red-btn-cancelar-hover.png');
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
-    font-size: large;
-    height: 70px;
-    width: 180px;
+.sair-btn {
+    background-image: url('../../../assets/red-btn-sair.png');
+}
+
+.sair-btn:hover {
+    background-image: url('../../../assets/red-btn-sair-hover.png');
+}
+
+.iniciar-partida-btn {
+    background-image: url('../../../assets/yellow-btn-iniciarpartida.png');
+}
+
+.iniciar-partida-btn:hover {
+    background-image: url('../../../assets/yellow-btn-iniciarpartida-hover.png');
+}
+
+.pronto-btn {
+    background-image: url('../../../assets/green-btn-pronto.png');
+}
+
+.pronto-btn:hover {
+    background-image: url('../../../assets/green-btn-pronto-hover.png');
 }

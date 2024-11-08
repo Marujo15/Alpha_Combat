@@ -1,15 +1,16 @@
 .ranking-page-container {
     align-items: center;
+    background-color: #3B6BA4;
     background-image: url('../../../assets/main-background.png');
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: contain;
+    background-position: center;
     display: flex;
     flex-direction: column;
-    gap: 5rem;
-    height: 100vh;
+    gap: 4rem;
+    min-height: 100vh;
     justify-content: center;
     /* overflow: hidden; */
-    padding-top: 3rem;
     width: 100vw;
 }
 
@@ -20,7 +21,7 @@
     height: 40vh;
     justify-content: space-around;
     margin-top: 4rem;
-    width: 90vw;
+    width: 80vw;
 }
 
 .ranking-div {
@@ -47,7 +48,7 @@
     justify-content: flex-start;
     padding: 30px 10px;
     text-align: center;
-    width: 80%;
+    width: 70%;
 }
 
 .rp-back-btn {

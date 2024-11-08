@@ -33,11 +33,21 @@ const DashboardPage = () => {
 
     return (
         <div className='dash-page-main-div'>
-            <Logo />
-            <Button type="submit" className={"start-game-btn"} onClick={() => {handleStartGame}}></Button>
-            <Button type="submit" className={"ranking-btn"} onClick={() => navigate('/rankings')}></Button>
-            <Button type="submit" className={"tutorial-btn"} onClick={() => navigate('/tutorial')}></Button>
-            <Button type="submit" className={"logout-btn"} onClick={handleLogout}></Button>
+            <div className='dash-page-div'>
+                <div className='find-game-div'>
+                    <p className='text'>ENCONTRAR JOGO</p>
+                    <Button type="submit" className={"create-room-btn"} onClick={() => {DashboardPage}}></Button>
+                </div>
+                <div className='code-name-div'>
+                    <p className='text'>OU INSIRA UM CÓDIGO:</p>
+                    <p>INPUT</p>
+                    <Button type="submit" className={"start-game-btn"} onClick={() => {handleStartGame}}></Button>
+                </div>
+                <div>
+                    <Button type="submit" className={"ranking-btn"} onClick={() => navigate('/rankings')}></Button>
+                    <Button type="submit" className={"tutorial-btn"} onClick={() => navigate('/tutorial')}></Button>
+                </div>
+            </div>
         </div>
     );
 };

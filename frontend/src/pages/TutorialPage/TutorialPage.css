@@ -1,19 +1,19 @@
 .tutorial-container {
     align-items: center;
-    background-attachment: fixed;
+    background-color: #3B6BA4;
     background-image: url('../../../assets/main-background.png');
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: contain;
+    background-position: center;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
     justify-content: space-around;
     width: 100vw;
 }
 
 .tutorial-div {
     align-items: center;
-    background-color: rgba(0,0,0,0.6);
     border: none;
     border-radius: 10rem;
     display: flex;
@@ -25,6 +25,10 @@
 
 .tutorial-container h1 {
     margin: 0;
+}
+
+.up {
+    text-align: center;
 }
 
 .controls-div {
@@ -54,6 +58,7 @@
 }
 
 .arrow-keys-div {
+    text-align: center;
     align-items: center;
     display: flex;
     flex-direction: column;
