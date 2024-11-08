@@ -60,12 +60,13 @@ const LoginPage = () => {
             });
         
             const data = await response.json();
-        
+            console.log("o data que veio para o frontend:", JSON.stringify(data));
         
             if (data.auth) {
                 login(data.user);
         
                 localStorage.setItem('token', data.token);
+                console.log("o cookie que veio para o frontend:", data.token);
         
                 if (data.needsPassword) {
                     console.log('usuário precisa definir senha. redirecionando para /set-password.');

@@ -9,9 +9,12 @@ export const authController = {
 
         try {
             if (token) {
+                console.log(`token1 (o que vem do google): ${token}`)
+                
                 const { auth, token: jwtToken, id, user } = await authService.authenticateWithGoogle(token);
-
-                console.log("o id é passado para cá:" + id);
+                
+                console.log(`esse confere... ${JSON.stringify({ auth, token: jwtToken, id, user })}`);
+                console.log("CONFERE!");
 
                 if (!auth) {
                     res.status(400).json({ error: "Invalid Google token" });
@@ -20,30 +23,17 @@ export const authController = {
 
                 const maxAge = 5 * 24 * 60 * 60 * 1000;
 
-                console.log(`jwtToken aaa ${jwtToken}`);
                 res.cookie("session_id", jwtToken, { maxAge, httpOnly: true });
 
-                if(password == null || password == '') {
-                    //para verificar se precisa ser criada uma senha
+                console.log("cookie definido:", { name: "session_id", value: jwtToken, maxAge, httpOnly: true });
+
+                if(password == null || password == ''){
                     res.status(200).json({
                         auth,
                         token: jwtToken,
                         id,
                         message: "User successfully authenticated with Google, but needs to define a password",
                         needsPassword: true,
-                        user: {
-                            id: user.id,
-                            username: user.username,
-                            email: user.email,
-                        },
-                    });
-                } else {
-                    res.status(200).json({
-                        auth,
-                        token: jwtToken,
-                        id,
-                        message: "User successfully authenticated!",
-                        needsPassword: false,
                         user: {
                             id: user.id,
                             username: user.username,
@@ -119,10 +109,18 @@ export const authController = {
 
     setPassword: async (req, res, next) => {
         try {
-           //como conseguir o id do usuário autenticado via Google oAuth???
 
-            const token = req.cookies.session_id;
-            console.log(`token aaaaaaaaaa: ${token}`);
+            const token =
+            req.headers.authorization?.split(' ')[1] ||
+            req.cookies.session_id ||
+            req.cookies.session_token; // Keep this last or remove it if not needed
+
+            console.log('Token from Authorization header:', req.headers.authorization);
+            console.log('Token from session_id cookie:', req.cookies.session_id);
+            console.log('Token from session_token cookie:', req.cookies.session_token);
+            console.log('Token used for verification:', token);
+
+            //porque o cookie de nome 'session_id' que coloquei nos cookies do usuário, quando autentiquei com Google oAuth, não é encontrado aqui?
 
             if (!token) {
                 return res.status(401).json({ message: 'Access token is missing or invalid' });
@@ -140,8 +138,6 @@ export const authController = {
             const userId = decoded.id;
             
             const { password } = req.body;
-            console.log("senha:" + password)
-
 
             if (!password) {
               return res.status(400).json({ message: 'You must set a password to be able to log in locally as well.' });

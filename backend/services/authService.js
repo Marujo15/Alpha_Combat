@@ -71,8 +71,8 @@ export const authService = {
                 expiresIn: "5d",
             });
           
-            console.log({ auth: true, token: jwtToken, id: user.id, user: user })
-
+            console.log(`esse confere... ${JSON.stringify({ auth: true, token: jwtToken, id: user.id, user: user })}`);
+            
             return { auth: true, token: jwtToken, id: user.id, user: user };
         } catch (error) {
             throw new ErrorApi({

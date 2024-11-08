@@ -24,18 +24,20 @@ const SetPassAfterGoogleoAuthFormPage = ({ title, children, onSubmit }) => {
 
         try {
             const token = localStorage.getItem('token');
+            console.log("o token que está vindo para cá:" + token);
 
             const decodedToken = JSON.parse(atob(token.split('.')[1]));
             const userId = decodedToken.id;
-            console.log("user id aqui aaa: ", userId);
-//AAAAAAAAAAAAAAa
-            const response = await fetch('http://localhost:3000/api/auth/set-password', {
-              method: 'POST',
+            console.log("o user id que está vindo pra cá:" + userId);
+
+            const response = await fetch(`http://localhost:3000/api/users`, {
+              method: 'PATCH',
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
               },
-              body: JSON.stringify({ id: userId, password }),
+              body: JSON.stringify({ password }),
+              credentials: 'include',
             });
 
             const data = await response.json();
