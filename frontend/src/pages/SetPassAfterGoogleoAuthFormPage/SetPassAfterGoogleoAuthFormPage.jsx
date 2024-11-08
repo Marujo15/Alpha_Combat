@@ -44,6 +44,7 @@ const SetPassAfterGoogleoAuthFormPage = ({ title, children, onSubmit }) => {
       
             if (response.ok) {
               setSuccessMessage('Password set successfully.');
+              navigate('/dashboard');
             } else {
               setError('Error setting password.');
             }
