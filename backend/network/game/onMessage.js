@@ -1,4 +1,5 @@
 import { createNewRoom } from "./rooms/createNewRoom.js";
+import { addPlayerToWaitingList, getPlayersWaitingList } from "./rooms/setPlayersWaitingList.js";
 
 export async function onMessage(ws, message, roomManager) {
     const data = JSON.parse(message);
@@ -25,6 +26,22 @@ export async function onMessage(ws, message, roomManager) {
     switch (data.type) {
         case "createNewRoom":
             response = await createNewRoom(data);
+            if (response.type === "roomCreated") {
+                addPlayerToWaitingList(data.player1_id);
+                response.players = getPlayersWaitingList();
+            }
+            break;
+        case "removePlayerFromWaitingList":
+            removePlayerFromWaitingList(data.playerId);
+            response = { type: "waitingListUpdated", players: getPlayersWaitingList() };
+            break;
+        case "getWaitingList":
+            response = { type: "waitingListUpdated", players: getPlayersWaitingList() };
+            break;
+        case "updateRoom":
+            addPlayerToWaitingList(data.player_id);
+            response = { type: "roomUpdated", message: "Room updated successfully" };
+            response.players = getPlayersWaitingList();
             break;
         case "greeting":
             break;

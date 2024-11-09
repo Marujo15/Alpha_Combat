@@ -17,7 +17,7 @@ const LoginPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (user && user.token) {
+        if (user) {
             navigate('/dashboard');
         }
     }, [user, navigate]);
