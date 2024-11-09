@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useContext } from "react";
 // import Button from '../../components/Button/Button';
 import './GamePage.css';
+import { RoomContext } from "../../context/RoomContext";
 
 class TankInterpolator {
   constructor() {
@@ -109,8 +111,8 @@ class TankPredictor {
 
 const GamePage = () => {
   const canvasRef = useRef(null);
+  const { roomId } = useContext(RoomContext);
   const [gameStatus, setGameStatus] = useState("Conectando ao servidor...");
-  const [roomInfo, setRoomInfo] = useState("");
   const wsRef = useRef(null);
   const gameStateRef = useRef({
     localTankId: null,
@@ -265,7 +267,6 @@ const GamePage = () => {
               ? "Você é o tanque verde. Aguardando segundo jogador..."
               : "Você é o tanque azul. Preparando para iniciar..."
           );
-          setRoomInfo(`Sala: ${data.roomId}`);
           break;
 
         case "gameStart":
@@ -366,7 +367,7 @@ const GamePage = () => {
       <div className="bg-gray-800 p-4 rounded-lg shadow-lg w-full max-w-4xl">
         <div className="text-center mb-4">
           <div className="text-white text-xl mb-2">{gameStatus}</div>
-          <div className="text-gray-400 text-sm">{roomInfo}</div>
+          <div className="text-gray-400 text-sm">{roomId}</div>
         </div>
         <canvas
           ref={canvasRef}

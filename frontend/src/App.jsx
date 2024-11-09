@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./context/UserContext.jsx";
+import { RoomProvider } from "./context/RoomContext.jsx";
+import { WaitingRoomProvider } from "./context/WaitingRoomContext.jsx";
 import LandingPage from "./pages/LandingPage/LandingPage.jsx";
 import GamePage from "./pages/GamePage/GamePage.jsx";
 import LoginPage from "./pages/LoginPage/LoginPage.jsx";
@@ -14,18 +16,22 @@ const App = () => {
   return (
     <GoogleOAuthProvider clientId="911355440047-ou9u9fjvti6gqk0vdrhifog3h9q5epdm.apps.googleusercontent.com">
       <UserProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/game/:matchId" element={<GamePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/tutorial" element={<TutorialPage />} />
-            <Route path="/rankings" element={<RankingPage />} />
-            <Route path="/waiting" element={<WaitingPage />} />
-          </Routes>
-        </Router>
+        <WaitingRoomProvider>
+          <RoomProvider>
+            <Router>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/game/:matchId" element={<GamePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/tutorial" element={<TutorialPage />} />
+                <Route path="/rankings" element={<RankingPage />} />
+                <Route path="/waiting/:matchId" element={<WaitingPage />} />
+              </Routes>
+            </Router>
+          </RoomProvider>
+        </WaitingRoomProvider>
       </UserProvider>
     </GoogleOAuthProvider>
   );

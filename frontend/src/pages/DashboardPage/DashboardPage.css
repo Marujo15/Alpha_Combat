@@ -95,3 +95,22 @@
 .create-room-btn:hover {
     background-image: url('../../../assets/yellow-btn-criar-sala-hover.png');
 }
+
+.error-message {
+    align-items: center;
+    background-color: lightcoral;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    color: white;
+    display: flex;
+    flex-direction: row;
+    font-size: medium;
+    height: 40px;
+    justify-content: center;
+    padding: 0 2rem;
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    white-space: nowrap;
+    width: auto;
+}

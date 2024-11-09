@@ -18,7 +18,6 @@ const RegisterPage = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log('Form submitted');
     };
 
     const handleRegister = async (event) => {
