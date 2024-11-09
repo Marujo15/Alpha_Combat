@@ -12,7 +12,7 @@ import './LoginPage.css';
 const LoginPage = () => {
     const { user, login, logout } = useContext(UserContext);
     const [email, setEmail] = useState('');
-    const [senha, setPassword] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
@@ -33,7 +33,7 @@ const LoginPage = () => {
                 },
                 body: JSON.stringify({
                     email: email,
-                    password: senha,
+                    password: password,
                 }),
                 credentials: 'include',
             });
@@ -100,7 +100,7 @@ const LoginPage = () => {
                 <Input
                     type="password"
                     placeholder="SENHA"
-                    value={senha}
+                    value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <Button type="submit" className="login-btn"></Button>
