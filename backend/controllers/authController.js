@@ -38,10 +38,24 @@ export const authController = {
                             id: user.id,
                             username: user.username,
                             email: user.email,
+                            token: user.token,
+                        },
+                    });
+                } else {
+                    res.status(200).json({
+                        auth,
+                        token: jwtToken,
+                        id,
+                        message: "User successfully authenticated with Google, but needs to define a password",
+                        needsPassword: false,
+                        user: {
+                            id: user.id,
+                            username: user.username,
+                            email: user.email,
+                            token: user.token,
                         },
                     });
                 }
-
             } else if (email && password) {
                 const { auth, token: jwtToken, id } = await authService.authenticateUser(email, password);
 
@@ -65,6 +79,7 @@ export const authController = {
                         id: user.id,
                         username: user.username,
                         email: user.email,
+                        token: user.token,
                     },
                 });
             } else {

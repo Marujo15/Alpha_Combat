@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import WebSocket from "ws";
+import { onMessage } from "./game/onMessage.js";
 
 export const initWebSocket = (wss) => {
     const TICK_RATE = 60;
@@ -226,23 +227,29 @@ export const initWebSocket = (wss) => {
     }
 
     const roomManager = new RoomManager();
-
+    
     wss.on("connection", (ws) => {
+        ws.send(JSON.stringify({ type: "welcome", message: "Hello, client!" }));
+
         roomManager.joinRoom(ws);
 
         ws.on("message", (message) => {
-            const data = JSON.parse(message);
-            const room = roomManager.getRoom(ws.roomId);
-            if (!room) return;
+            // const data = JSON.parse(message);
+            // const room = roomManager.getRoom(ws.roomId);
+            // if (!room) return;
 
-            switch (data.type) {
-                case "move":
-                    room.processInput(ws.tankId, data.actions, data.moveNumber, data.deltaTime);
-                    break;
-                case "shoot":
-                    room.createBullet(ws.tankId);
-                    break;
-            }
+            // switch (data.type) {
+            //     case "move":
+            //         room.processInput(ws.tankId, data.actions, data.moveNumber, data.deltaTime);
+            //         break;
+            //     case "shoot":
+            //         room.createBullet(ws.tankId);
+            //         break;
+            // }
+            onMessage(ws, message);
+
+            // Responde ao cliente confirmando o recebimento
+            ws.send(JSON.stringify({ type: "response", message: "Message received" }));
         });
 
         ws.on("close", () => {

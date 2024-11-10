@@ -1,8 +1,8 @@
 .landing-page-container {
     align-items: center;
-    background-color: #4c7bbf;
+    background-color: #3B6BA4;
     background-image: url('../../../assets/landing-page.png');
-    background-repeat: no-repeat;
+    background-repeat: repeat;
     background-size: contain;
     background-position: center;
     display: flex;
@@ -10,32 +10,31 @@
     min-height: 100vh;
     justify-content: center;
     width: 100vw;
-    overflow-y: auto;
 }
 
 .title {
-    padding-top: 25vh;
-    font-size: 2rem;
+    font-size: 3rem;
     margin-bottom: 1rem;
-}
-
-.userInfo {
-    text-align: center;
-}
-
-.button {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 1rem;
+    margin-top: 35vh;
+    text-shadow: 
+    -4px -4px 0 black,
+    4px -4px 0 black,
+    -4px 4px 0 black,
+    4px 4px 0 black,
+    0px -4px 0 black,
+    0px 4px 0 black,
+    -4px 0px 0 black,
+    4px 0px 0 black;
 }
 
 .about {
-    padding-top: 25vh;
-    max-width: 58%;
+    margin-top: 24vh;
+    max-width: 56%;
     line-height: 1.6;
+    position: absolute;
+    text-align: center;
+    top: 53vh;
 }
-
 
 .go-to-login-btn {
     background-image: url('../../../assets/yellow-btn-play.png');
@@ -43,8 +42,8 @@
     background-size: contain;
     background-position: center;
     font-size: large;
-    height: 70px;
-    width: 160px;
+    height: 78px;
+    width: 210px;
 }
 
 .go-to-login-btn:hover {

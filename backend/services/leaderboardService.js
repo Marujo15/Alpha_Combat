@@ -1,4 +1,5 @@
 import { leaderboardRepository } from '../repositories/leaderboardRepository.js';
+import { ErrorApi } from '../errors/ErrorApi.js';
 
 export const leaderboardService = {
     getLeaderboardByUserId: async (userId) => {

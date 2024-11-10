@@ -1,13 +1,13 @@
-import React, { useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../../context/UserContext';
+import { useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import Logo from '../../components/Logo/Logo.jsx';
 import Form from '../../components/Form/Form';
 import Input from '../../components/Input/Input.jsx';
 import Button from '../../components/Button/Button.jsx';
 import GoogleSignInButton from '../../components/GoogleSignInButton/GoogleSignInButton.jsx';
 import './LoginPage.css';
-import { useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
 
 const LoginPage = () => {
     const { user, login, logout } = useContext(UserContext);
@@ -16,7 +16,13 @@ const LoginPage = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    const handleSubmit = async (event) => {
+    useEffect(() => {
+        if (user) {
+            navigate('/dashboard');
+        }
+    }, [user, navigate]);
+
+    const handleLogin = async (event) => {
         event.preventDefault();
 
         try {
@@ -36,7 +42,11 @@ const LoginPage = () => {
 
             if (response.ok) {
                 if (data.auth) {
-                    login(data.user);
+                    const userData = {
+                        user: data.user,
+                        token: data.token
+                    };
+                    login(userData);
                     navigate('/dashboard');
                 } else {
                     setError(data.error || 'Failed to login');
@@ -97,7 +107,7 @@ const LoginPage = () => {
     return (
         <div className='login-page-container'>
             <Logo />
-            <Form title="LOGIN" onSubmit={handleSubmit}>
+            <Form title="LOGIN" onSubmit={handleLogin}>
                 <Input
                     type="email"
                     placeholder="EMAIL"

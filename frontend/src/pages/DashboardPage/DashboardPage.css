@@ -1,13 +1,16 @@
 .dash-page-main-div {
     align-items: center;
+    background-color: #3B6BA4;
     background-image: url('../../../assets/main-background.png');
-    background-repeat: no-repeat;
-    background-size: cover;
+    background-repeat: repeat;
+    background-size: contain;
+    background-position: center;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
     justify-content: center;
     width: 100vw;
+    font-size: 1.8rem;
 }
 
 .dash-page-main-div {
@@ -18,7 +21,21 @@
     gap: 10px;
 }
 
-.start-game-btn, .ranking-btn, .tutorial-btn {
+.dash-page-div {
+    align-items: center;
+    background-color: rgba(0,0,0,0.6);
+    border: none;
+    border-radius: 10rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    height: 90vh;
+    justify-content: center;
+    padding: 1rem;
+    width: 70vw;
+}
+
+.start-game-btn, .ranking-btn, .tutorial-btn, .create-room-btn {
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -27,12 +44,32 @@
     width: 310px;
 }
 
+.find-game-div, .code-name-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.text {
+    text-align: center;
+    text-shadow: 
+    -4px -4px 0 black,
+    4px -4px 0 black,
+    -4px 4px 0 black,
+    4px 4px 0 black,
+    0px -4px 0 black,
+    0px 4px 0 black,
+    -4px 0px 0 black,
+    4px 0px 0 black;
+}
+
 .start-game-btn {
-    background-image: url('../../../assets/yellow-btn-iniciarpartida.png');
+    background-image: url('../../../assets/yellow-btn-entrar.png');
 }
 
 .start-game-btn:hover {
-    background-image: url('../../../assets/yellow-btn-iniciarpartida-hover.png');
+    background-image: url('../../../assets/yellow-btn-entrar-hover.png');
 }
 
 .ranking-btn {
@@ -51,18 +88,29 @@
     background-image: url('../../../assets/yellow-btn-comojogar-hover.png');
 }
 
-
-
-.logout-btn {
-    background-image: url('../../../assets/red-btn-sair.png');
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
-    font-size: large;
-    height: 70px;
-    width: 165px;
+.create-room-btn {
+    background-image: url('../../../assets/yellow-btn-criar-sala.png');
 }
 
-.logout-btn:hover {
-    background-image: url('../../../assets/red-btn-sair-hover.png');
+.create-room-btn:hover {
+    background-image: url('../../../assets/yellow-btn-criar-sala-hover.png');
+}
+
+.error-message {
+    align-items: center;
+    background-color: lightcoral;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    color: white;
+    display: flex;
+    flex-direction: row;
+    font-size: medium;
+    height: 40px;
+    justify-content: center;
+    padding: 0 2rem;
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    white-space: nowrap;
+    width: auto;
 }

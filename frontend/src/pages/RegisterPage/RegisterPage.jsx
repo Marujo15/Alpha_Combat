@@ -18,14 +18,10 @@ const RegisterPage = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log('Form submitted');
     };
 
     const handleRegister = async (event) => {
         event.preventDefault();
-
-        console.log("Registering user...");
-        console.log("body", { username, password, email });
 
         try {
             const response = await fetch("http://localhost:3000/api/auth/register", {
