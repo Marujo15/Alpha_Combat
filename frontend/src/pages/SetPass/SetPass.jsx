@@ -24,12 +24,10 @@ const SetPass = ({ title, children, onSubmit }) => {
 
         try {
             const token = localStorage.getItem('token');
-            console.log("o token que está vindo para cá:" + token);
 
             const decodedToken = JSON.parse(atob(token.split('.')[1]));
             const userId = decodedToken.id;
-            console.log("o user id que está vindo pra cá:" + userId);
-
+            
             const response = await fetch(`http://localhost:3000/api/users`, {
               method: 'PATCH',
               headers: {
@@ -41,7 +39,6 @@ const SetPass = ({ title, children, onSubmit }) => {
             });
 
             const data = await response.json();
-            console.log("DATAAAA", data);
             
             if (response.status == 200) {
               setSuccessMessage('Password set successfully.');
@@ -63,7 +60,7 @@ const SetPass = ({ title, children, onSubmit }) => {
             <Logo />
             <Form title={"CRIAR SENHA"} onSubmit={handleSubmit}>
 
-            <label>"Defina uma senha para conseguir logar de maneira local:</label>
+            <label>"Defina uma senha para conseguir, também, logar de maneira local:</label>
             <Input
                 type="password"
                 placeholder="Nova senha"

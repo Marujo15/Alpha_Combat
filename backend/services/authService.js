@@ -6,7 +6,6 @@ import { SECRET_KEY } from "../config/index.js";
 import { OAuth2Client } from 'google-auth-library';
 import { userService } from "./userService.js";
 import { generateNickname } from "../utils/generateNickName.js";
-import { hashPassword } from "../utils/hashPassword.js";
 
 const client = new OAuth2Client('911355440047-ou9u9fjvti6gqk0vdrhifog3h9q5epdm.apps.googleusercontent.com');
 
@@ -70,8 +69,6 @@ export const authService = {
             const jwtToken = jwt.sign({ id: user.id }, SECRET_KEY, {
                 expiresIn: "5d",
             });
-          
-            console.log(`esse confere... ${JSON.stringify({ auth: true, token: jwtToken, id: user.id, user: user })}`);
             
             return { auth: true, token: jwtToken, id: user.id, user: user };
         } catch (error) {

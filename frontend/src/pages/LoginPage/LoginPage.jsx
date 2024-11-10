@@ -70,30 +70,27 @@ const LoginPage = () => {
             });
         
             const data = await response.json();
-            console.log("o data que veio para o frontend:", JSON.stringify(data));
         
             if (data.auth) {
                 login(data.user);
         
                 localStorage.setItem('token', data.token);
-                console.log("o cookie que veio para o frontend:", data.token);
-                console.log("O DARA", data);
         
                 if (data.needsPassword) {
-                    console.log('usuário precisa definir senha. redirecionando para /set-password.');
+                    console.log('User needs to set password. Redirecting to /set-password');
                     navigate('/set-password');
                     // se o usuário precisar definir uma senha, redireciona para a página set-password
                 } else {
-                    console.log('usuário não precisa definir senha. redirecionando para /dashboard.');
+                    console.log('User does not need to set password. Redirecting to /dashboard');
                     navigate('/dashboard');
                     //caso contrário, redireciona para o dashboard
                 }
             } else {
-                console.log('falha na autenticação:', data.error);
+                console.log('Authentication failure:', data.error);
                 setError(data.error || 'Failed to login with Google');
             }
         } catch (error) {
-            console.error('Erro na requisição:', error);
+            console.error('Request error:', error);
             setError('An error occurred during login with Google');
         }
         

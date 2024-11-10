@@ -9,12 +9,7 @@ export const authController = {
 
         try {
             if (token) {
-                console.log(`token1 (o que vem do google): ${token}`)
-                
                 const { auth, token: jwtToken, id, user } = await authService.authenticateWithGoogle(token);
-                
-                console.log(`esse confere... ${JSON.stringify({ auth, token: jwtToken, id, user })}`);
-                console.log("CONFERE!");
 
                 if (!auth) {
                     res.status(400).json({ error: "Invalid Google token" });
@@ -24,8 +19,6 @@ export const authController = {
                 const maxAge = 5 * 24 * 60 * 60 * 1000;
 
                 res.cookie("session_id", jwtToken, { maxAge, httpOnly: true });
-
-                console.log("cookie definido:", { name: "session_id", value: jwtToken, maxAge, httpOnly: true });
 
                 if(user.password == null || user.password == ''){
                     res.status(200).json({
@@ -128,20 +121,12 @@ export const authController = {
             const token =
             req.headers.authorization?.split(' ')[1] ||
             req.cookies.session_id ||
-            req.cookies.session_token; // Keep this last or remove it if not needed
-
-            console.log('Token from Authorization header:', req.headers.authorization);
-            console.log('Token from session_id cookie:', req.cookies.session_id);
-            console.log('Token from session_token cookie:', req.cookies.session_token);
-            console.log('Token used for verification:', token);
-
-            //porque o cookie de nome 'session_id' que coloquei nos cookies do usuário, quando autentiquei com Google oAuth, não é encontrado aqui?
+            req.cookies.session_token;
 
             if (!token) {
                 return res.status(401).json({ message: 'Access token is missing or invalid' });
             }
 
-            // Verificar e decodificar o token
             let decoded;
             try {
                 decoded = jwt.verify(token, SECRET_KEY);
@@ -149,7 +134,6 @@ export const authController = {
                 return res.status(403).json({ message: 'Invalid token' });
             }
 
-            // Extrair o userId do token decodificado
             const userId = decoded.id;
             
             const { password } = req.body;
