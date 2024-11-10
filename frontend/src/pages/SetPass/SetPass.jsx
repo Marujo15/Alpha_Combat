@@ -4,9 +4,9 @@ import Logo from '../../components/Logo/Logo.jsx';
 import Form from '../../components/Form/Form.jsx';
 import Input from '../../components/Input/Input.jsx';
 import Button from '../../components/Button/Button.jsx';
-import './SetPassAfterGoogleoAuthForm.css'
+import './SetPass.css'
 
-const SetPassAfterGoogleoAuthFormPage = ({ title, children, onSubmit }) => {
+const SetPass = ({ title, children, onSubmit }) => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
@@ -41,8 +41,9 @@ const SetPassAfterGoogleoAuthFormPage = ({ title, children, onSubmit }) => {
             });
 
             const data = await response.json();
-      
-            if (response.ok) {
+            console.log("DATAAAA", data);
+            
+            if (response.status == 200) {
               setSuccessMessage('Password set successfully.');
               navigate('/dashboard');
             } else {
@@ -88,4 +89,4 @@ const SetPassAfterGoogleoAuthFormPage = ({ title, children, onSubmit }) => {
     );
 };
 
-export default SetPassAfterGoogleoAuthFormPage;
+export default SetPass;

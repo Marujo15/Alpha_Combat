@@ -147,12 +147,25 @@ export const userController = {
 
     updateUser: async (req, res) => {
         try {
-            const userId = req.user
-            const { username, email, password } = req.body
-
+            const userId = req.user;
+    
+            if (!userId) {
+                return res.status(401).json({ error: 'User not authenticated' });
+            }
+    
+            const { username, email, password } = req.body;
+    
             const updatedUser = await userService.updateUser(userId, { username, email, password });
-            if (updatedUser) res.json(updatedUser);
-            else res.status(404).json({ error: "User not found" });
+    
+            if (updatedUser) {
+                res.status(200).json({
+                    success: true,
+                    message: 'Usuário atualizado com sucesso',
+                    data: updatedUser,
+                });
+            } else {
+                res.status(404).json({ error: "User not found" });
+            }
         } catch (error) {
             if (error instanceof ErrorApi) {
                 res.status(error.status).json({ error: error.message });
@@ -161,6 +174,7 @@ export const userController = {
             }
         }
     },
+    
 
     deleteUser: async (req, res) => {
         try {

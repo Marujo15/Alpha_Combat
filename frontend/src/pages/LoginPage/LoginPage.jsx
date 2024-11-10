@@ -67,6 +67,7 @@ const LoginPage = () => {
         
                 localStorage.setItem('token', data.token);
                 console.log("o cookie que veio para o frontend:", data.token);
+                console.log("O DARA", data);
         
                 if (data.needsPassword) {
                     console.log('usuário precisa definir senha. redirecionando para /set-password.');

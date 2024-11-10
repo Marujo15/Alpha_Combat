@@ -9,7 +9,7 @@ import TutorialPage from "./pages/TutorialPage/TutorialPage.jsx";
 import RankingPage from "./pages/RankingPage/RankingPage.jsx";
 import WaitingPage from "./pages/WaitingPage/WaitingPage.jsx";
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import SetPassAfterGoogleoAuthFormPage from "./pages/SetPassAfterGoogleoAuthFormPage/SetPassAfterGoogleoAuthFormPage.jsx";
+import SetPass from "./pages/SetPass/SetPass.jsx";
 
 const App = () => {
   return (
@@ -20,7 +20,7 @@ const App = () => {
             <Route path="/" element={<LandingPage />} />
             <Route path="/game" element={<GamePage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/set-password" element={<SetPassAfterGoogleoAuthFormPage />} />
+            <Route path="/set-password" element={<SetPass />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/tutorial" element={<TutorialPage />} />
