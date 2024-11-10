@@ -27,7 +27,7 @@ export const authController = {
 
                 console.log("cookie definido:", { name: "session_id", value: jwtToken, maxAge, httpOnly: true });
 
-                if(password == null || password == ''){
+                if(user.password == null || user.password == ''){
                     res.status(200).json({
                         auth,
                         token: jwtToken,

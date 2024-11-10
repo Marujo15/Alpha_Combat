@@ -94,8 +94,7 @@ export const authService = {
             throw new ErrorApi({ message: 'Password already defined.', status: 400 });
           }
     
-          const hashedPassword = await hashPassword(password);
-          await userService.updateUserPassword(userId, hashedPassword);
+          await userService.updateUserPassword(userId, password);
     
           return true;
         } catch (error) {

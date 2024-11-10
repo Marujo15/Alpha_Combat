@@ -160,7 +160,7 @@ export const userService = {
         }
     },
 
-    updateUserPassword: async (userId, hashedPassword) => {
+    updateUserPassword: async (userId, password) => {
         try {
             const oldUser = await userRepository.getUserById(userId);
 
@@ -168,12 +168,14 @@ export const userService = {
                 throw new Error("User does not exist");
             }
 
-            if (hashedPassword) {
-                const result = validatePassword(hashedPassword);
+            if (password) {
+                const result = validatePassword(password);
                 if (!result.passed) {
                     throw result.error;
                 }
             }
+
+            const hashedPassword = await hashPassword(password);
 
             const updatedPasswordUser = await userRepository.updateUserPassword(userId, hashedPassword);
             return updatedPasswordUser;
