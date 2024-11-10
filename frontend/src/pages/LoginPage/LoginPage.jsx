@@ -110,9 +110,9 @@ const LoginPage = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <Button type="submit" className="login-btn">ENTRAR</Button>
+                <Button type="submit" className="login-btn"></Button>
                 {error && <p className="error-message">{error}</p>}
-                <a href="/register">CRIAR CONTA</a>
+                <a href="/register"></a>
                 <div className="google-btn">
                     <GoogleLogin
                         onSuccess={handleGoogleLoginSuccess}

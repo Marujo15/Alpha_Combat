@@ -79,8 +79,8 @@ const SetPass = ({ title, children, onSubmit }) => {
                 required
             />    
             <div className="set-pass-btns">
-                <Button type="button" className={"sp-back-btn"} onClick={() => {navigate('/login')}}>Voltar</Button>
-                <Button type="submit" className={"set-pass-btn"}>Definir Senha</Button> 
+                <Button type="button" className={"sp-back-btn"} onClick={() => {navigate('/login')}}></Button>
+                <Button type="submit" className={"set-pass-btn"}></Button> 
             </div>
             </Form>
             {error && <p className="error-message">{error}</p>}
