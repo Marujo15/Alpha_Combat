@@ -1,53 +1,41 @@
 .waiting-page-container {
     align-items: center;
+    background-color: #3B6BA4;
     background-image: url('../../../assets/main-background.png');
-    background-repeat: no-repeat;
-    background-size: cover;
+    background-repeat: repeat;
+    background-size: contain;
+    background-position: center;
     display: flex;
     flex-direction: column;
-    gap: 3rem;
-    height: 100vh;
+    min-height: 100vh;
     justify-content: center;
     width: 100vw;
 }
 
-/* .waiting-page-container {
+.waiting-page-div {
     align-items: center;
-    background-color: rgba(0,0,0,0.7);
-    border-radius: 100px;
+    background-color: rgba(0,0,0,0.6);
+    border: none;
+    border-radius: 10rem;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    height: 90vh;
-    justify-content: center;
-    width: 90vw;
-} */
-
-/* .scoreboard-div {
-    background-color: #C3C9CD;
-    border-radius: 30px;
-    height: 15vh;
-    width: 20vw;
-} */
-
-/* .time-div {
-    background-color: #C3C9CD;
-    border-radius: 20px;
-    height: 10vh;
-    width: 15vw;
+    height: 80vh;
+    justify-content: space-around;
+    width: 70vw;
 }
 
-.msg-div {
-    color: yellow;
-    display: flex;
-    font-size: xx-large;
-    flex-direction: column;
-    justify-content: center;
-    height: 40vh;
-} */
+.room-id-title {
+    font-size: x-large;
+}
 
-.w-cancel-btn {
-    background-image: url('../../../assets/red-btn-cancelar.png');
+.waiting-buttons-div {
+    display: flex;
+    flex-direction: row;
+    gap: 3rem;
+    justify-content: center;
+}
+
+.leave-btn, .start-match-btn, .ready-btn {
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -56,12 +44,31 @@
     width: 180px;
 }
 
-.w-cancel-btn:hover {
-    background-image: url('../../../assets/red-btn-cancelar-hover.png');
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
-    font-size: large;
+.start-match-btn {
     height: 70px;
-    width: 180px;
+    width: 240px;
+}
+
+.leave-btn {
+    background-image: url('../../../assets/red-btn-leave.png');
+}
+
+.leave-btn:hover {
+    background-image: url('../../../assets/red-btn-leave-hover.png');
+}
+
+.start-match-btn {
+    background-image: url('../../../assets/yellow-btn-start-match.png');
+}
+
+.start-match-btn:hover {
+    background-image: url('../../../assets/yellow-btn-start-match-hover.png');
+}
+
+.ready-btn {
+    background-image: url('../../../assets/green-btn-ready.png');
+}
+
+.ready-btn:hover {
+    background-image: url('../../../assets/green-btn-ready-hover.png');
 }

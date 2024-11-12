@@ -1,52 +1,62 @@
+.images {
+    height: 250px;
+    width: auto;
+}
+
 .landing-page-container {
     align-items: center;
-    background-color: #4c7bbf;
     background-image: url('../../../assets/landing-page.png');
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
+    background-size: cover;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     justify-content: center;
     width: 100vw;
-    overflow-y: auto;
 }
 
 .title {
-    padding-top: 25vh;
-    font-size: 2rem;
-    margin-bottom: 1rem;
-}
-
-.userInfo {
-    text-align: center;
-}
-
-.button {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 1rem;
+    font-size: 3rem;
+    text-shadow: 
+    -4px -4px 0 black,
+    4px -4px 0 black,
+    -4px 4px 0 black,
+    4px 4px 0 black,
+    0px -4px 0 black,
+    0px 4px 0 black,
+    -4px 0px 0 black,
+    4px 0px 0 black;
 }
 
 .about {
-    padding-top: 25vh;
-    max-width: 58%;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 5vh;
     line-height: 1.6;
+    position: absolute;
+    text-align: center;
+    bottom: 0;
 }
-
 
 .go-to-login-btn {
     background-image: url('../../../assets/yellow-btn-play.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
+    margin-top: 10vh;
+    margin-bottom: 25vh;
     font-size: large;
-    height: 70px;
-    width: 160px;
+    height: 78px;
+    width: 210px;
 }
 
 .go-to-login-btn:hover {
     background-image: url('../../../assets/yellow-btn-play-hover.png');
+}
+
+.flag, .trophy {
+    width: auto;
+    background-size: cover;
+    background-position: center;
 }

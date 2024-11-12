@@ -6,7 +6,8 @@ if (!SECRET_KEY) {
 }
 
 export const authenticateJWT = (req, res, next) => {
-    const token = req.cookies.session_id;
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1] || req.cookies.session_id;
 
     if (!token) {
         res.status(401).json({ message: "Access Denied" });

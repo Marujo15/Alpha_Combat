@@ -8,6 +8,7 @@ import Button from '../../components/Button/Button.jsx';
 import './RegisterPage.css';
 
 const RegisterPage = () => {
+    const apiUrl = import.meta.env.VITE_API_URL;
     const navigate = useNavigate();
     const { user, setUser, login } = useContext(UserContext);
     const [username, setUsername] = useState("");
@@ -18,17 +19,13 @@ const RegisterPage = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log('Form submitted');
     };
 
     const handleRegister = async (event) => {
         event.preventDefault();
 
-        console.log("Registering user...");
-        console.log("body", { username, password, email });
-
         try {
-            const response = await fetch("http://localhost:3000/api/auth/register", {
+            const response = await fetch(`${apiUrl}/api/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

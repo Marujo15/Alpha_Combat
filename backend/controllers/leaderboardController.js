@@ -57,9 +57,7 @@ export const leaderboardController = {
         try {
             const userId = req.params.userId;
             const updates = {
-                victories: req.body.victories ? parseInt(req.body.victories, 10) : undefined,
-                defeats: req.body.defeats ? parseInt(req.body.defeats, 10) : undefined,
-                draws: req.body.draws ? parseInt(req.body.draws, 10) : undefined,
+                matches: req.body.matches ? parseInt(req.body.matches, 10) : undefined,
                 kills_count: req.body.kills_count ? parseInt(req.body.kills_count, 10) : undefined,
                 deaths_count: req.body.deaths_count ? parseInt(req.body.deaths_count, 10) : undefined,
                 time_played: formatTimePlayed(req.body.time_played),

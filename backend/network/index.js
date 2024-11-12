@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import WebSocket from "ws";
+// Remova ou ajuste a importação de onMessage se não estiver usando
+// import { onMessage } from "./game/onMessage.js";
 
 export const initWebSocket = (wss) => {
     const mapSize = 1000;
@@ -145,7 +147,6 @@ export const initWebSocket = (wss) => {
 
     function checkBulletCollisions(bullet) {
         for (const player of players.values()) {
-            // console.log("player.isRotating", player.isRotating)
             if (player.id !== bullet.playerId) {
                 const translatedX = bullet.x - (player.x - playerSize / 2);
                 const translatedY = bullet.y - (player.y - playerSize / 2);
@@ -153,8 +154,8 @@ export const initWebSocket = (wss) => {
                 const rotatedX = translatedX * Math.cos(-player.angle) - translatedY * Math.sin(-player.angle);
                 const rotatedY = translatedX * Math.sin(-player.angle) + translatedY * Math.cos(-player.angle);
 
-                const halfWidth = playerSize / 2
-                const halfHeight = playerSize / 2
+                const halfWidth = playerSize / 2;
+                const halfHeight = playerSize / 2;
                 if (
                     rotatedX >= -halfWidth - bulletSize &&
                     rotatedX <= halfWidth + bulletSize &&
@@ -273,42 +274,46 @@ export const initWebSocket = (wss) => {
                 case "bulletHit":
                     {
                         const player = players.get(action.playerId);
-                        player.canMove = true;
-                        player.canShoot = true;
-                        resetPlayerPosition(player);
-                        const playerUpdate = {
-                            type: "playerUpdate",
-                            id: player.id,
-                            x: player.x,
-                            y: player.y,
-                            canMove: true,
-                            canShoot: true,
-                            isRotating: false,
-                            angle: player.angle,
-                            speedX: player.speedX,
-                            speedY: player.speedY,
-                        };
-                        players.set(player.id, { ...player, isRotating: false });
-                        updates.push(playerUpdate);
+                        if (player) {
+                            player.canMove = true;
+                            player.canShoot = true;
+                            resetPlayerPosition(player);
+                            const playerUpdate = {
+                                type: "playerUpdate",
+                                id: player.id,
+                                x: player.x,
+                                y: player.y,
+                                canMove: true,
+                                canShoot: true,
+                                isRotating: false,
+                                angle: player.angle,
+                                speedX: player.speedX,
+                                speedY: player.speedY,
+                            };
+                            players.set(player.id, { ...player, isRotating: false });
+                            updates.push(playerUpdate);
+                        }
                     }
                     break;
                 case "stopMoving":
                     {
                         const player = players.get(action.playerId);
-                        player.canMove = false;
-                        player.canShoot = false;
-                        updates.push({
-                            type: "playerUpdate",
-                            id: player.id,
-                            x: player.x,
-                            y: player.y,
-                            canMove: false,
-                            canShoot: false,
-                            isRotating: true,
-                            angle: action.playerAngle,
-                            speedX: player.speedX,
-                            speedY: player.speedY,
-                        })
+                        if (player) {
+                            player.canMove = false;
+                            player.canShoot = false;
+                            updates.push({
+                                type: "playerUpdate",
+                                id: player.id,
+                                x: player.x,
+                                y: player.y,
+                                canMove: false,
+                                canShoot: false,
+                                isRotating: true,
+                                angle: action.playerAngle,
+                                speedX: player.speedX,
+                                speedY: player.speedY,
+                            });
+                        }
                     }
                     break;
                 default:
@@ -391,8 +396,9 @@ export const initWebSocket = (wss) => {
             speed: 5,
             speedX: 0,
             speedY: 0,
-            canShoot: true,
             canMove: true,
+            canShoot: true,
+            lastShotTime: 0,
             isRotating: false,
             angle: Number((Math.random() * (2 * Math.PI)).toFixed(2)),
             lastShotTime: 0,
@@ -412,18 +418,32 @@ export const initWebSocket = (wss) => {
 
         actionQueue.push({
             type: "playerJoin",
-            id: player.id,
-            x: player.x,
-            y: player.y,
-            angle: player.angle
+            player: {
+                id: player.id,
+                x: player.x,
+                y: player.y,
+                angle: player.angle,
+                speedX: player.speedX,
+                speedY: player.speedY,
+                canMove: player.canMove,
+                canShoot: player.canShoot,
+                isRotating: player.isRotating,
+            },
         });
 
         ws.on("message", (message) => {
-            const data = JSON.parse(message);
+            let data;
+            try {
+                data = JSON.parse(message);
+            } catch (err) {
+                console.error("Erro ao analisar mensagem JSON:", err);
+                return;
+            }
+
             if (data.action === "move") {
                 actionQueue.push({
                     type: "move",
-                    playerId: player.id,
+                    playerId: player.id, // Usar player.id definido acima
                     direction: data.direction,
                     sequenceNumber: data.sequenceNumber,
                     canMove: data.canMove
@@ -431,7 +451,7 @@ export const initWebSocket = (wss) => {
             } else if (data.action === "shoot") {
                 actionQueue.push({
                     type: "shoot",
-                    playerId: data.playerId,
+                    playerId: player.id, // Usar player.id definido acima
                     bulletId: data.bullet.id,
                     angle: data.bullet.angle,
                 });
@@ -443,24 +463,38 @@ export const initWebSocket = (wss) => {
             } else if (data.action === "bulletHit") {
                 actionQueue.push({
                     type: "bulletHit",
-                    playerId: data.playerId,
+                    playerId: player.id, // Usar player.id definido acima
                 });
             } else if (data.action === "stopMoving") {
                 actionQueue.push({
                     type: "stopMoving",
-                    playerId: data.playerId,
+                    playerId: player.id, // Usar player.id definido acima
                     playerAngle: data.playerAngle
                 });
+            } else {
+                console.error("Ação desconhecida:", data.action);
             }
         });
 
         ws.on("close", () => {
+            // Remover o jogador do mapa
             players.delete(player.id);
+
+            // Notificar todos os clientes sobre a saída do jogador
             actionQueue.push({
                 type: "playerLeave",
                 id: player.id,
             });
         });
+
+        // Opcional: Enviar uma mensagem de boas-vindas para o jogador
+        ws.send(JSON.stringify({
+            type: "welcome",
+            playerId: player.id,
+            x: player.x,
+            y: player.y,
+            angle: player.angle,
+        }));
     });
 
     gameLoop();

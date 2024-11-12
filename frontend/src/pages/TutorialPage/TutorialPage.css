@@ -1,18 +1,31 @@
 .tutorial-container {
     align-items: center;
-    background-attachment: fixed;
-    background-image: url('../../../assets/tutorial-background.png');
-    background-repeat: no-repeat;
+    background-image: url('../../../assets/main-background.png');
     background-size: cover;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
     justify-content: space-around;
     width: 100vw;
 }
 
+.tutorial-div {
+    align-items: center;
+    border: none;
+    border-radius: 10rem;
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    justify-content: space-around;
+    width: 90vw;
+}
+
 .tutorial-container h1 {
     margin: 0;
+}
+
+.up {
+    text-align: center;
 }
 
 .controls-div {
@@ -42,6 +55,7 @@
 }
 
 .arrow-keys-div {
+    text-align: center;
     align-items: center;
     display: flex;
     flex-direction: column;

@@ -1,3 +1,14 @@
+.game-container {
+    background-color: #3B6BA4;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: rgb(17, 24, 39);
+    font-family: Arial, sans-serif;
+}
+
 .game-card {
     padding: 1rem;
     max-width: 672px;

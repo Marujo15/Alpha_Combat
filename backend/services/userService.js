@@ -6,7 +6,6 @@ import { ErrorApi } from "../errors/ErrorApi.js";
 
 export const userService = {
     createUser: async (username, email, password, authProvider) => {
-        //agora para criar um novo usuário será preciso passar o authProvider como parâmetro
         try {
             const result1 = await validateName(username);
             if (!result1.passed) {
@@ -21,7 +20,6 @@ export const userService = {
             let hashedPassword = null;
     
             if (authProvider == 'local') {
-            //se o authProvider for 'local' a validação de senha (as regras para a criação da senha) terá de ser feita
                 const result3 = validatePassword(password);
                 if (!result3.passed) {
                     throw new Error(result3.error || 'Password validation failed');
@@ -37,7 +35,6 @@ export const userService = {
                 }
             } else { 
                 hashedPassword = password;
-                //senão, se for uma autenticação com o Google oAuth, a senha registrada no banco de dados será a senha aleatória hasheada feita no authService mesmo
             }
 
             const user = await userRepository.createUser(

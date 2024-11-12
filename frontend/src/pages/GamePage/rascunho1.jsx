@@ -135,7 +135,7 @@ export default function AlphaCombat() {
   const connectWebSocket = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
-    const socket = new WebSocket("ws://localhost:3000/");
+    const socket = new WebSocket("ws://208.167.252.106:3000/");
     let reconnectTimeout;
 
     socket.onopen = () => {

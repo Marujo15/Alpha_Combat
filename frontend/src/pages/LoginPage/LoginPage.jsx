@@ -1,33 +1,39 @@
-import React, { useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../../context/UserContext';
+import { useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import Logo from '../../components/Logo/Logo.jsx';
 import Form from '../../components/Form/Form';
 import Input from '../../components/Input/Input.jsx';
 import Button from '../../components/Button/Button.jsx';
-import GoogleSignInButton from '../../components/GoogleSignInButton/GoogleSignInButton.jsx';
 import './LoginPage.css';
-import { useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
 
 const LoginPage = () => {
+    const apiUrl = import.meta.env.VITE_API_URL;
     const { user, login, logout } = useContext(UserContext);
     const [email, setEmail] = useState('');
-    const [senha, setSenha] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    const handleSubmit = async (event) => {
+    useEffect(() => {
+        if (user) {
+            navigate('/dashboard');
+        }
+    }, [user, navigate]);
+
+    const handleLogin = async (event) => {
         event.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:3000/api/auth/login', {
+            const response = await fetch(`${apiUrl}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     email: email,
-                    password: senha,
+                    password: password,
                 }),
                 credentials: 'include',
             });
@@ -36,7 +42,11 @@ const LoginPage = () => {
 
             if (response.ok) {
                 if (data.auth) {
-                    login(data.user);
+                    const userData = {
+                        user: data.user,
+                        token: data.token
+                    };
+                    login(userData);
                     navigate('/dashboard');
                 } else {
                     setError(data.error || 'Failed to login');
@@ -50,26 +60,38 @@ const LoginPage = () => {
         }
     };
 
-    const handleGoogleLoginSuccess = (credentialResponse) => {
-        fetch('http://localhost:3000/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: credentialResponse.credential }),
-            credentials: 'include',
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.auth) {
-                    login(data.user);
-                    navigate('/dashboard');
-                } else {
-                    setError(data.error || 'Failed to login with Google');
-                }
-            })
-            .catch((error) => {
-                setError('An error occurred during login with Google');
-                console.error(error);
+    const handleGoogleLoginSuccess = async (credentialResponse) => {
+        try {
+            const response = await fetch(`${apiUrl}/api/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: credentialResponse.credential }),
+                credentials: 'include',
             });
+        
+            const data = await response.json();
+        
+            if (data.auth) {
+                login(data.user);
+        
+                localStorage.setItem('token', data.token);
+        
+                if (data.needsPassword) {
+                    console.log('User needs to set password. Redirecting to /set-password');
+                    navigate('/set-password');
+                } else {
+                    console.log('User does not need to set password. Redirecting to /dashboard');
+                    navigate('/dashboard');
+                }
+            } else {
+                console.log('Authentication failure:', data.error);
+                setError(data.error || 'Failed to login with Google');
+            }
+        } catch (error) {
+            console.error('Request error:', error);
+            setError('An error occurred during login with Google');
+        }
+        
     };
 
     const handleGoogleLoginError = () => {
@@ -80,7 +102,7 @@ const LoginPage = () => {
     return (
         <div className='login-page-container'>
             <Logo />
-            <Form title="LOGIN" onSubmit={handleSubmit}>
+            <Form title="LOGIN" onSubmit={handleLogin}>
                 <Input
                     type="email"
                     placeholder="EMAIL"
@@ -90,19 +112,18 @@ const LoginPage = () => {
                 <Input
                     type="password"
                     placeholder="SENHA"
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                 />
-                <Button type="submit" className="login-btn">ENTRAR</Button>
+                <Button type="submit" className="login-btn"></Button>
                 {error && <p className="error-message">{error}</p>}
-                <a href="/register">CRIAR CONTA</a>
+                <a  className='register' href="/register">CRIAR CONTA</a>
                 <div className="google-btn">
                     <GoogleLogin
                         onSuccess={handleGoogleLoginSuccess}
                         onError={handleGoogleLoginError}
                     />
                 </div>
-                <GoogleSignInButton></GoogleSignInButton>
             </Form>
         </div>
     );

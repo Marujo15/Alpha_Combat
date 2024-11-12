@@ -1,12 +1,10 @@
 .login-page-container {
     align-items: center;
-    background-color: lightblue;
     background-image: url('../../../assets/main-background.png');
-    background-repeat: no-repeat;
     background-size: cover;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
     justify-content: center;
     width: 100vw;
 }
@@ -30,7 +28,18 @@
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
+    display: flex;
+    flex-direction: row;
     font-size: large;
     height: 70px;
+    justify-content: center;
     width: 330px;
+}
+
+.haAclf {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.register:hover {
+    color: rgb(173, 173, 29);
 }

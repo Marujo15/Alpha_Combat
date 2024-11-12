@@ -32,8 +32,7 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://backend:3000
-      - NODE_ENV=development
+      - ./frontend/.env
     restart: unless-stopped
     volumes:
       - ./frontend:/app
@@ -42,6 +41,20 @@ services:
       - network
     depends_on:
       - backend
+    
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - network
+
 
 networks:
   network:
