@@ -1,5 +1,6 @@
 import { userService } from "../services/userService.js";
 import { ErrorApi } from "../errors/ErrorApi.js";
+import jwt from 'jsonwebtoken';
 
 export const userController = {
     getUserMe: async (req, res) => {
