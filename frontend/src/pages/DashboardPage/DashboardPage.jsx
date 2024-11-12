@@ -114,7 +114,7 @@ const DashboardPage = () => {
     const handleLogout = async () => {
         try {
           const response = await fetch('http://localhost:3000/api/auth/logout', {
-            method: 'POST',
+            method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
             },
@@ -124,6 +124,8 @@ const DashboardPage = () => {
           const data = await response.json();
     
           if (response.ok) {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
             navigate('/login');
           } else {
             console.error(data.error || 'An error occurred during logout');
@@ -154,7 +156,7 @@ const DashboardPage = () => {
                     <Button type="submit" className={"tutorial-btn"} onClick={() => navigate('/tutorial')}></Button>
                 </div>
                 <div>
-                    <Button type="submit" className={"leave-btn"} onClick={handleCreateRoom}></Button>
+                    <Button type="submit" className={"leave-btn"} onClick={handleLogout}></Button>
                 </div>
             </div>
         </div>
