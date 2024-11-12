@@ -57,7 +57,7 @@ const RegisterPage = () => {
             <Form title={"CRIAR CONTA"} onSubmit={handleSubmit}>
                 <Input type="text" placeholder="APELIDO" onChange={(e) => setUsername(e.target.value)} />
                 <Input type="text" placeholder="EMAIL" onChange={(e) => setEmail(e.target.value)} />
-                <Input type="email" placeholder="SENHA" onChange={(e) => setPassword(e.target.value)} />
+                <Input type="password" placeholder="SENHA" onChange={(e) => setPassword(e.target.value)} />
                 <div className="register-btns">
                     <Button type="submit" className={"r-back-btn"} onClick={() => {navigate('/login')}}></Button>
                     <Button type="submit" className={"register-btn"} onClick={handleRegister}></Button>

@@ -112,6 +112,29 @@ const DashboardPage = () => {
         }
     };
 
+    const handleLogout = async () => {
+        try {
+          const response = await fetch('http://localhost:3000/api/auth/logout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          });
+    
+          const data = await response.json();
+    
+          if (response.ok) {
+            navigate('/login');
+          } else {
+            console.error(data.error || 'An error occurred during logout');
+          }
+        } catch (error) {
+          console.error('Failed to log out');
+          console.error(error);
+        }
+    };
+
     return (
         <div className='dash-page-main-div'>
             <div className='dash-page-div'>
@@ -132,7 +155,7 @@ const DashboardPage = () => {
                     <Button type="submit" className={"tutorial-btn"} onClick={() => navigate('/tutorial')}></Button>
                 </div>
                 <div>
-                    <Button type="submit" className={"leave-btn"} onClick={() => navigate('/login')}></Button>
+                    <Button type="submit" className={"leave-btn"} onClick={handleCreateRoom}></Button>
                 </div>
             </div>
         </div>
