@@ -32,8 +32,7 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://backend:3000
-      - NODE_ENV=development
+      - ./frontend/.env
     restart: unless-stopped
     volumes:
       - ./frontend:/app

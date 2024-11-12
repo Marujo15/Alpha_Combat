@@ -11,10 +11,13 @@ import TutorialPage from "./pages/TutorialPage/TutorialPage.jsx";
 import RankingPage from "./pages/RankingPage/RankingPage.jsx";
 import WaitingPage from "./pages/WaitingPage/WaitingPage.jsx";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import SetPass from "./pages/SetPass/SetPass.jsx";
+
+const oAuthClientId = import.meta.env.VITE_OAUTH_CLIENT_ID
 
 const App = () => {
   return (
-    <GoogleOAuthProvider clientId="911355440047-ou9u9fjvti6gqk0vdrhifog3h9q5epdm.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={oAuthClientId}>
       <UserProvider>
         <WaitingRoomProvider>
           <RoomProvider>
@@ -23,6 +26,7 @@ const App = () => {
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/game/:matchId" element={<GamePage />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/set-password" element={<SetPass />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/tutorial" element={<TutorialPage />} />

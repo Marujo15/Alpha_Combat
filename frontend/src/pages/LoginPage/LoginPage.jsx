@@ -6,7 +6,6 @@ import Logo from '../../components/Logo/Logo.jsx';
 import Form from '../../components/Form/Form';
 import Input from '../../components/Input/Input.jsx';
 import Button from '../../components/Button/Button.jsx';
-import GoogleSignInButton from '../../components/GoogleSignInButton/GoogleSignInButton.jsx';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -60,26 +59,38 @@ const LoginPage = () => {
         }
     };
 
-    const handleGoogleLoginSuccess = (credentialResponse) => {
-        fetch('http://localhost:3000/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: credentialResponse.credential }),
-            credentials: 'include',
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.auth) {
-                    login(data.user);
-                    navigate('/dashboard');
-                } else {
-                    setError(data.error || 'Failed to login with Google');
-                }
-            })
-            .catch((error) => {
-                setError('An error occurred during login with Google');
-                console.error(error);
+    const handleGoogleLoginSuccess = async (credentialResponse) => {
+        try {
+            const response = await fetch('http://localhost:3000/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: credentialResponse.credential }),
+                credentials: 'include',
             });
+        
+            const data = await response.json();
+        
+            if (data.auth) {
+                login(data.user);
+        
+                localStorage.setItem('token', data.token);
+        
+                if (data.needsPassword) {
+                    console.log('User needs to set password. Redirecting to /set-password');
+                    navigate('/set-password');
+                } else {
+                    console.log('User does not need to set password. Redirecting to /dashboard');
+                    navigate('/dashboard');
+                }
+            } else {
+                console.log('Authentication failure:', data.error);
+                setError(data.error || 'Failed to login with Google');
+            }
+        } catch (error) {
+            console.error('Request error:', error);
+            setError('An error occurred during login with Google');
+        }
+        
     };
 
     const handleGoogleLoginError = () => {
@@ -105,7 +116,7 @@ const LoginPage = () => {
                 />
                 <Button type="submit" className="login-btn"></Button>
                 {error && <p className="error-message">{error}</p>}
-                <a href="/register">CRIAR CONTA</a>
+                <a href="/register"></a>
                 <div className="google-btn">
                     <GoogleLogin
                         onSuccess={handleGoogleLoginSuccess}

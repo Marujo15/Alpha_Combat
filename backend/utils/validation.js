@@ -107,7 +107,7 @@ export function validatePassword(password) {
 }
 
 export async function validateName(username) {
-    const regex = new RegExp(/^[A-Za-z\s]+$/);
+    const regex = new RegExp(/^[A-Za-z0-9]*$/);
     
     if (!username) {
         return {

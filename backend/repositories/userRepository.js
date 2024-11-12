@@ -4,7 +4,7 @@ import { ErrorApi } from "../errors/ErrorApi.js";
 export const userRepository = {
     getAllUsers: async () => {
         try {
-            const { rows } = await pool.query(`SELECT id, username, email, created_at FROM users`);
+            const { rows } = await pool.query(`SELECT id, username, email, created_at, authProvider FROM users`);
             return rows;
         } catch (error) {
 
@@ -21,7 +21,6 @@ export const userRepository = {
         password,
         authProvider
     ) => {
-        //foi adicionado o parâmetro authProvider para criar um novo usuário (ele pode ser 'local' ou 'google')
         
         const query = `
             INSERT INTO users (username, email, password, authProvider) 
@@ -121,6 +120,35 @@ export const userRepository = {
             return result.rows[0];
         } catch (error) {
             console.error("Error while updating user:", error);
+            throw new ErrorApi({
+                message: "Failed to update user on DB",
+                status: 500,
+            })
+        }
+    },
+
+    updateUserPassword: async (userId, hashedPassword) => {
+        const query = `
+            UPDATE users
+            SET password=$1
+            WHERE id=$2
+            RETURNING id, username, email, created_at, authProvider
+            `;
+        const values = [hashedPassword, userId]
+
+        try {
+            const result = await pool.query(query, values);
+
+            if (result.rows.length === 0) {
+                throw new ErrorApi({
+                    message: `User ${id} was not found on DB`,
+                    status: 404,
+                });
+            }
+
+            return result.rows[0];
+        } catch (error) {
+            console.error("Error while updating user password:", error);
             throw new ErrorApi({
                 message: "Failed to update user on DB",
                 status: 500,
