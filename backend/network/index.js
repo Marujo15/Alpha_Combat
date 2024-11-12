@@ -270,7 +270,7 @@ export const initWebSocket = (wss) => {
     }
 
     wss.on("connection", (ws) => {
-        roomManager.joinRoom(ws);
+        //roomManager.joinRoom(ws);
 
         ws.on("message", (message) => {
             const data = JSON.parse(message);
