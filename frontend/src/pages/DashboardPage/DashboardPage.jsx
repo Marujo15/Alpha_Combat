@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/UserContext';
-import { WaitingRoomContext } from '../../context/WaitingRoomContext.jsx';
 import Logo from '../../components/Logo/Logo.jsx';
 import Button from '../../components/Button/Button.jsx';
 import Input from '../../components/Input/Input.jsx';
@@ -11,7 +10,6 @@ import { RoomContext } from '../../context/RoomContext.jsx';
 const DashboardPage = () => {
     const { user } = useContext(UserContext);
     const { roomId, setRoomId } = useContext(RoomContext);
-    const { waitingPlayers, setWaitingPlayers } = useContext(WaitingRoomContext);
     const wsRef = useRef(null);
     const navigate = useNavigate();
     const [gameStatus, setGameStatus] = useState("Connecting to server...");
@@ -97,11 +95,12 @@ const DashboardPage = () => {
             wsRef.current.send(
                 JSON.stringify({
                     type: "updateRoom",
+                    match_id: inputedRoomId,
                     player_id: user.user.id,
                 })
             );
             if (response.ok) {
-
+                setRoomId(inputedRoomId);
                 navigate(`/waiting/${inputedRoomId}`);
             } else {
                 console.error(data.error || 'An error occurred during room creation');

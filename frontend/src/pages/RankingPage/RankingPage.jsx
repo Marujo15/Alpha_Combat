@@ -68,7 +68,7 @@ const RankingPage = () => {
                 <div className='ranking-div'>
                     <h2>Abates</h2>
                     <div className='ranking-list'>
-                        {mostKills.map((entry, index) => (
+                        {mostKills.slice(0, 4).map((entry, index) => (
                             <div key={index} className='ranking-item'>
                                 {entry.username}: {entry.kills}
                             </div>
@@ -78,7 +78,7 @@ const RankingPage = () => {
                 <div className='ranking-div'>
                     <h2>Mortes</h2>
                     <div className='ranking-list'>
-                        {mostDeaths.map((entry, index) => (
+                        {mostDeaths.slice(0, 4).map((entry, index) => (
                             <div key={index} className='ranking-item'>
                                 {entry.username}: {entry.deaths}
                             </div>
@@ -88,7 +88,7 @@ const RankingPage = () => {
                 <div className='ranking-div'>
                     <h2>Partidas</h2>
                     <div className='ranking-list'>
-                        {mostMatchesPlayed.map((entry, index) => (
+                        {mostMatchesPlayed.slice(0, 4).map((entry, index) => (
                             <div key={index} className='ranking-item'>
                                 {entry.username}: {entry.matches}
                             </div>
@@ -98,7 +98,7 @@ const RankingPage = () => {
                 <div className='ranking-div'>
                     <h2>Tempo de Jogo</h2>
                     <div className='ranking-list'>
-                        {mostTimePlayed.map((entry, index) => (
+                        {mostTimePlayed.slice(0, 4).map((entry, index) => (
                             <div key={index} className='ranking-item'>
                                 {entry.username}: {entry.timePlayed} min
                             </div>

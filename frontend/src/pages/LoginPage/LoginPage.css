@@ -40,6 +40,17 @@
     background: rgba(0, 0, 0, 0.8);
 }
 
+.password-input-container {
+    position: relative;
+}
+
+.toggle-password-visibility {
+    position: absolute;
+    right: 0;
+    top: 10px;
+}
+
 .register:hover {
     color: rgb(173, 173, 29);
+
 }
