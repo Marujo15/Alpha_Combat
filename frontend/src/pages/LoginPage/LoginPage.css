@@ -41,13 +41,13 @@
 }
 
 .password-input-container {
-    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center ;
 }
 
-.toggle-password-visibility {
-    position: absolute;
-    right: 0;
-    top: 10px;
+.password-input-container input {
+    width: 65%;
 }
 
 .register:hover {
