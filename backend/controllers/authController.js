@@ -39,7 +39,7 @@ export const authController = {
                         auth,
                         token: jwtToken,
                         id,
-                        message: "User successfully authenticated with Google, but needs to define a password",
+                        message: "User successfully authenticated with Google, and already set password",
                         needsPassword: false,
                         user: {
                             id: user.id,

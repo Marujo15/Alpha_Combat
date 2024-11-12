@@ -24,39 +24,39 @@ const SetPass = () => {
         }
 
         try {
-            const token = localStorage.getItem('token');
-            
-            const response = await fetch(`${apiUrl}/users`, {
+          const oldToken = localStorage.getItem('token');
+          console.log("Token antigo:", oldToken);
+
+          const response = await fetch(`${apiUrl}/users`, {
               method: 'PATCH',
               headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${oldToken}`,
               },
               body: JSON.stringify({ password }),
               credentials: 'include',
-            });
+          });
 
-            const data = await response.json();
-            console.log("Resposta do servidor:", data);
-            
-            if (response.status == 200) {
+          const data = await response.json();
+          console.log("Resposta do servidor:", data);
+
+          if (response.status === 200 && data.needsPassword === false) {
               if (data.token) {
-                localStorage.setItem('token', data.token);
-                console.log("Novo token armazenado:", data.token);
+                  localStorage.setItem('token', data.token);
+                  console.log("Novo token armazenado:", data.token);
               } else {
-                console.warn("Token não recebido na resposta.");
-            }
+                  console.warn("Token não recebido na resposta.");
+              }
 
-            setSuccessMessage('Password set successfully.');
-
-            navigate('/dashboard');
-            } else {
-              setError(data.error || 'Error setting password.');
-            }
-        } catch (error) {
-        console.error('Request error:', error);
-        setError('Error setting password.');
-        }
+              setSuccessMessage('Senha definida com sucesso.');
+              navigate('/dashboard');
+          } else {
+              setError(data.error || 'Erro ao definir a senha.');
+          }
+      } catch (error) {
+          console.error('Erro na requisição:', error);
+          setError('Erro ao definir a senha.');
+      }
 
         console.log('Form submitted');
     };
