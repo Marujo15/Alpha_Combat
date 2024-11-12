@@ -1,16 +1,12 @@
 .ranking-page-container {
     align-items: center;
-    background-color: #3B6BA4;
     background-image: url('../../../assets/main-background.png');
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
+    background-size: cover;
     display: flex;
     flex-direction: column;
     gap: 4rem;
     min-height: 100vh;
     justify-content: center;
-    /* overflow: hidden; */
     width: 100vw;
 }
 
