@@ -42,10 +42,15 @@ const SetPass = ({ title, children, onSubmit }) => {
             const data = await response.json();
             
             if (response.status == 200) {
-              setSuccessMessage('Password set successfully.');
-              navigate('/dashboard');
+              if (data.token) {
+                localStorage.setItem('token', data.token);
+            }
+
+            setSuccessMessage('Password set successfully.');
+
+            navigate('/dashboard');
             } else {
-              setError('Error setting password.');
+              setError(data.error || 'Error setting password.');
             }
         } catch (error) {
         console.error('Request error:', error);

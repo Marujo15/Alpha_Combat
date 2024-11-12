@@ -157,10 +157,21 @@ export const userController = {
             const updatedUser = await userService.updateUser(userId, { username, email, password });
     
             if (updatedUser) {
+                const token = jwt.sign(
+                    { id: updatedUser.id },
+                    process.env.JWT_SECRET,
+                    { expiresIn: '5d' }
+                );
+
+                const maxAge = 5 * 24 * 60 * 60 * 1000;
+                res.cookie("session_id", token, { maxAge, httpOnly: true });       
+
                 res.status(200).json({
                     success: true,
                     message: 'Usuário atualizado com sucesso',
                     data: updatedUser,
+                    token,
+                    needsPassword: false,
                 });
             } else {
                 res.status(404).json({ error: "User not found" });
