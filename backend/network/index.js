@@ -7,6 +7,10 @@ export const initWebSocket = (wss) => {
     const bulletSize = 5; // Ajustado para corresponder ao frontend
     const bulletSpeed = 10;
     const bulletLifetime = 5000;
+    const walls = new Map([
+        ["wall1", { x: 450, y: 200, width: 100, height: 600 }],  // Parede vertical
+        ["wall2", { x: 200, y: 450, width: 600, height: 100 }],  // Parede horizontal
+    ]);
     const players = new Map();
     const bullets = new Map();
     const actionQueue = [];
@@ -15,14 +19,32 @@ export const initWebSocket = (wss) => {
 
     function resetPlayerPosition(player) {
         player.canMove = true;
-        player.x = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-        player.y = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+        let playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+        let playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+        walls.forEach((wall, id) => {
+            do {
+                playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+                playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+            } while (
+                playerX >= wall.x &&
+                playerX <= wall.x + wall.width &&
+                playerY >= wall.y &&
+                playerY <= wall.y + wall.height
+            )
+        })
+        player.x = playerX;
+        player.y = playerY;
     }
 
     function movePlayer(player, direction) {
+        const oldX = player.x;
+        const oldY = player.y;
+        const oldAngle = player.angle;
+
         if (player.canMove === false) {
             return;
         }
+
         player.speedX = player.speed * Math.cos(player.angle);
         player.speedY = player.speed * Math.sin(player.angle);
 
@@ -56,6 +78,14 @@ export const initWebSocket = (wss) => {
             playerSize,
             Math.min(mapSize, player.y)
         );
+
+        const wallCollision = checkWallCollision(player, playerSize, true);
+        if (wallCollision) {
+            // Se colidir, reverte o movimento
+            player.x = oldX;
+            player.y = oldY;
+            player.angle = oldAngle;
+        }
     }
 
     function moveBullet(bullet) {
@@ -79,7 +109,38 @@ export const initWebSocket = (wss) => {
             Math.min(mapSize - bulletSize, bullet.y)
         );
 
+        // Verifica colisão com paredes
+        const wallCollision = checkWallCollision(bullet, bulletSize);
+        if (wallCollision) {
+            calculateRicochet(bullet, wallCollision);
+        }
+
         bullet.sequenceNumber++;
+    }
+
+    function calculateRicochet(bullet, wall) {
+        const bulletCenterX = bullet.x;
+        const bulletCenterY = bullet.y;
+
+        const distToLeft = Math.abs(bulletCenterX - wall.x);
+        const distToRight = Math.abs(bulletCenterX - (wall.x + wall.width));
+        const distToTop = Math.abs(bulletCenterY - wall.y);
+        const distToBottom = Math.abs(bulletCenterY - (wall.y + wall.height));
+
+        const minDist = Math.min(distToLeft, distToRight, distToTop, distToBottom);
+
+        if (minDist === distToLeft || minDist === distToRight) {
+            bullet.speedX *= -1;
+        }
+        if (minDist === distToTop || minDist === distToBottom) {
+            bullet.speedY *= -1;
+        }
+
+        const buffer = bulletSize + 1;
+        if (minDist === distToLeft) bullet.x = wall.x - buffer;
+        if (minDist === distToRight) bullet.x = wall.x + wall.width + buffer;
+        if (minDist === distToTop) bullet.y = wall.y - buffer;
+        if (minDist === distToBottom) bullet.y = wall.y + wall.height + buffer;
     }
 
     function checkBulletCollisions(bullet) {
@@ -106,6 +167,46 @@ export const initWebSocket = (wss) => {
             }
         }
         return null;
+    }
+
+    // Adicione as funções de verificação de colisão
+    function checkWallCollision(entity, size, isPlayer = false) {
+        for (const wall of walls.values()) {
+            if (isPlayer) {
+                if (rectCollision(
+                    entity.x - size, entity.y - size, size, size,
+                    wall.x, wall.y, wall.width, wall.height
+                )) {
+                    return wall;
+                }
+            } else {
+                if (pointRectCollision(
+                    entity.x, entity.y, size,
+                    wall.x, wall.y, wall.width, wall.height
+                )) {
+                    return wall;
+                }
+            }
+        }
+        return null;
+    }
+
+    function rectCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
+        return (
+            x1 < x2 + w2 &&
+            x1 + w1 > x2 &&
+            y1 < y2 + h2 &&
+            y1 + h1 > y2
+        );
+    }
+
+    function pointRectCollision(x, y, size, rectX, rectY, rectWidth, rectHeight) {
+        return (
+            x - size / 2 < rectX + rectWidth &&
+            x + size / 2 > rectX &&
+            y - size / 2 < rectY + rectHeight &&
+            y + size / 2 > rectY
+        );
     }
 
     function gameLoop() {
@@ -218,6 +319,7 @@ export const initWebSocket = (wss) => {
 
         for (const [bulletId, bullet] of bullets.entries()) {
             moveBullet(bullet);
+
             const hitPlayer = checkBulletCollisions(bullet);
             if (hitPlayer) {
                 updates.push({
@@ -269,10 +371,23 @@ export const initWebSocket = (wss) => {
     }
 
     wss.on("connection", (ws) => {
+        let playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+        let playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+        walls.forEach((wall, id) => {
+            do {
+                playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+                playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+            } while (
+                playerX >= wall.x - 10 &&
+                playerX <= wall.x + wall.width + 10 &&
+                playerY >= wall.y - 10 &&
+                playerY <= wall.y + wall.height + 10
+            )
+        })
         const player = {
             id: uuidv4(),
-            x: Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2,
-            y: Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2,
+            x: playerX,
+            y: playerY,
             speed: 5,
             speedX: 0,
             speedY: 0,
@@ -290,6 +405,7 @@ export const initWebSocket = (wss) => {
             player: player,
             players: Array.from(players.values()).filter(p => p.id !== player.id),
             bullets: Array.from(bullets.values()),
+            walls: Array.from(walls.values())  // Adiciona as paredes ao snapshot
         };
 
         ws.send(JSON.stringify(fullSnapshot));

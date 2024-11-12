@@ -17,7 +17,7 @@ export default function AlphaCombat() {
     const players = new Map();
     const bullets = new Map();
     const localBullets = new Map();
-    // const walls = new Map();
+    const walls = new Map();
     const explosions = new Map();
     const updateQueue = [];
     const shotCooldown = 1200; // 1 second cooldown
@@ -35,6 +35,11 @@ export default function AlphaCombat() {
     let isReconciling = false;
     let lastServerUpdateTimestamp;
     let lastShotTime = 0;
+
+    const redTank = new Image();
+    redTank.src = "../../assets/redTank.png";
+    const blueTank = new Image();
+    blueTank.src = "../../assets/blueTank.png";
 
     class PredictedEntity {
       constructor(id, x, y, speed = 5, angle = 0) {
@@ -118,11 +123,102 @@ export default function AlphaCombat() {
       }
     }
 
+    class Wall {
+      constructor(x, y, width, height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+      }
+
+      // Verifica colisão com um ponto (útil para balas)
+      checkCollision(x, y, size) {
+        return (
+          x - size / 2 < this.x + this.width &&
+          x + size / 2 > this.x &&
+          y - size / 2 < this.y + this.height &&
+          y + size / 2 > this.y
+        );
+      }
+
+      // Verifica colisão com um retângulo (útil para players)
+      checkRectCollision(x, y, width, height) {
+        return (
+          x < this.x + this.width &&
+          x + width > this.x &&
+          y < this.y + this.height &&
+          y + height > this.y
+        );
+      }
+
+      // Calcula o ricochete de uma bala
+      calculateRicochet(bullet) {
+        // Determina qual lado da parede foi atingido
+        const bulletCenterX = bullet.x;
+        const bulletCenterY = bullet.y;
+
+        // Calcula as distâncias até as bordas da parede
+        const distToLeft = Math.abs(bulletCenterX - this.x);
+        const distToRight = Math.abs(bulletCenterX - (this.x + this.width));
+        const distToTop = Math.abs(bulletCenterY - this.y);
+        const distToBottom = Math.abs(bulletCenterY - (this.y + this.height));
+
+        // Encontra a menor distância
+        const minDist = Math.min(
+          distToLeft,
+          distToRight,
+          distToTop,
+          distToBottom
+        );
+
+        // Inverte a velocidade apropriada baseado no lado atingido
+        if (minDist === distToLeft || minDist === distToRight) {
+          bullet.speedX *= -1;
+        }
+        if (minDist === distToTop || minDist === distToBottom) {
+          bullet.speedY *= -1;
+        }
+
+        // Ajusta a posição para evitar que a bala fique presa na parede
+        const buffer = bulletSize + 1;
+        if (minDist === distToLeft) bullet.x = this.x - buffer;
+        if (minDist === distToRight) bullet.x = this.x + this.width + buffer;
+        if (minDist === distToTop) bullet.y = this.y - buffer;
+        if (minDist === distToBottom) bullet.y = this.y + this.height + buffer;
+      }
+    }
+
+    function checkWallCollisions(entity, size, isPlayer = false) {
+      for (const wall of walls.values()) {
+        if (isPlayer) {
+          if (
+            wall.checkRectCollision(
+              entity.x - size,
+              entity.y - size,
+              size,
+              size
+            )
+          ) {
+            return wall;
+          }
+        } else {
+          if (wall.checkCollision(entity.x, entity.y, size)) {
+            return wall;
+          }
+        }
+      }
+      return null;
+    }
+
     function interpolate(a, b, t) {
       return a + (b - a) * t;
     }
 
     function movePlayer(player, direction) {
+      const oldX = player.x;
+      const oldY = player.y;
+      const oldAngle = player.angle;
+
       player.speedX = player.speed * Math.cos(player.angle);
       player.speedY = player.speed * Math.sin(player.angle);
 
@@ -152,6 +248,14 @@ export default function AlphaCombat() {
       player.y = Math.max(playerSize, Math.min(mapSize, player.y));
 
       // console.log(player)
+
+      const wallCollision = checkWallCollisions(player, playerSize, true);
+      if (wallCollision) {
+        // Se colidir, reverte o movimento
+        player.x = oldX;
+        player.y = oldY;
+        player.angle = oldAngle;
+      }
 
       return player.addMove(direction, player.x, player.y);
     }
@@ -460,6 +564,18 @@ export default function AlphaCombat() {
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "green";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      walls.forEach((wall) => {
+        ctx.fillStyle = "#BBB";
+        ctx.fillRect(
+          wall.x * (canvas.width / mapSize),
+          wall.y * (canvas.width / mapSize),
+          wall.width * (canvas.width / mapSize),
+          wall.height * (canvas.width / mapSize)
+        );
+      });
 
       if (localPlayer) {
         // Draw local player
@@ -483,21 +599,21 @@ export default function AlphaCombat() {
         );
 
         // Draw tank turret
-        ctx.fillStyle = "darkred";
-        ctx.fillRect(
-          -(playerSize * (canvas.width / mapSize)) / 4,
-          -(playerSize * (canvas.width / mapSize)) / 4,
-          (playerSize * (canvas.width / mapSize)) / 2,
-          (playerSize * (canvas.width / mapSize)) / 2
-        );
+        // ctx.fillStyle = "darkred";
+        // ctx.fillRect(
+        //   -(playerSize * (canvas.width / mapSize)) / 4,
+        //   -(playerSize * (canvas.width / mapSize)) / 4,
+        //   (playerSize * (canvas.width / mapSize)) / 2,
+        //   (playerSize * (canvas.width / mapSize)) / 2
+        // );
 
         // Draw tank cannon
-        ctx.fillStyle = "black";
-        ctx.fillRect(
-          -(playerSize * (canvas.width / mapSize)) / 8,
-          -(playerSize * (canvas.width / mapSize)) / 16,
-          (playerSize * (canvas.width / mapSize)) / 2,
-          (playerSize * (canvas.width / mapSize)) / 8
+        ctx.drawImage(
+          redTank,
+          -playerSize / 2,
+          -playerSize / 3,
+          playerSize,
+          playerSize / 1.5
         );
 
         ctx.restore();
@@ -539,22 +655,22 @@ export default function AlphaCombat() {
           playerSize * (canvas.width / mapSize)
         );
 
-        // Draw tank turret
-        ctx.fillStyle = "darkblue";
-        ctx.fillRect(
-          -(playerSize * (canvas.width / mapSize)) / 4,
-          -(playerSize * (canvas.width / mapSize)) / 4,
-          (playerSize * (canvas.width / mapSize)) / 2,
-          (playerSize * (canvas.width / mapSize)) / 2
-        );
+        // // Draw tank turret
+        // ctx.fillStyle = "darkblue";
+        // ctx.fillRect(
+        //   -(playerSize * (canvas.width / mapSize)) / 4,
+        //   -(playerSize * (canvas.width / mapSize)) / 4,
+        //   (playerSize * (canvas.width / mapSize)) / 2,
+        //   (playerSize * (canvas.width / mapSize)) / 2
+        // );
 
         // Draw tank cannon
-        ctx.fillStyle = "black";
-        ctx.fillRect(
-          -(playerSize * (canvas.width / mapSize)) / 8,
-          -(playerSize * (canvas.width / mapSize)) / 16,
-          (playerSize * (canvas.width / mapSize)) / 2,
-          (playerSize * (canvas.width / mapSize)) / 8
+        ctx.drawImage(
+          blueTank,
+          -playerSize / 2,
+          -playerSize / 3,
+          playerSize,
+          playerSize / 1.5
         );
 
         ctx.restore();
@@ -701,6 +817,13 @@ export default function AlphaCombat() {
             bullets.set(
               bullet.id,
               new InterpolatedEntity(bullet.id, bullet.x, bullet.y, 0)
+            );
+          });
+          walls.clear();
+          data.walls.forEach((wall, index) => {
+            walls.set(
+              `wall${index}`,
+              new Wall(wall.x, wall.y, wall.width, wall.height)
             );
           });
           if (!gameLoopStarted) {
