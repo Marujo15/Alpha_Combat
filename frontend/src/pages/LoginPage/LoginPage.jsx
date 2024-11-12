@@ -130,7 +130,7 @@ const LoginPage = () => {
                 </div>
                 <Button type="submit" className="login-btn"></Button>
                 {error && <p className="error-message">{error}</p>}
-                <a href="/register">CRIAR CONTA</a>
+                <a  className='register' href="/register">CRIAR CONTACRIAR CONTA</a>
                 <div className="google-btn">
                     <GoogleLogin
                         onSuccess={handleGoogleLoginSuccess}

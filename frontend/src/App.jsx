@@ -14,7 +14,7 @@ import WaitingPage from './pages/WaitingPage/WaitingPage';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import SetPass from "./pages/SetPass/SetPass.jsx";
 
-const oAuthClientId = import.meta.env.VITE_OAUTH_CLIENT_ID
+const oAuthClientId = import.meta.env.VITE_OAUTH_CLIENT_ID;
 
 const App = () => {
   return (

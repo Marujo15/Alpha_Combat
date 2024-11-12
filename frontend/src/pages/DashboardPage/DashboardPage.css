@@ -1,10 +1,7 @@
 .dash-page-main-div {
     align-items: center;
-    background-color: #3B6BA4;
     background-image: url('../../../assets/main-background.png');
-    background-repeat: repeat;
-    background-size: contain;
-    background-position: center;
+    background-size: cover;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -94,6 +91,14 @@
 
 .create-room-btn:hover {
     background-image: url('../../../assets/yellow-btn-criar-sala-hover.png');
+}
+
+.leave-btn {
+    background-image: url('../../../assets/red-btn-leave.png');
+}
+
+.leave-btn-hover {
+    background-image: url('../../../assets/red-btn-leave.png');
 }
 
 .error-message {
