@@ -20,7 +20,8 @@ app.use(
     origin:
     [
       'http://208.167.252.106', 
-      'http://alpha03.alphaedtech.org.br'
+      'http://alpha03.alphaedtech.org.br',
+      'http://www.alpha03.alphaedtech.org.br'
     ],
     credentials: true,
   })
