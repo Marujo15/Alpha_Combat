@@ -6,7 +6,7 @@ import Input from '../../components/Input/Input.jsx';
 import Button from '../../components/Button/Button.jsx';
 import './SetPass.css'
 
-const SetPass = ({ title, children, onSubmit }) => {
+const SetPass = () => {
     const apiUrl = import.meta.env.VITE_API_URL;
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -25,9 +25,6 @@ const SetPass = ({ title, children, onSubmit }) => {
 
         try {
             const token = localStorage.getItem('token');
-
-            const decodedToken = JSON.parse(atob(token.split('.')[1]));
-            const userId = decodedToken.id;
             
             const response = await fetch(`${apiUrl}/users`, {
               method: 'PATCH',
@@ -40,10 +37,14 @@ const SetPass = ({ title, children, onSubmit }) => {
             });
 
             const data = await response.json();
+            console.log("Resposta do servidor:", data);
             
             if (response.status == 200) {
               if (data.token) {
                 localStorage.setItem('token', data.token);
+                console.log("Novo token armazenado:", data.token);
+              } else {
+                console.warn("Token não recebido na resposta.");
             }
 
             setSuccessMessage('Password set successfully.');

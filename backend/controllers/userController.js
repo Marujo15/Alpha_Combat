@@ -161,11 +161,17 @@ export const userController = {
             const updatedUser = await userService.updateUser(userId, { username, email, password });
     
             if (updatedUser) {
+                
+                console.log("Updated User:", updatedUser);
+                console.log("JWT_SECRET:", process.env.JWT_SECRET);
+                
                 const token = jwt.sign(
                     { id: updatedUser.id },
                     process.env.SECRET_KEY,
                     { expiresIn: '5d' }
                 );
+
+                console.log("Generated Token:", token);
 
                 const maxAge = 5 * 24 * 60 * 60 * 1000;
                 res.cookie("session_id", token, { maxAge, httpOnly: true });       
