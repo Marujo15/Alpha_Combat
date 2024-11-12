@@ -3,257 +3,319 @@ import WebSocket from "ws";
 import { onMessage } from "./game/onMessage.js";
 
 export const initWebSocket = (wss) => {
-    const TICK_RATE = 60;
-    const TANK_SPEED = 300; // Pixels per second
+    const mapSize = 1000;
+    const playerSize = 50;
+    const bulletSize = 5; // Ajustado para corresponder ao frontend
+    const bulletSpeed = 10;
+    const bulletLifetime = 5000;
+    const players = new Map();
+    const bullets = new Map();
+    const actionQueue = [];
+    const shotCooldown = 1000;
+    let lastTimestamp = null;
 
-    class GameRoom {
-        constructor(id) {
-            this.id = id;
-            this.tanks = new Map();
-            this.bullets = new Map();
-            this.players = new Set();
-            this.isRunning = false;
-            this.gameLoopInterval = null;
-            this.lastProcessedInputs = new Map();
+    function resetPlayerPosition(player) {
+        player.canMove = true;
+        player.x = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+        player.y = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+    }
+
+    function movePlayer(player, direction) {
+        if (player.canMove === false) {
+            return;
+        }
+        player.speedX = player.speed * Math.cos(player.angle);
+        player.speedY = player.speed * Math.sin(player.angle);
+
+        switch (direction) {
+            case "up":
+                player.x += player.speedX;
+                player.y += player.speedY;
+                break;
+            case "down":
+                player.x -= player.speedX;
+                player.y -= player.speedY;
+                break;
+            case "left":
+                player.angle -= 0.03;
+                player.speedX = player.speed * Math.cos(player.angle);
+                player.speedY = player.speed * Math.sin(player.angle);
+                break;
+            case "right":
+                player.angle += 0.03;
+                player.speedX = player.speed * Math.cos(player.angle);
+                player.speedY = player.speed * Math.sin(player.angle);
+                break;
         }
 
-        addPlayer(ws) {
-            if (this.players.size >= 2) return false;
+        player.x = Math.max(
+            playerSize,
+            Math.min(mapSize, player.x)
+        );
 
-            const tankId = uuidv4();
-            const isFirstTank = this.tanks.size === 0;
+        player.y = Math.max(
+            playerSize,
+            Math.min(mapSize, player.y)
+        );
+    }
 
-            const tank = {
-                id: tankId,
-                x: isFirstTank ? 100 : 900,
-                y: 300,
-                angle: isFirstTank ? 0 : Math.PI,
-                color: isFirstTank ? 'green' : 'blue'
-            };
+    function moveBullet(bullet) {
+        bullet.x += bullet.speedX;
+        bullet.y += bullet.speedY;
 
-            this.tanks.set(tankId, tank);
-            this.players.add(ws);
-            this.lastProcessedInputs.set(tankId, 0);
-            ws.tankId = tankId;
-            ws.roomId = this.id;
-
-            ws.send(JSON.stringify({
-                type: "spawn",
-                tank,
-                isFirstTank,
-                roomId: this.id
-            }));
-
-            if (this.players.size === 2) {
-                this.startGame();
-            }
-
-            return true;
+        if (bullet.x <= bulletSize || bullet.x >= mapSize - bulletSize) {
+            bullet.speedX *= -1;
+        }
+        if (bullet.y <= bulletSize || bullet.y >= mapSize - bulletSize) {
+            bullet.speedY *= -1;
         }
 
-        removePlayer(ws) {
-            this.players.delete(ws);
-            this.tanks.delete(ws.tankId);
-            this.lastProcessedInputs.delete(ws.tankId);
+        bullet.x = Math.max(
+            bulletSize,
+            Math.min(mapSize - bulletSize, bullet.x)
+        );
 
-            this.broadcast({
-                type: "playerLeft",
-                tankId: ws.tankId
-            });
+        bullet.y = Math.max(
+            bulletSize,
+            Math.min(mapSize - bulletSize, bullet.y)
+        );
 
-            if (this.players.size === 0) {
-                this.stopGame();
-                return true;
-            }
-            return false;
-        }
+        bullet.sequenceNumber++;
+    }
 
-        processInput(tankId, actions, moveNumber, deltaTime) {
-            const tank = this.tanks.get(tankId);
-            if (!tank) return false;
+    function checkBulletCollisions(bullet) {
+        for (const player of players.values()) {
+            // console.log("player.isRotating", player.isRotating)
+            if (player.id !== bullet.playerId) {
+                const translatedX = bullet.x - (player.x - playerSize / 2);
+                const translatedY = bullet.y - (player.y - playerSize / 2);
 
-            const lastProcessed = this.lastProcessedInputs.get(tankId);
-            if (moveNumber <= lastProcessed) return false;
+                const rotatedX = translatedX * Math.cos(-player.angle) - translatedY * Math.sin(-player.angle);
+                const rotatedY = translatedX * Math.sin(-player.angle) + translatedY * Math.cos(-player.angle);
 
-            this.lastProcessedInputs.set(tankId, moveNumber);
-
-            const moveAmount = TANK_SPEED * (deltaTime / 1000); // Convert to seconds
-
-            if (actions.forward) {
-                tank.x += Math.cos(tank.angle) * moveAmount;
-                tank.y += Math.sin(tank.angle) * moveAmount;
-            }
-            if (actions.backward) {
-                tank.x -= Math.cos(tank.angle) * moveAmount;
-                tank.y -= Math.sin(tank.angle) * moveAmount;
-            }
-            if (actions.left) {
-                tank.angle -= 0.1;
-            }
-            if (actions.right) {
-                tank.angle += 0.1;
-            }
-
-            // Collision with boundaries
-            tank.x = Math.max(0, Math.min(1000, tank.x));
-            tank.y = Math.max(0, Math.min(600, tank.y));
-
-            return true;
-        }
-
-        createBullet(tankId) {
-            const tank = this.tanks.get(tankId);
-            const bullet = {
-                id: uuidv4(),
-                x: tank.x + Math.cos(tank.angle) * 20,
-                y: tank.y + Math.sin(tank.angle) * 20,
-                angle: tank.angle,
-                speed: 10,
-                tankId: tankId,
-                createdAt: Date.now()
-            };
-            this.bullets.set(bullet.id, bullet);
-            this.broadcast({
-                type: "newBullet",
-                bullet
-            });
-        }
-
-        updateBullets(deltaTime) {
-            for (const [bulletId, bullet] of this.bullets.entries()) {
-                bullet.x += Math.cos(bullet.angle) * bullet.speed;
-                bullet.y += Math.sin(bullet.angle) * bullet.speed;
-
-                if (Date.now() - bullet.createdAt > 1500) {
-                    this.bullets.delete(bulletId);
-                    continue;
+                const halfWidth = playerSize / 2
+                const halfHeight = playerSize / 2
+                if (
+                    rotatedX >= -halfWidth - bulletSize &&
+                    rotatedX <= halfWidth + bulletSize &&
+                    rotatedY >= -halfHeight - bulletSize &&
+                    rotatedY <= halfHeight + bulletSize &&
+                    !player.isRotating
+                ) {
+                    return player;
                 }
+            }
+        }
+        return null;
+    }
 
-                if (bullet.x < 3 || bullet.x > 997) bullet.angle = Math.PI - bullet.angle;
-                if (bullet.y < 3 || bullet.y > 597) bullet.angle = -bullet.angle;
+    function gameLoop() {
+        const updates = [];
+
+        while (actionQueue.length > 0) {
+            const action = actionQueue.shift();
+
+            switch (action.type) {
+                case "move":
+                    {
+                        const player = players.get(action.playerId);
+                        if (player) {
+                            movePlayer(player, action.direction);
+                            updates.push({
+                                type: "playerUpdate",
+                                id: player.id,
+                                x: player.x,
+                                y: player.y,
+                                angle: player.angle,
+                                speedX: player.speedX,
+                                speedY: player.speedY,
+                                sequenceNumber: action.sequenceNumber,
+                            });
+                        }
+                    }
+                    break;
+                case "shoot":
+                    {
+                        const player = players.get(action.playerId);
+                        const currentTime = Date.now();
+
+                        if (
+                            player &&
+                            !bullets.has(action.bulletId) &&
+                            currentTime - player.lastShotTime > shotCooldown
+                        ) {
+                            if (player.canShoot) {
+                                const bullet = {
+                                    id: action.bulletId,
+                                    playerId: player.id,
+                                    x: player.x - playerSize / 2,
+                                    y: player.y - playerSize / 2,
+                                    speed: bulletSpeed,
+                                    speedX: bulletSpeed * Math.cos(action.angle),
+                                    speedY: bulletSpeed * Math.sin(action.angle),
+                                    angle: action.angle,
+                                    createdAt: currentTime,
+                                    sequenceNumber: 0,
+                                };
+
+                                bullets.set(bullet.id, bullet);
+                                player.lastShotTime = currentTime;
+                            }
+                        }
+                    }
+                    break;
+                case "playerJoin":
+                    updates.push(action);
+                    break;
+                case "playerLeave":
+                    updates.push(action);
+                    break;
+                case "bulletHit":
+                    {
+                        const player = players.get(action.playerId);
+                        player.canMove = true;
+                        player.canShoot = true;
+                        resetPlayerPosition(player);
+                        const playerUpdate = {
+                            type: "playerUpdate",
+                            id: player.id,
+                            x: player.x,
+                            y: player.y,
+                            canMove: true,
+                            canShoot: true,
+                            isRotating: false,
+                            angle: player.angle,
+                            speedX: player.speedX,
+                            speedY: player.speedY,
+                        };
+                        players.set(player.id, { ...player, isRotating: false });
+                        updates.push(playerUpdate);
+                    }
+                    break;
+                case "stopMoving":
+                    {
+                        const player = players.get(action.playerId);
+                        player.canMove = false;
+                        player.canShoot = false;
+                        updates.push({
+                            type: "playerUpdate",
+                            id: player.id,
+                            x: player.x,
+                            y: player.y,
+                            canMove: false,
+                            canShoot: false,
+                            isRotating: true,
+                            angle: action.playerAngle,
+                            speedX: player.speedX,
+                            speedY: player.speedY,
+                        })
+                    }
+                    break;
+                default:
+                    console.error("Unknown action type:", action.type);
+                    break;
             }
         }
 
-        broadcast(message) {
-            const messageStr = JSON.stringify(message);
-            this.players.forEach(client => {
-                if (client.readyState === WebSocket.OPEN) {
-                    client.send(messageStr);
-                }
-            });
-        }
-
-        gameLoop() {
-            const timestamp = Date.now();
-            this.updateBullets();
-
-            const worldState = {
-                tanks: Array.from(this.tanks.values()),
-                bullets: Array.from(this.bullets.values()),
-                timestamp
-            };
-
-            this.broadcast({
-                type: "worldState",
-                worldState,
-                lastProcessedInputs: Array.from(this.lastProcessedInputs.entries())
-            });
-        }
-
-        startGame() {
-            if (!this.isRunning) {
-                this.isRunning = true;
-                this.gameLoopInterval = setInterval(() => this.gameLoop(), 1000 / TICK_RATE);
-                this.broadcast({ type: "gameStart" });
+        for (const [bulletId, bullet] of bullets.entries()) {
+            moveBullet(bullet);
+            const hitPlayer = checkBulletCollisions(bullet);
+            if (hitPlayer) {
+                updates.push({
+                    type: "explosion",
+                    x: hitPlayer.x,
+                    y: hitPlayer.y,
+                });
+                bullets.delete(bulletId);
+                updates.push({ type: "bulletRemove", id: bulletId });
+                players.set(hitPlayer.id, { ...hitPlayer, isRotating: true });
+            } else if (Date.now() - bullet.createdAt > bulletLifetime) {
+                bullets.delete(bulletId);
+                updates.push({ type: "bulletRemove", id: bulletId });
+            } else {
+                updates.push({
+                    type: "bulletUpdate",
+                    id: bulletId,
+                    playerId: bullet.playerId,
+                    x: bullet.x,
+                    y: bullet.y,
+                    angle: bullet.angle,
+                    speedX: bullet.speedX,
+                    speedY: bullet.speedY,
+                    sequenceNumber: bullet.sequenceNumber,
+                });
             }
         }
 
-        stopGame() {
-            if (this.isRunning) {
-                this.isRunning = false;
-                clearInterval(this.gameLoopInterval);
-                this.broadcast({ type: "gameEnd" });
+        if (updates.length > 0) {
+            broadcast({ type: "update", updates: updates });
+        }
+
+        const now = performance.now();
+        if (lastTimestamp) {
+            const delta = Math.round(now - lastTimestamp);
+            // console.log(delta);
+        }
+        lastTimestamp = now;
+
+        setTimeout(gameLoop, 1000 / 60);
+    }
+
+    function broadcast(message) {
+        for (const client of wss.clients) {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify(message));
             }
         }
     }
 
-    class RoomManager {
-        constructor() {
-            this.rooms = new Map();
-            this.waitingRoom = null;
-        }
-
-        createRoom() {
-            const roomId = uuidv4();
-            const room = new GameRoom(roomId);
-            this.rooms.set(roomId, room);
-            return room;
-        }
-
-        joinRoom(ws) {
-            if (this.waitingRoom && this.rooms.has(this.waitingRoom)) {
-                const room = this.rooms.get(this.waitingRoom);
-                if (room.addPlayer(ws)) {
-                    if (room.players.size === 2) {
-                        this.waitingRoom = null;
-                    }
-                    return;
-                }
-            }
-
-            const room = this.createRoom();
-            room.addPlayer(ws);
-            this.waitingRoom = room.id;
-        }
-
-        handlePlayerLeave(ws) {
-            if (!ws.roomId) return;
-
-            const room = this.rooms.get(ws.roomId);
-            if (room) {
-                const shouldRemoveRoom = room.removePlayer(ws);
-                if (shouldRemoveRoom) {
-                    this.rooms.delete(ws.roomId);
-                    if (this.waitingRoom === ws.roomId) {
-                        this.waitingRoom = null;
-                    }
-                }
-            }
-        }
-
-        getRoom(roomId) {
-            return this.rooms.get(roomId);
-        }
-    }
-
-    const roomManager = new RoomManager();
-    
     wss.on("connection", (ws) => {
-        ws.send(JSON.stringify({ type: "welcome", message: "Hello, client!" }));
-
         roomManager.joinRoom(ws);
 
         ws.on("message", (message) => {
-            // const data = JSON.parse(message);
-            // const room = roomManager.getRoom(ws.roomId);
-            // if (!room) return;
-
-            // switch (data.type) {
-            //     case "move":
-            //         room.processInput(ws.tankId, data.actions, data.moveNumber, data.deltaTime);
-            //         break;
-            //     case "shoot":
-            //         room.createBullet(ws.tankId);
-            //         break;
-            // }
-            onMessage(ws, message);
-
-            // Responde ao cliente confirmando o recebimento
-            ws.send(JSON.stringify({ type: "response", message: "Message received" }));
+            const data = JSON.parse(message);
+            if (data.action === "move") {
+                actionQueue.push({
+                    type: "move",
+                    playerId: player.id,
+                    direction: data.direction,
+                    sequenceNumber: data.sequenceNumber,
+                    canMove: data.canMove
+                });
+            } else if (data.action === "shoot") {
+                actionQueue.push({
+                    type: "shoot",
+                    playerId: data.playerId,
+                    bulletId: data.bullet.id,
+                    angle: data.bullet.angle,
+                });
+            } else if (data.action === "ping") {
+                ws.send(JSON.stringify({
+                    type: "pong",
+                    id: data.id
+                }));
+            } else if (data.action === "bulletHit") {
+                actionQueue.push({
+                    type: "bulletHit",
+                    playerId: data.playerId,
+                });
+            } else if (data.action === "stopMoving") {
+                actionQueue.push({
+                    type: "stopMoving",
+                    playerId: data.playerId,
+                    playerAngle: data.playerAngle
+                });
+            }
         });
 
         ws.on("close", () => {
-            roomManager.handlePlayerLeave(ws);
+            players.delete(player.id);
+            actionQueue.push({
+                type: "playerLeave",
+                id: player.id,
+            });
         });
     });
+
+    gameLoop();
 }
