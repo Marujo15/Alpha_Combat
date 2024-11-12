@@ -1,44 +1,52 @@
-.game-container {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    background-color: rgb(17, 24, 39);
-    font-family: Arial, sans-serif;
-}
-
 .game-card {
-    background-color: rgb(31, 41, 55);
     padding: 1rem;
+    max-width: 672px;
+    /* equivalente a max-w-2xl */
+    margin: 2rem auto;
+    background: white;
     border-radius: 0.5rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 56rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.status-container {
+.game-header {
     text-align: center;
     margin-bottom: 1rem;
 }
 
-.game-status {
-    color: white;
-    font-size: 1.25rem;
+.game-title {
+    font-size: 1.5rem;
+    font-weight: bold;
     margin-bottom: 0.5rem;
 }
 
-.room-info {
-    color: rgb(156, 163, 175);
+.connection-status {
     font-size: 0.875rem;
 }
 
+.connection-status.connected {
+    color: #22c55e;
+}
+
+.connection-status.disconnected {
+    color: #ef4444;
+}
+
 .game-canvas {
-    background-color: black;
+    border: 1px solid #d1d5db;
     border-radius: 0.5rem;
     display: block;
     margin: 0 auto;
-    max-width: 100%;
+}
+
+.game-instructions {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+
+.game-instructions p {
+    margin: 0.25rem 0;
 }
 
 /* .game-page-container {
