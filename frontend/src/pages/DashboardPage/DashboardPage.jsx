@@ -115,7 +115,7 @@ const DashboardPage = () => {
     return (
         <div className='dash-page-main-div'>
             <div className='dash-page-div'>
-                <p className='text'>ENCONTRAR JOGO</p>
+                <p className='text'>JOGAR</p>
                 <Button type="submit" className={"create-room-btn"} onClick={handleCreateRoom}></Button>
                 <p className='text'>OU INSIRA UM CÓDIGO:</p>
                 <Input 
@@ -130,6 +130,9 @@ const DashboardPage = () => {
                 <div>
                     <Button type="submit" className={"ranking-btn"} onClick={() => navigate('/rankings')}></Button>
                     <Button type="submit" className={"tutorial-btn"} onClick={() => navigate('/tutorial')}></Button>
+                </div>
+                <div>
+                    <Button type="submit" className={"leave-btn"} onClick={() => navigate('/login')}></Button>
                 </div>
             </div>
         </div>

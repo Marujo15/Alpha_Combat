@@ -1,10 +1,12 @@
+.images {
+    height: 250px;
+    width: auto;
+}
+
 .landing-page-container {
     align-items: center;
-    background-color: #3B6BA4;
     background-image: url('../../../assets/landing-page.png');
-    background-repeat: repeat;
-    background-size: contain;
-    background-position: center;
+    background-size: cover;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -14,8 +16,6 @@
 
 .title {
     font-size: 3rem;
-    margin-bottom: 1rem;
-    margin-top: 35vh;
     text-shadow: 
     -4px -4px 0 black,
     4px -4px 0 black,
@@ -28,12 +28,15 @@
 }
 
 .about {
-    margin-top: 24vh;
-    max-width: 56%;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 5vh;
     line-height: 1.6;
     position: absolute;
     text-align: center;
-    top: 53vh;
+    bottom: 0;
 }
 
 .go-to-login-btn {
@@ -41,6 +44,8 @@
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
+    margin-top: 10vh;
+    margin-bottom: 25vh;
     font-size: large;
     height: 78px;
     width: 210px;
@@ -48,4 +53,10 @@
 
 .go-to-login-btn:hover {
     background-image: url('../../../assets/yellow-btn-play-hover.png');
+}
+
+.flag, .trophy {
+    width: auto;
+    background-size: cover;
+    background-position: center;
 }

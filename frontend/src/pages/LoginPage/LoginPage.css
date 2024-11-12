@@ -1,10 +1,7 @@
 .login-page-container {
     align-items: center;
-    background-color: #3B6BA4;
     background-image: url('../../../assets/main-background.png');
-    background-repeat: repeat;
-    background-size: contain;
-    background-position: center;
+    background-size: cover;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -41,4 +38,8 @@
 
 .haAclf {
     background: rgba(0, 0, 0, 0.8);
+}
+
+.register:hover {
+    color: rgb(173, 173, 29);
 }
