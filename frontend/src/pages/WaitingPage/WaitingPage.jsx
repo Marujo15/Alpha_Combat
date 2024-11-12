@@ -1,48 +1,50 @@
 import React, { useEffect, useRef, useContext, useState } from 'react';
 import { UserContext } from '../../context/UserContext';
 import { RoomContext } from '../../context/RoomContext';
-import { WaitingRoomContext } from '../../context/WaitingRoomContext';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/Button/Button';
-import Input from '../../components/Input/Input';
 import './WaitingPage.css';
 
 const WaitingPage = () => {
     const { user } = useContext(UserContext);
     const { roomId } = useContext(RoomContext);
-    const { waitingPlayers, setWaitingPlayers } = useContext(WaitingRoomContext);
     const navigate = useNavigate();
     const wsRef = useRef(null);
     const [gameStatus, setGameStatus] = useState("Connecting to server...");
+    const [waitingPlayers, setWaitingPlayers] = useState([]);
+    const [isWsOpen, setIsWsOpen] = useState(false);
+    const [updatePage, setUpdatePage] = useState(false);
 
     useEffect(() => {
         wsRef.current = new WebSocket('ws://localhost:3000');
 
         wsRef.current.onopen = () => {
-            // console.log('Connected to WebSocket server');
             setGameStatus("Connected to server");
-            wsRef.current.send(
-                JSON.stringify({
-                    type: "getWaitingList"
-                 })
-            );
+            setIsWsOpen(true);
+            wsRef.current.send(JSON.stringify({ type: "getWaitingList", matchId: roomId }));
         };
 
-        wsRef.current.onmessage = (message) => {
+        wsRef.current.onmessage = async (message) => {
             const data = JSON.parse(message.data);
-            // console.log("Data received from server:", data);
             switch (data.type) {
                 case "waitingListUpdated":
-                    setWaitingPlayers(data.players);
+                    // console.log("waitingListUpdated:", data.matchInfo.players);
                     break;
+                case "matchStarted":
+                    console.log("Players in the room:", data);
+                    if (data.players.map(player => player.id).includes(user.user.id)) {
+                        console.log("Match started successfully");
+                        navigate(`/game/${roomId}`);
+                    }
+                    break;
+                default:
+                    // console.log("Unknown message type:", data.type);
             }
         };
 
         wsRef.current.onclose = () => {
-            // console.log("Disconnected from server");
-            setGameStatus(
-                "Disconnected from server. Please, refresh the page to try again."
-            );
+            setGameStatus("Disconnected from server. Please, refresh the page to try again.");
+            setIsWsOpen(false);
         };
 
         return () => {
@@ -50,16 +52,24 @@ const WaitingPage = () => {
                 wsRef.current.close();
             }
         };
-    }, []);
+    }, [roomId, updatePage]);
 
     const handleStartMatchBtn = () => {
-        console.log('Entering room...');
+        console.log('Starting match...');
+        console.log("userId", user.user.id);
+        console.log("roomId", roomId);
 
-        // this.ws.send(JSON.stringify({
-        //     type: 'enterRoom',
-        //     player: this.currentPlayer,
-        //     roomCode: this.roomCode,
-        // }));
+        if (isWsOpen) {
+            wsRef.current.send(
+                JSON.stringify({
+                    type: "startMatch",
+                    playerId: user.user.id,
+                    matchId: roomId,
+                })
+            );
+        } else {
+            console.log("WebSocket is not open. Current state:", wsRef.current.readyState);
+        }
     };
 
     return (
@@ -69,7 +79,7 @@ const WaitingPage = () => {
                 <div>
                     <p className='waiting-players-title'>Jogadores na sala:</p>
                     <ul className='waiting-players-list'>
-                        {waitingPlayers.players.map((player, index) => (
+                        {waitingPlayers.map((player, index) => (
                             <li key={index}>{player}</li>
                         ))}
                     </ul>
@@ -77,11 +87,9 @@ const WaitingPage = () => {
                 <div className='waiting-buttons-div'>
                     <Button type="submit" className={"leave-btn"} onClick={() => navigate('/dashboard')}></Button>
                     <Button type="submit" className={"start-match-btn"} onClick={handleStartMatchBtn}></Button>
-                    <Button type="submit" className={"ready-btn"} onClick={() => {}}></Button>
+                    {/* <Button type="submit" className={"ready-btn"} onClick={() => {}}></Button> */}
                 </div>
             </div>
-            {/* <div className='scoreboard-div'></div>
-            <div className='time-div'></div> */}
         </div>
     );
 };
