@@ -1,3 +1,6 @@
+// App.jsx
+
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./context/UserContext.jsx";
 import { RoomProvider } from "./context/RoomContext.jsx";
@@ -12,8 +15,9 @@ import RankingPage from "./pages/RankingPage/RankingPage.jsx";
 import WaitingPage from "./pages/WaitingPage/WaitingPage.jsx";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import SetPass from "./pages/SetPass/SetPass.jsx";
+import BackgroundMusic from "../../public/sounds/background-music.mp4";
 
-const oAuthClientId = import.meta.env.VITE_OAUTH_CLIENT_ID
+const oAuthClientId = import.meta.env.VITE_OAUTH_CLIENT_ID;
 
 const App = () => {
   return (
@@ -21,6 +25,7 @@ const App = () => {
       <UserProvider>
         <WaitingRoomProvider>
           <RoomProvider>
+            <BackgroundMusic />
             <Router>
               <Routes>
                 <Route path="/" element={<LandingPage />} />
