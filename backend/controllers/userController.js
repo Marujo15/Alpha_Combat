@@ -1,6 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { userService } from "../services/userService.js";
 import { ErrorApi } from "../errors/ErrorApi.js";
 import jwt from 'jsonwebtoken';
+
 
 export const userController = {
     getUserMe: async (req, res) => {
@@ -160,7 +163,7 @@ export const userController = {
             if (updatedUser) {
                 const token = jwt.sign(
                     { id: updatedUser.id },
-                    process.env.JWT_SECRET,
+                    process.env.SECRET_KEY,
                     { expiresIn: '5d' }
                 );
 
