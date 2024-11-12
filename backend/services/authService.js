@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import { comparePassword } from "../utils/comparePassword.js";
 import { userRepository } from "../repositories/userRepository.js";
@@ -7,7 +8,9 @@ import { OAuth2Client } from 'google-auth-library';
 import { userService } from "./userService.js";
 import { generateNickname } from "../utils/generateNickName.js";
 
-const oAuthClientId = import.meta.env.VITE_OAUTH_CLIENT_ID
+dotenv.config();
+
+const oAuthClientId = process.env.OAUTH_CLIENT_ID
 
 const client = new OAuth2Client(oAuthClientId);
 
