@@ -93,6 +93,14 @@
     background-image: url('../../../assets/yellow-btn-criar-sala-hover.png');
 }
 
+.leave-btn {
+    background-image: url('../../../assets/red-btn-leave.png');
+}
+
+.leave-btn-hover {
+    background-image: url('../../../assets/red-btn-leave.png');
+}
+
 .error-message {
     align-items: center;
     background-color: lightcoral;
