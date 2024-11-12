@@ -238,8 +238,7 @@ const GamePage = () => {
     canvas.width = 1000;
     canvas.height = 600;
 
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    wsRef.current = new WebSocket(`${protocol}://${window.location.host}/ws/`);
+    wsRef.current = new WebSocket(`ws://localhost:3000`);
 
     wsRef.current.onopen = () => {
       console.log("Conectado ao servidor");
