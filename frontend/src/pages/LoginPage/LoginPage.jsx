@@ -16,11 +16,11 @@ const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (user) {
-            navigate('/dashboard');
-        }
-    }, [user, navigate]);
+    // useEffect(() => {
+    //     if (user) {
+    //         navigate('/dashboard');
+    //     }
+    // }, [user, navigate]);
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -130,7 +130,7 @@ const LoginPage = () => {
                 </div>
                 <Button type="submit" className="login-btn"></Button>
                 {error && <p className="error-message">{error}</p>}
-                <a  className='register' href="/register">CRIAR CONTACRIAR CONTA</a>
+                <a  className='register' href="/register">CRIAR CONTA</a>
                 <div className="google-btn">
                     <GoogleLogin
                         onSuccess={handleGoogleLoginSuccess}
