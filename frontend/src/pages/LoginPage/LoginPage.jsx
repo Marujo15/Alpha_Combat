@@ -27,7 +27,7 @@ const LoginPage = () => {
         event.preventDefault();
 
         try {
-            const response = await fetch(`${apiUrl}/api/auth/login`, {
+            const response = await fetch(`${apiUrl}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ const LoginPage = () => {
 
     const handleGoogleLoginSuccess = async (credentialResponse) => {
         try {
-            const response = await fetch(`${apiUrl}/api/auth/login`, {
+            const response = await fetch(`${apiUrl}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token: credentialResponse.credential }),

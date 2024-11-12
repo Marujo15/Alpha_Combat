@@ -23,7 +23,7 @@ const RegisterPage = () => {
 
     const handleRegister = async (event) => {
         try {
-            const response = await fetch(`${apiUrl}/api/auth/register`, {
+            const response = await fetch(`${apiUrl}/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

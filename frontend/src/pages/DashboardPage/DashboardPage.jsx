@@ -84,7 +84,7 @@ const DashboardPage = () => {
         }
 
         try {
-            const response = await fetch(`${apiUrl}/api/matches/${inputedRoomId}`, {
+            const response = await fetch(`${apiUrl}/matches/${inputedRoomId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ const DashboardPage = () => {
 
     const handleLogout = async () => {
         try {
-          const response = await fetch(`${apiUrl}/api/auth/logout`, {
+          const response = await fetch(`${apiUrl}/auth/logout`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',

@@ -29,7 +29,7 @@ const SetPass = ({ title, children, onSubmit }) => {
             const decodedToken = JSON.parse(atob(token.split('.')[1]));
             const userId = decodedToken.id;
             
-            const response = await fetch(`${apiUrl}/api/users`, {
+            const response = await fetch(`${apiUrl}/users`, {
               method: 'PATCH',
               headers: {
                 'Content-Type': 'application/json',
