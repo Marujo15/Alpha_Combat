@@ -7,7 +7,9 @@ import { OAuth2Client } from 'google-auth-library';
 import { userService } from "./userService.js";
 import { generateNickname } from "../utils/generateNickName.js";
 
-const client = new OAuth2Client('911355440047-ou9u9fjvti6gqk0vdrhifog3h9q5epdm.apps.googleusercontent.com');
+const oAuthClientId = import.meta.env.VITE_OAUTH_CLIENT_ID
+
+const client = new OAuth2Client(oAuthClientId);
 
 export const authService = {
     authenticateUser: async (email, password) => {
@@ -41,7 +43,7 @@ export const authService = {
         try {
             const ticket = await client.verifyIdToken({
                 idToken: token,
-                audience: '911355440047-ou9u9fjvti6gqk0vdrhifog3h9q5epdm.apps.googleusercontent.com',
+                audience: oAuthClientId,
             });
 
             const payload = ticket.getPayload();
@@ -51,17 +53,14 @@ export const authService = {
 
             let user = await userRepository.getUserByEmail(userEmail);
             
-            //se esse usuário autenticado com Google oAuth ainda não estiver na tabela 'users' do banco de dados (primeiro acesso), essa entidade será criada:
             if (!user) {
 
                 const newUser = {
                     email: userEmail,
                     username: username,
                     password: null,
-                    //é melhor que a password seja null, inicialmente, mesmo
                     authProvider: 'google',
                 };
-                //será criado um usuário com o authProvider (nova coluna que criei na tabela 'users') 'google', afinal ele entrou com o Google o Auth
 
                 user = await userService.createUser(newUser.username, newUser.email, newUser.password, newUser.authProvider);
             }

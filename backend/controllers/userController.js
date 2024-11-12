@@ -114,7 +114,6 @@ export const userController = {
             const { username, email, password } = req.body;
             let authProvider;
             if(!req.body.authProvider) {
-                //se não houver um authProvider no corpo da requisição, significa que é 'local'
                authProvider = 'local';
             }
 

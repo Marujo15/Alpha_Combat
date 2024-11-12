@@ -115,7 +115,7 @@ export const authController = {
         }
     },
 
-    setPassword: async (req, res, next) => {
+    setPassword: async (req, res) => {
         try {
 
             const token =
@@ -144,9 +144,17 @@ export const authController = {
       
             await authService.setPassword(userId, password);
       
-            res.status(200).json({ message: 'Password set successfully.' });
+            res.status(200).json({ success: true, message: 'Password set successfully.' });
           } catch (error) {
-            next(error);
+            if (error instanceof ErrorApi) {
+                res.status(error.status).json({ error: error.message });
+                return;
+            }
+
+            res
+                .status(500)
+                .json({ error: "Internal server error when trying to set password" });
+            return;
         }
     }
 };

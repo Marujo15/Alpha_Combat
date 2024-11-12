@@ -21,7 +21,6 @@ export const userRepository = {
         password,
         authProvider
     ) => {
-        //foi adicionado o parâmetro authProvider para criar um novo usuário (ele pode ser 'local' ou 'google')
         
         const query = `
             INSERT INTO users (username, email, password, authProvider) 

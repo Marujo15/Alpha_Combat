@@ -6,7 +6,6 @@ import Logo from '../../components/Logo/Logo.jsx';
 import Form from '../../components/Form/Form';
 import Input from '../../components/Input/Input.jsx';
 import Button from '../../components/Button/Button.jsx';
-import GoogleSignInButton from '../../components/GoogleSignInButton/GoogleSignInButton.jsx';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -79,11 +78,9 @@ const LoginPage = () => {
                 if (data.needsPassword) {
                     console.log('User needs to set password. Redirecting to /set-password');
                     navigate('/set-password');
-                    // se o usuário precisar definir uma senha, redireciona para a página set-password
                 } else {
                     console.log('User does not need to set password. Redirecting to /dashboard');
                     navigate('/dashboard');
-                    //caso contrário, redireciona para o dashboard
                 }
             } else {
                 console.log('Authentication failure:', data.error);
