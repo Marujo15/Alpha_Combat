@@ -1,5 +1,7 @@
 .game-container {
-    background-color: #3B6BA4;
+    align-items: center;
+    background-image: url('../../../assets/main-background.png');
+    background-size: cover;
     min-height: 100vh;
     display: flex;
     align-items: center;
