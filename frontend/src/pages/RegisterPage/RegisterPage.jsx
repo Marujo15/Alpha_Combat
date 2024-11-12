@@ -21,15 +21,13 @@ const RegisterPage = () => {
     };
 
     const handleRegister = async (event) => {
-        event.preventDefault();
-
         try {
             const response = await fetch("http://localhost:3000/api/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ username, password, email }),
+                body: JSON.stringify({ username, email, password }),
             });
 
             if (!response.ok) {
