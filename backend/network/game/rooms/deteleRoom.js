@@ -1,10 +1,13 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import fetch from 'node-fetch';
+const apiUrl = process.env.API_URL;
 
 export const deteleRoom = async (matchId) => {
     try {
         const token = data.token;
 
-        const response = await fetch(`http://localhost:3000/api/matches/${matchId}`, {
+        const response = await fetch(`${apiUrl}/api/matches/${matchId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
