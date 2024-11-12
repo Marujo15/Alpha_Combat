@@ -7,7 +7,7 @@ export default function AlphaCombat() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    wsRef.current = new WebSocket("ws://localhost:3000");
+    wsRef.current = new WebSocket("ws://208.167.252.106:3000");
     const ws = wsRef.current;
 
     const playerSize = 50;

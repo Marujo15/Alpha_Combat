@@ -19,7 +19,6 @@ app.use(
   cors({
     origin:
     [
-      'http://localhost:5173', 
       'http://208.167.252.106', 
       'http://alpha03.alphaedtech.org.br'
     ],

@@ -16,7 +16,7 @@ const WaitingPage = () => {
     const [gameStatus, setGameStatus] = useState("Connecting to server...");
 
     useEffect(() => {
-        wsRef.current = new WebSocket(`ws://localhost:3000`);
+        wsRef.current = new WebSocket(`ws://208.167.252.106:3000`);
 
         wsRef.current.onopen = () => {
             // console.log('Connected to WebSocket server');

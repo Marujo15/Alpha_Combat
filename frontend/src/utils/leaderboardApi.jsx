@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:3000/api/leaderboards";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export const getLeaderboardByKey = async (key) => {
     try {
@@ -7,7 +7,7 @@ export const getLeaderboardByKey = async (key) => {
             throw new Error("Token not found");
         }
         
-        const response = await fetch(`${API_BASE_URL}`, {
+        const response = await fetch(`${apiUrl}/api/leaderboards`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

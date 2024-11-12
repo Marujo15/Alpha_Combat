@@ -4,7 +4,7 @@ export const createNewRoom = async (data) => {
     try {
         const token = data.token;
 
-        const response = await fetch('http://localhost:3000/api/matches', {
+        const response = await fetch('http://208.167.252.106:3000/api/matches', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
