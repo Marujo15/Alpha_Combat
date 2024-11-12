@@ -20,7 +20,8 @@ const DashboardPage = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        wsRef.current = new WebSocket('ws://localhost:3000');
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        wsRef.current = new WebSocket(`${protocol}://${window.location.host}/ws/`);
         
         wsRef.current.onopen = () => {
             setGameStatus("Connected to server");

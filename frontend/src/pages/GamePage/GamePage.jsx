@@ -110,9 +110,6 @@ class TankPredictor {
 }
 
 const GamePage = () => {
-  const wsUrl = window.location.hostname === 'localhost'
-    ? "ws://localhost:3000"
-    : "ws://208.167.252.106:3000"; // ou "ws://alpha03.alphaedtech.org.br:3000" se o domínio for usado
   const canvasRef = useRef(null);
   const { roomId } = useContext(RoomContext);
   const [gameStatus, setGameStatus] = useState("Conectando ao servidor...");
@@ -241,7 +238,8 @@ const GamePage = () => {
     canvas.width = 1000;
     canvas.height = 600;
 
-    wsRef.current = new WebSocket("ws://208.167.252.106:3000");
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    wsRef.current = new WebSocket(`${protocol}://${window.location.host}/ws/`);
 
     wsRef.current.onopen = () => {
       console.log("Conectado ao servidor");
