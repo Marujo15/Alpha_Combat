@@ -14,13 +14,14 @@ const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (user) {
-            navigate('/dashboard');
-        }
-    }, [user, navigate]);
+    // useEffect(() => {
+    //     if (user) {
+    //         navigate('/dashboard');
+    //     }
+    // }, [user, navigate]);
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -109,12 +110,25 @@ const LoginPage = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-                <Input
-                    type="password"
-                    placeholder="SENHA"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="password-input-container">
+                    <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="SENHA"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                        type="button"
+                        className="toggle-password-visibility"
+                        onClick={() => setShowPassword(!showPassword)}
+                    >
+                        <img
+                            src={showPassword ? "./public/assets/Lock.svg" : "./public/assets/Lock_Open.svg"}
+                            alt={showPassword ? "Hide password" : "Show password"}
+                            className="password-visibility-icon"
+                        />
+                    </button>
+                </div>
                 <Button type="submit" className="login-btn"></Button>
                 {error && <p className="error-message">{error}</p>}
                 <a  className='register' href="/register">CRIAR CONTA</a>

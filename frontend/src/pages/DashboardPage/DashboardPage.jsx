@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/UserContext';
-import { WaitingRoomContext } from '../../context/WaitingRoomContext.jsx';
 import Logo from '../../components/Logo/Logo.jsx';
 import Button from '../../components/Button/Button.jsx';
 import Input from '../../components/Input/Input.jsx';
@@ -12,7 +11,6 @@ const DashboardPage = () => {
     const apiUrl = import.meta.env.VITE_API_URL;
     const { user } = useContext(UserContext);
     const { roomId, setRoomId } = useContext(RoomContext);
-    const { waitingPlayers, setWaitingPlayers } = useContext(WaitingRoomContext);
     const wsRef = useRef(null);
     const navigate = useNavigate();
     const [gameStatus, setGameStatus] = useState("Connecting to server...");
@@ -98,11 +96,12 @@ const DashboardPage = () => {
             wsRef.current.send(
                 JSON.stringify({
                     type: "updateRoom",
+                    match_id: inputedRoomId,
                     player_id: user.user.id,
                 })
             );
             if (response.ok) {
-
+                setRoomId(inputedRoomId);
                 navigate(`/waiting/${inputedRoomId}`);
             } else {
                 console.error(data.error || 'An error occurred during room creation');
@@ -110,6 +109,31 @@ const DashboardPage = () => {
         } catch (error) {
             console.error('Failed to create room');
             console.error(error);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+          const response = await fetch('http://localhost:3000/api/auth/logout', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          });
+    
+          const data = await response.json();
+    
+          if (response.ok) {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            navigate('/login');
+          } else {
+            console.error(data.error || 'An error occurred during logout');
+          }
+        } catch (error) {
+          console.error('Failed to log out');
+          console.error(error);
         }
     };
 
@@ -133,7 +157,7 @@ const DashboardPage = () => {
                     <Button type="submit" className={"tutorial-btn"} onClick={() => navigate('/tutorial')}></Button>
                 </div>
                 <div>
-                    <Button type="submit" className={"leave-btn"} onClick={() => navigate('/login')}></Button>
+                    <Button type="submit" className={"leave-btn"} onClick={handleLogout}></Button>
                 </div>
             </div>
         </div>

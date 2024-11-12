@@ -40,6 +40,17 @@
     background: rgba(0, 0, 0, 0.8);
 }
 
+.password-input-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center ;
+}
+
+.password-input-container input {
+    width: 65%;
+}
+
 .register:hover {
     color: rgb(173, 173, 29);
+
 }
