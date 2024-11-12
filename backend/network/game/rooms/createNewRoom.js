@@ -1,10 +1,13 @@
 import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+dotenv.config();
+const apiUrl = process.env.API_URL;
 
 export const createNewRoom = async (data) => {
     try {
         const token = data.token;
 
-        const response = await fetch('http://208.167.252.106:3000/api/matches', {
+        const response = await fetch(`${apiUrl}/api/matches`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
