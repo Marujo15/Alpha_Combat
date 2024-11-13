@@ -4,6 +4,9 @@
     background-size: cover;
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
+    justify-content: center;
+    width: 100vw;
 }
 
 .game-card {
@@ -59,6 +62,8 @@
 
 .give-up-btn {
     background-image: url('../../../assets/red-btn-giv-up.png');
+    height: 78px;
+    width: 210px;
 }
 
 .give-up-btn-hover {
