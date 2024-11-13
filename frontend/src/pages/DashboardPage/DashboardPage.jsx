@@ -58,25 +58,36 @@ const DashboardPage = () => {
 
   const handleCreateRoom = () => {
     if (wsRef.current.readyState === WebSocket.OPEN) {
-      const message = JSON.stringify({
-        type: "greeting",
-        content: "Hello, server!",
-      });
-      wsRef.current.send(message);
+        // Enviar uma mensagem de saudação para o servidor
+        const greetingMessage = JSON.stringify({
+            type: "greeting",
+            content: "Hello, server!",
+        });
+        wsRef.current.send(greetingMessage);
+
+        // Enviar a mensagem de criação de nova sala
+        const createRoomMessage = JSON.stringify({
+            type: "createNewRoom",
+            player1_id: user.user.id,
+            player1_name: user.user.username,
+            token: user.token,
+        });
+        wsRef.current.send(createRoomMessage);
+
     } else {
-      console.log(
-        "WebSocket is not open. Current state:",
-        wsRef.current.readyState
-      );
+        console.log("WebSocket ainda está conectando... Estado atual:", wsRef.current.readyState);
+
+        // Configura um listener para esperar até que o WebSocket esteja aberto
+        wsRef.current.onopen = () => {
+            const createRoomMessage = JSON.stringify({
+                type: "createNewRoom",
+                player1_id: user.user.id,
+                player1_name: user.user.username,
+                token: user.token,
+            });
+            wsRef.current.send(createRoomMessage);
+        };
     }
-    wsRef.current.send(
-      JSON.stringify({
-        type: "createNewRoom",
-        player1_id: user.user.id,
-        player1_name: user.user.username,
-        token: user.token,
-      })
-    );
   };
 
   const handleEnterRoom = async (roomId) => {
