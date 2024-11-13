@@ -1,6 +1,6 @@
 let rooms = [];
 
-export const addPlayerToWaitingList = (matchId, playerId) => {
+export const addPlayerToWaitingList = (matchId, playerId, playerName) => {
     let room = rooms.find(room => room.matchId === matchId);
 
     if (!room) {
@@ -9,7 +9,7 @@ export const addPlayerToWaitingList = (matchId, playerId) => {
     }
 
     if (room.players.length < 4 && !room.players.includes(playerId)) {
-        room.players.push(playerId);
+        room.players.push({ playerId, playerName });
     }
 
     return room.players;
@@ -30,8 +30,6 @@ export const removePlayerFromWaitingList = (matchId, playerId) => {
 };
 
 export const getPlayersWaitingList = (matchId) => {
-    // console.log("=======matchId:", matchId);
     const room = rooms.find(room => room.matchId === matchId);
-    // console.log("=======Room:", room);
     return room ? room : [];
 };
