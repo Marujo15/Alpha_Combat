@@ -7,16 +7,18 @@ export const UserProvider = ({ children }) => {
 
     const login = (userData) => {
         setUser(userData);
+        // Armazena todas as informações do usuário, incluindo o token, em um único objeto `user` no localStorage
         localStorage.setItem("user", JSON.stringify(userData));
-        localStorage.setItem("token", JSON.stringify(userData.token));
     };
 
     const logout = () => {
         setUser(null);
+        // Remove o `user` do localStorage ao fazer logout
         localStorage.removeItem("user");
-    }
+    };
 
     useEffect(() => {
+        // Ao inicializar, busca o `user` do localStorage (se estiver logado previamente)
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
             setUser(JSON.parse(storedUser));
@@ -28,4 +30,4 @@ export const UserProvider = ({ children }) => {
             {children}
         </UserContext.Provider>
     );
-}
+};
