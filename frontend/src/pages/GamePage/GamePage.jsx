@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import Button from "../../components/Button/Button";
+import Clock from "../../components/Clock/Clock";
 
 export default function AlphaCombat() {
   const canvasRef = useRef();
@@ -916,7 +917,7 @@ export default function AlphaCombat() {
   return (
     <div className="game-main-div">
       <div>
-
+        <Clock />
       </div>
       <div>
         <canvas
