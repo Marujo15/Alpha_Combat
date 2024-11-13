@@ -1,16 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/Button/Button.jsx';
-import BackgroundMusic from '../../components/BackgroundMusic/BackgroundMusic.jsx';
 import './LandingPage.css';
 
 const LandingPage = () => {
-    const audioUrl = "/sounds/background-music.mp3";
     const navigate = useNavigate();
 
     return (
         <>
-            <BackgroundMusic audioUrl="/assets/sounds/background-music.mp3" />
             <div className="landing-page-container">
                 <div>
                     <h1 className="title">ALPHA COMBAT</h1>
