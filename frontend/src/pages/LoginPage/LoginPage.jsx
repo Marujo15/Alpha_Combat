@@ -17,11 +17,12 @@ const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     if (user) {
-    //         navigate('/dashboard');
-    //     }
-    // }, [user, navigate]);
+    useEffect(() => {
+        if (user) {
+            navigate('/dashboard');
+        }
+    }, [user, navigate]);
+    //porque isso foi comentado?
 
     const handleLogin = async (event) => {
         event.preventDefault();

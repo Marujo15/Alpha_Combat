@@ -6,7 +6,7 @@ import Input from '../../components/Input/Input.jsx';
 import Button from '../../components/Button/Button.jsx';
 import './SetPass.css'
 
-const SetPass = () => {
+const SetPass = ({ title, children, onSubmit }) => {
     const apiUrl = import.meta.env.VITE_API_URL;
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -25,7 +25,9 @@ const SetPass = () => {
 
         try {
           const token = localStorage.getItem('token');
-          console.log("token (que deve persistir):", token);
+
+          const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const userId = decodedToken.id;
 
           const response = await fetch(`${apiUrl}/users`, {
               method: 'PATCH',
@@ -38,16 +40,8 @@ const SetPass = () => {
           });
 
           const data = await response.json();
-          console.log("Resposta do servidor:", data);
 
-          if (response.status === 200 && data.needsPassword === false) {
-              if (data.token) {
-                  localStorage.setItem('token', data.token);
-                  console.log("Novo token armazenado:", data.token);
-              } else {
-                  console.warn("Token não recebido na resposta.");
-              }
-
+          if (response.status === 200) {
               setSuccessMessage('Senha definida com sucesso.');
               navigate('/dashboard');
           } else {

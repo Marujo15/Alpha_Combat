@@ -157,15 +157,12 @@ export const userController = {
             const updatedUser = await userService.updateUser(userId, { username, email, password });
     
             if (updatedUser) {
-                
-                console.log("Updated User:", updatedUser);     
-
                 res.status(200).json({
                     success: true,
                     message: 'Usuário atualizado com sucesso',
                     data: updatedUser,
-                    needsPassword: false,
-                    token,
+                    //needsPassword: false,
+                    //token,
                 });
             } else {
                 res.status(404).json({ error: "User not found" });
