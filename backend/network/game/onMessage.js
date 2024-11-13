@@ -19,7 +19,7 @@ export async function onMessage(ws, message, roomManager) {
         case "createNewRoom":
             response = await createNewRoom(data);
             if (response.type === "roomCreated") {
-                addPlayerToWaitingList(response.matchId, response.player1_id);
+                addPlayerToWaitingList(response.matchId, response.player1_id, response.player1_name);
                 response.players = getPlayersWaitingList(response.matchId);
             }
             break;
@@ -39,7 +39,7 @@ export async function onMessage(ws, message, roomManager) {
             // if (match.players.length >= MAX_PLAYERS) {
             //     response = { type: "error", message: "Room is full" };
             // } else {
-                addPlayerToWaitingList(data.match_id, data.player_id);
+                addPlayerToWaitingList(data.match_id, data.player_id, data.player_name);
                 response = { type: "roomUpdated", message: "Room updated successfully", matchInfo: getPlayersWaitingList(data.match_id) };
             // }
             break;
