@@ -69,19 +69,19 @@ const WaitingPage = () => {
     console.log("userId", user.user.id);
     console.log("roomId", roomId);
 
-    if (!audioRef.current) {
-      audioRef.current = new Audio("../../public/sounds/background-music.mp3");
-      audioRef.current.volume = 0.3;
-      audioRef.current.loop = true;
-      audioRef.current.play();
+    if (!window.audioRef) {
+        window.audioRef = new Audio('../../public/sounds/background-music.mp3');
+        window.audioRef.volume = 0.5;
+        window.audioRef.loop = true;
+        window.audioRef.play();
 
-      setTimeout(() => {
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.currentTime = 0;
-          audioRef.current = null;
-        }
-      }, 300000);
+        window.audioTimeout = setTimeout(() => {
+            if (window.audioRef) {
+                window.audioRef.pause();
+                window.audioRef.currentTime = 0;
+                window.audioRef = null;
+            }
+        }, 300000);
     }
 
     if (isWsOpen) {
