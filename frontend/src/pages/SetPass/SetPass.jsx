@@ -24,8 +24,11 @@ const SetPass = () => {
         }
 
         try {
-          const token = localStorage.getItem('token');
-          console.log("token (que deve persistir):", token);
+            const token = localStorage.getItem('token') || userContext.token;
+            if (!token) {
+                console.error("Token não encontrado");
+                return; // ou redirecionar para a página de login
+            }            
 
           const response = await fetch(`${apiUrl}/users`, {
               method: 'PATCH',
