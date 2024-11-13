@@ -17,11 +17,11 @@ const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (user) {
-            navigate('/dashboard');
-        }
-    }, [user, navigate]);
+    // useEffect(() => {
+    //     if (user) {
+    //         navigate('/dashboard');
+    //     }
+    // }, [user, navigate]);
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -73,7 +73,7 @@ const LoginPage = () => {
             const data = await response.json();
         
             if (data.auth) {
-                login({ user: data.user, token: data.token });
+                login(data.user);
         
                 localStorage.setItem('token', data.token);
         
