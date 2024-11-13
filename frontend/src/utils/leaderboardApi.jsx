@@ -2,9 +2,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 export const getLeaderboardByKey = async (key) => {
     try {
-        const user = JSON.parse(localStorage.getItem("user"));
-        const token = user ? user.token : null;
-        
+        const token = localStorage.getItem("user");
         if (!token) {
             throw new Error("Token not found");
         }
