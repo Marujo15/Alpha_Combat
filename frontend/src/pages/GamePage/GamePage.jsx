@@ -649,6 +649,10 @@ export default function AlphaCombat() {
 
       // Draw other players
       players.forEach((player) => {
+        if (player.id === localPlayer.id || !player.id) {
+          return;
+        }
+
         ctx.save();
 
         ctx.translate(
