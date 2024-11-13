@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useRef, useContext, useState } from "react";
 import { UserContext } from "../../context/UserContext";
 import { RoomContext } from "../../context/RoomContext";
@@ -18,7 +19,7 @@ const WaitingPage = () => {
   const [updatePage, setUpdatePage] = useState(false);
 
   useEffect(() => {
-    wsRef.current = new WebSocket(`ws://localhost:3000`);
+    wsRef.current = new WebSocket(`ws://208.167.252.106:3000`);
 
     wsRef.current.onopen = () => {
       setGameStatus("Connected to server");
