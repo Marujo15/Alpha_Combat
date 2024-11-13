@@ -8,7 +8,7 @@ export const initWebSocket = (wss) => {
     const mapSize = 1000;
     const playerSize = 50;
     const bulletSize = 5; // Ajustado para corresponder ao frontend
-    const bulletSpeed = 10;
+    const bulletSpeed = 30;
     const bulletLifetime = 5000;
     const walls = new Map([
         ["wall1", { x: 450, y: 200, width: 100, height: 600 }],  // Parede vertical
@@ -61,12 +61,12 @@ export const initWebSocket = (wss) => {
                 player.y -= player.speedY;
                 break;
             case "left":
-                player.angle -= 0.03;
+                player.angle -= 0.06;
                 player.speedX = player.speed * Math.cos(player.angle);
                 player.speedY = player.speed * Math.sin(player.angle);
                 break;
             case "right":
-                player.angle += 0.03;
+                player.angle += 0.06;
                 player.speedX = player.speed * Math.cos(player.angle);
                 player.speedY = player.speed * Math.sin(player.angle);
                 break;
@@ -365,7 +365,7 @@ export const initWebSocket = (wss) => {
         }
         lastTimestamp = now;
 
-        setTimeout(gameLoop, 1000 / 60);
+        setTimeout(gameLoop, 1000 / 30);
     }
 
     function broadcast(message) {
@@ -394,7 +394,7 @@ export const initWebSocket = (wss) => {
             id: uuidv4(),
             x: playerX,
             y: playerY,
-            speed: 5,
+            speed: 10,
             speedX: 0,
             speedY: 0,
             canMove: true,
@@ -484,7 +484,7 @@ export const initWebSocket = (wss) => {
                 }
                     break;
                 default:
-                    onMessage(ws, message)
+                    onMessage(wss, ws, message)
                     break
             }
         });
