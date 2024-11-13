@@ -926,6 +926,21 @@ export default function AlphaCombat() {
     }
   }, []);
 
+  const handleGiveUpBtn = () => {
+    if (window.audioRef) {
+      window.audioRef.pause();
+      window.audioRef.currentTime = 0;
+      window.audioRef = null;
+    }
+
+    if (window.audioTimeout) {
+      clearTimeout(window.audioTimeout);
+      window.audioTimeout = null;
+    }
+
+    navigate('/dashboard');
+  };
+  
   return (
     <div className="game-main-div">
       <div>
@@ -940,11 +955,7 @@ export default function AlphaCombat() {
         />
       </div>
       <div>
-        <Button
-          type="submit"
-          className={"give-up-btn"}
-          onClick={() => navigate("/dashboard")}
-        ></Button>
+        <Button type="submit" className={"give-up-btn"} onClick={handleGiveUpBtn}></Button>
       </div>
     </div>
   );
