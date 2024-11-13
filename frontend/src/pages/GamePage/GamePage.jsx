@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import Button from "../../components/Button/Button";
 import Clock from "../../components/Clock/Clock";
+import './GamePage.css';
 
 export default function AlphaCombat() {
   const canvasRef = useRef();
