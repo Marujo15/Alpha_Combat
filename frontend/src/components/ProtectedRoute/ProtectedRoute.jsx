@@ -1,13 +1,11 @@
 import React, { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
-import { UserContext } from '../../context/UserContext';
 
 const ProtectedRoute = ({ children }) => {
-    const { user } = useContext(UserContext);
+    const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
 
-    // Redireciona apenas se o usuário não estiver autenticado
     if (!user || !user.token) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" />;
     }
 
     return children;

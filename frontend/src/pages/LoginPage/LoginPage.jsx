@@ -76,7 +76,7 @@ const LoginPage = () => {
             if (data.auth) {
                 login(data.user);
         
-                setItem("user", JSON.stringify(userData));
+                localStorage.setItem('token', data.token);
         
                 if (data.needsPassword) {
                     console.log('User needs to set password. Redirecting to /set-password');
