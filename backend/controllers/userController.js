@@ -1,9 +1,5 @@
-import dotenv from 'dotenv';
-dotenv.config();
 import { userService } from "../services/userService.js";
 import { ErrorApi } from "../errors/ErrorApi.js";
-import jwt from 'jsonwebtoken';
-
 
 export const userController = {
     getUserMe: async (req, res) => {
@@ -162,26 +158,14 @@ export const userController = {
     
             if (updatedUser) {
                 
-                console.log("Updated User:", updatedUser);
-                console.log("SECRET_KEY:", process.env.SECRET_KEY);
-                
-                const token = jwt.sign(
-                    { id: updatedUser.id },
-                    process.env.SECRET_KEY,
-                    { expiresIn: '5d' }
-                );
-
-                console.log("Generated Token:", token);
-
-                const maxAge = 5 * 24 * 60 * 60 * 1000;
-                res.cookie("session_id", token, { maxAge, httpOnly: true });       
+                console.log("Updated User:", updatedUser);     
 
                 res.status(200).json({
                     success: true,
                     message: 'Usuário atualizado com sucesso',
                     data: updatedUser,
-                    token,
                     needsPassword: false,
+                    token,
                 });
             } else {
                 res.status(404).json({ error: "User not found" });

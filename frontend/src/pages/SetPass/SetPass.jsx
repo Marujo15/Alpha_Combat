@@ -24,14 +24,14 @@ const SetPass = () => {
         }
 
         try {
-          const oldToken = localStorage.getItem('token');
-          console.log("Token antigo:", oldToken);
+          const token = localStorage.getItem('token');
+          console.log("token (que deve persistir):", token);
 
           const response = await fetch(`${apiUrl}/users`, {
               method: 'PATCH',
               headers: {
                   'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${oldToken}`,
+                  'Authorization': `Bearer ${token}`,
               },
               body: JSON.stringify({ password }),
               credentials: 'include',
