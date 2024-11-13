@@ -24,7 +24,8 @@ const SetPass = ({ title, children, onSubmit }) => {
         }
 
         try {
-          const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem("user"));
+            const token = user ? user.token : null;            
 
           const decodedToken = JSON.parse(atob(token.split('.')[1]));
             const userId = decodedToken.id;
