@@ -22,6 +22,7 @@ const RegisterPage = () => {
     };
 
     const handleRegister = async (event) => {
+        event.preventDefault()
         try {
             const response = await fetch(`${apiUrl}/auth/register`, {
                 method: "POST",
@@ -53,13 +54,13 @@ const RegisterPage = () => {
     return (
         <div className='register-container'>
             <Logo />
-            <Form title={"CRIAR CONTA"} onSubmit={handleSubmit}>
+            <Form title={"CRIAR CONTA"} onSubmit={handleRegister}>
                 <Input type="text" placeholder="APELIDO" onChange={(e) => setUsername(e.target.value)} />
                 <Input type="text" placeholder="EMAIL" onChange={(e) => setEmail(e.target.value)} />
                 <Input type="password" placeholder="SENHA" onChange={(e) => setPassword(e.target.value)} />
                 <div className="register-btns">
+                    <Button type="submit" className={"register-btn"}></Button>
                     <Button type="submit" className={"r-back-btn"} onClick={() => {navigate('/login')}}></Button>
-                    <Button type="submit" className={"register-btn"} onClick={handleRegister}></Button>
                 </div>
             </Form>
             {error && <p className="error-message">{error}</p>}

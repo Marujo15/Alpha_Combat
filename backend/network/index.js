@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import WebSocket from "ws";
+import { onMessage } from "./game/onMessage.js";
 // Remova ou ajuste a importação de onMessage se não estiver usando
 // import { onMessage } from "./game/onMessage.js";
 
@@ -440,39 +441,51 @@ export const initWebSocket = (wss) => {
                 return;
             }
 
-            if (data.action === "move") {
-                actionQueue.push({
-                    type: "move",
-                    playerId: player.id, // Usar player.id definido acima
-                    direction: data.direction,
-                    sequenceNumber: data.sequenceNumber,
-                    canMove: data.canMove
-                });
-            } else if (data.action === "shoot") {
-                actionQueue.push({
-                    type: "shoot",
-                    playerId: player.id, // Usar player.id definido acima
-                    bulletId: data.bullet.id,
-                    angle: data.bullet.angle,
-                });
-            } else if (data.action === "ping") {
-                ws.send(JSON.stringify({
-                    type: "pong",
-                    id: data.id
-                }));
-            } else if (data.action === "bulletHit") {
-                actionQueue.push({
-                    type: "bulletHit",
-                    playerId: player.id, // Usar player.id definido acima
-                });
-            } else if (data.action === "stopMoving") {
-                actionQueue.push({
-                    type: "stopMoving",
-                    playerId: player.id, // Usar player.id definido acima
-                    playerAngle: data.playerAngle
-                });
-            } else {
-                console.error("Ação desconhecida:", data.action);
+            switch (data.action) {
+                case 'move': {
+                    actionQueue.push({
+                        type: "move",
+                        playerId: player.id, // Usar player.id definido acima
+                        direction: data.direction,
+                        sequenceNumber: data.sequenceNumber,
+                        canMove: data.canMove
+                    });
+                }
+                    break;
+                case 'shoot': {
+                    actionQueue.push({
+                        type: "shoot",
+                        playerId: player.id, // Usar player.id definido acima
+                        bulletId: data.bullet.id,
+                        angle: data.bullet.angle,
+                    });
+                }
+                    break;
+                case 'ping': {
+                    ws.send(JSON.stringify({
+                        type: "pong",
+                        id: data.id
+                    }));
+                }
+                    break;
+                case 'bulletHit': {
+                    actionQueue.push({
+                        type: "bulletHit",
+                        playerId: player.id, // Usar player.id definido acima
+                    });
+                }
+                    break;
+                case 'stopMoving': {
+                    actionQueue.push({
+                        type: "stopMoving",
+                        playerId: player.id, // Usar player.id definido acima
+                        playerAngle: data.playerAngle
+                    });
+                }
+                    break;
+                default:
+                    onMessage(ws, message)
+                    break
             }
         });
 
