@@ -1,4 +1,8 @@
 .text {
+    background-color: rgba(0,0,0,0.6);
+    padding: 20px;
+    border: none;
+    border-radius: 1rem;
     text-shadow: 
     -4px -4px 0 black,
     4px -4px 0 black,
