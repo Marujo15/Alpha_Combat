@@ -1,4 +1,7 @@
 import { useEffect, useRef } from "react";
+import Button from "../../components/Button/Button";
+import Clock from "../../components/Clock/Clock";
+import './GamePage.css';
 
 export default function AlphaCombat() {
   const canvasRef = useRef();
@@ -914,11 +917,21 @@ export default function AlphaCombat() {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={500}
-      height={500}
-      style={{ border: "1px solid black" }}
-    />
+    <div className="game-main-div">
+      <div>
+        <Clock />
+      </div>
+      <div>
+        <canvas
+          ref={canvasRef}
+          width={500}
+          height={500}
+          style={{ border: "1px solid black" }}
+        />
+      </div>
+      <div>
+        <Button type="submit" className={"give-up-btn"} onClick={() => navigate('/dashboard')}></Button>
+      </div>
+    </div>
   );
 }

@@ -29,7 +29,7 @@ const WaitingPage = () => {
             const data = JSON.parse(message.data);
             switch (data.type) {
                 case "waitingListUpdated":
-                    // console.log("waitingListUpdated:", data.matchInfo.players);
+                    setWaitingPlayers(data.matchInfo.players);
                     break;
                 case "matchStarted":
                     console.log("Players in the room:", data);
@@ -39,7 +39,7 @@ const WaitingPage = () => {
                     }
                     break;
                 default:
-                    // console.log("Unknown message type:", data.type);
+                    console.log("Unknown message type:", data.type);
             }
         };
 
@@ -53,7 +53,7 @@ const WaitingPage = () => {
                 wsRef.current.close();
             }
         };
-    }, [roomId, updatePage]);
+    }, [roomId, updatePage, waitingPlayers]);
 
     const handleStartMatchBtn = () => {
         console.log('Starting match...');
@@ -81,7 +81,7 @@ const WaitingPage = () => {
                     <p className='waiting-players-title'>Jogadores na sala:</p>
                     <ul className='waiting-players-list'>
                         {waitingPlayers.map((player, index) => (
-                            <li key={index}>{player}</li>
+                            <li key={index}>{player.playerName}</li>
                         ))}
                     </ul>
                 </div>

@@ -1,12 +1,12 @@
-.game-container {
-    background-color: #3B6BA4;
-    min-height: 100vh;
-    display: flex;
+.game-main-div {
     align-items: center;
+    background-image: url('../../../assets/main-background.png');
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     justify-content: center;
-    padding: 1rem;
-    background-color: rgb(17, 24, 39);
-    font-family: Arial, sans-serif;
+    width: 100vw;
 }
 
 .game-card {
@@ -58,6 +58,16 @@
 
 .game-instructions p {
     margin: 0.25rem 0;
+}
+
+.give-up-btn {
+    background-image: url('../../../assets/red-btn-giv-up.png');
+    height: 78px;
+    width: 210px;
+}
+
+.give-up-btn-hover {
+    background-image: url('../../../assets/red-btn-giv-up-hover.png');
 }
 
 /* .game-page-container {

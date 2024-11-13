@@ -61,11 +61,11 @@ const DashboardPage = () => {
         } else {
             console.log("WebSocket is not open. Current state:", wsRef.current.readyState);
         }
-        
         wsRef.current.send(
             JSON.stringify({
                 type: "createNewRoom",
                 player1_id: user.user.id,
+                player1_name: user.user.username,
                 token: user.token,
             })
         );
@@ -99,6 +99,7 @@ const DashboardPage = () => {
                     type: "updateRoom",
                     match_id: inputedRoomId,
                     player_id: user.user.id,
+                    player_name: user.user.username,
                 })
             );
             if (response.ok) {

@@ -34,6 +34,7 @@ export const createNewRoom = async (data) => {
             message: 'Room created successfully',
             matchId: result.data.id,
             player1_id: result.data.player1_id,
+            player1_name: data.player1_name,
         };
     } catch (error) {
         console.error('Error creating room:', error);
