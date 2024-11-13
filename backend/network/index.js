@@ -365,7 +365,7 @@ export const initWebSocket = (wss) => {
         }
         lastTimestamp = now;
 
-        setTimeout(gameLoop, 1000 / 60);
+        setTimeout(gameLoop, 1000 / 30);
     }
 
     function broadcast(message) {
@@ -484,7 +484,7 @@ export const initWebSocket = (wss) => {
                 }
                     break;
                 default:
-                    onMessage(ws, message)
+                    onMessage(wss, ws, message)
                     break
             }
         });

@@ -1,11 +1,13 @@
 import { useEffect, useRef } from "react";
 import Button from "../../components/Button/Button";
 import Clock from "../../components/Clock/Clock";
-import './GamePage.css';
+import "./GamePage.css";
+import { useNavigate } from "react-router-dom";
 
 export default function AlphaCombat() {
   const canvasRef = useRef();
   const wsRef = useRef();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const wsUrl = import.meta.env.VITE_WS_URL;
@@ -15,8 +17,8 @@ export default function AlphaCombat() {
     const ws = wsRef.current;
 
     const playerSize = 50;
-    const bulletSize = 5;
     const mapSize = 1000;
+    const bulletSize = 5;
     const bulletSpeed = 10;
     const players = new Map();
     const bullets = new Map();
@@ -223,6 +225,10 @@ export default function AlphaCombat() {
       const oldY = player.y;
       const oldAngle = player.angle;
 
+      if (player.canMove === false) {
+        return;
+      }
+
       player.speedX = player.speed * Math.cos(player.angle);
       player.speedY = player.speed * Math.sin(player.angle);
 
@@ -288,6 +294,11 @@ export default function AlphaCombat() {
       bullet.x = Math.max(bulletSize, Math.min(mapSize - bulletSize, bullet.x));
 
       bullet.y = Math.max(bulletSize, Math.min(mapSize - bulletSize, bullet.y));
+
+      const wallCollision = checkWallCollisions(bullet, bulletSize);
+      if (wallCollision) {
+        wallCollision.calculateRicochet(bullet);
+      }
 
       return bullet.addMove(undefined, bullet.x, bullet.y);
     }
@@ -916,6 +927,21 @@ export default function AlphaCombat() {
     }
   }, []);
 
+  const handleGiveUpBtn = () => {
+    if (window.audioRef) {
+      window.audioRef.pause();
+      window.audioRef.currentTime = 0;
+      window.audioRef = null;
+    }
+
+    if (window.audioTimeout) {
+      clearTimeout(window.audioTimeout);
+      window.audioTimeout = null;
+    }
+
+    navigate('/dashboard');
+  };
+  
   return (
     <div className="game-main-div">
       <div>
@@ -930,7 +956,7 @@ export default function AlphaCombat() {
         />
       </div>
       <div>
-        <Button type="submit" className={"give-up-btn"} onClick={() => navigate('/dashboard')}></Button>
+        <Button type="submit" className={"give-up-btn"} onClick={handleGiveUpBtn}></Button>
       </div>
     </div>
   );
