@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function AlphaCombat() {
+  const wsUrl = import.meta.env.VITE_WS_URL;
   const canvasRef = useRef(null);
   const stateRef = useRef(null);
   const gameLoopRef = useRef(null);
@@ -135,7 +136,7 @@ export default function AlphaCombat() {
   const connectWebSocket = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
-    const socket = new WebSocket("ws://208.167.252.106:3000/");
+    const socket = new WebSocket(wsUrl);
     let reconnectTimeout;
 
     socket.onopen = () => {

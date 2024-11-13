@@ -6,6 +6,7 @@ import Button from '../../components/Button/Button';
 import './WaitingPage.css';
 
 const WaitingPage = () => {
+    const wsUrl = import.meta.env.VITE_WS_URL;
     const { user } = useContext(UserContext);
     const { roomId } = useContext(RoomContext);
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ const WaitingPage = () => {
     const [updatePage, setUpdatePage] = useState(false);
 
     useEffect(() => {
-        wsRef.current = new WebSocket(`ws://208.167.252.106:3000`);
+        wsRef.current = new WebSocket(wsUrl);
 
         wsRef.current.onopen = () => {
             setGameStatus("Connected to server");

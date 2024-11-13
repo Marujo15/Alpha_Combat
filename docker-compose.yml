@@ -32,7 +32,7 @@ services:
     ports:
       - "5173:5173"
     env_file:
-      - ./frontend/.env
+      - ./frontend/.env.front
     restart: unless-stopped
     volumes:
       - ./frontend:/app

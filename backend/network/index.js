@@ -472,7 +472,7 @@ export const initWebSocket = (wss) => {
                     playerAngle: data.playerAngle
                 });
             } else {
-                console.error("Ação desconhecida:", data.action);
+                console.error("Ação desconhecida:", data);
             }
         });
 

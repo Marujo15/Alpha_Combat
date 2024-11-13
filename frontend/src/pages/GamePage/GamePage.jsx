@@ -5,9 +5,10 @@ export default function AlphaCombat() {
   const wsRef = useRef();
 
   useEffect(() => {
+    const wsUrl = import.meta.env.VITE_WS_URL;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    wsRef.current = new WebSocket("ws://208.167.252.106:3000");
+    wsRef.current = new WebSocket(wsUrl);
     const ws = wsRef.current;
 
     const playerSize = 50;
