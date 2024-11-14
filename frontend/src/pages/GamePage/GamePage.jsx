@@ -5,6 +5,7 @@ import "./GamePage.css";
 import { useNavigate } from "react-router-dom";
 
 export default function AlphaCombat() {
+  const wsUrl = import.meta.env.WS_URL;
   const canvasRef = useRef();
   const wsRef = useRef();
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export default function AlphaCombat() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    wsRef.current = new WebSocket("ws://208.167.252.106:3000");
+    wsRef.current = new WebSocket(wsUrl);
     const ws = wsRef.current;
 
     const playerSize = 50;
@@ -949,8 +950,8 @@ export default function AlphaCombat() {
       <div>
         <canvas
           ref={canvasRef}
-          width={500}
-          height={500}
+          width={1000}
+          height={600}
           style={{ border: "1px solid black" }}
         />
       </div>

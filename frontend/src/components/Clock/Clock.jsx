@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Button from '../Button/Button';
 import './Clock.css';
 
 function Clock() {
   const [timeLeft, setTimeLeft] = useState(300);
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timerId = setInterval(() => {
@@ -14,7 +18,19 @@ function Clock() {
 
   useEffect(() => {
     if (timeLeft === 0) {
-        // Função para parar o jogo
+      console.log('Time is up!');
+      if (window.audioRef) {
+        window.audioRef.pause();
+        window.audioRef.currentTime = 0;
+        window.audioRef = null;
+      }
+  
+      if (window.audioTimeout) {
+        clearTimeout(window.audioTimeout);
+        window.audioTimeout = null;
+      }
+
+      setShowModal(true);
     }
   }, [timeLeft]);
 
@@ -23,9 +39,24 @@ function Clock() {
 
   return (
     <div>
-      <h1 className='text'>
+      <h1 className='clock-text'>
         Tempo: {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
       </h1>
+      {showModal && (
+        <div className='modal'>
+          <h1>FIM DE JOGO!</h1>
+          <h2>Status da Partida:</h2>
+          <div className='gp-rankings-div'>
+            <div className='kills-div'>
+              <p>Abates</p>
+            </div>
+            <div className='deaths-div'>
+              <p>Mortes</p>
+            </div>
+          </div>
+          <Button type='submit' className={'menu-btn'} onClick={() => navigate('/dashboard')}></Button>
+        </div>
+      )}
     </div>
   );
 }

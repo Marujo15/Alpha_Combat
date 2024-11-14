@@ -36,7 +36,6 @@ const RegisterPage = () => {
                 throw new Error(`Error on request: ${response.statusText}`);
             }
 
-            login({ username, password, email });
             setSuccessMessage("Registered successfully! Redirecting...");
             setTimeout(() => {
                 setSuccessMessage("");
