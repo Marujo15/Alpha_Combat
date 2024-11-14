@@ -9,7 +9,8 @@ import { RoomContext } from "../../context/RoomContext.jsx";
 
 const DashboardPage = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
-  const { user } = useContext(UserContext);
+  const wsUrl = import.meta.env.WS_URL;
+  const { user, logout } = useContext(UserContext);
   const { roomId, setRoomId } = useContext(RoomContext);
   const wsRef = useRef(null);
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const DashboardPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    wsRef.current = new WebSocket(`ws://localhost:3000`);
+    wsRef.current = new WebSocket(wsUrl);
 
     wsRef.current.onopen = () => {
       setGameStatus("Connected to server");
@@ -136,6 +137,7 @@ const DashboardPage = () => {
       if (response.ok) {
         localStorage.removeItem("user");
         localStorage.removeItem("token");
+        logout();
         navigate("/login");
       } else {
         console.error(data.error || "An error occurred during logout");
