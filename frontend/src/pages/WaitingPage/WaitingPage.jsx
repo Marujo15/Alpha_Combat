@@ -9,7 +9,7 @@ import "./WaitingPage.css";
 const audioRef = { current: null };
 
 const WaitingPage = () => {
-  const wsUrl = import.meta.env.WS_URL;
+  const wsUrl = import.meta.env.VITE_WS_URL;
   const { user } = useContext(UserContext);
   const { roomId } = useContext(RoomContext);
   const navigate = useNavigate();
