@@ -9,7 +9,7 @@ import { RoomContext } from "../../context/RoomContext.jsx";
 
 const DashboardPage = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
-  const wsUrl = import.meta.env.WS_URL;
+  const wsUrl = import.meta.env.VITE_WS_URL;
   const { user, logout } = useContext(UserContext);
   const { roomId, setRoomId } = useContext(RoomContext);
   const wsRef = useRef(null);
