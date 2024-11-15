@@ -1,17 +1,17 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../context/UserContext";
+import { RoomContext } from "../../context/RoomContext.jsx";
 import Logo from "../../components/Logo/Logo.jsx";
 import Button from "../../components/Button/Button.jsx";
 import Input from "../../components/Input/Input.jsx";
 import "./DashboardPage.css";
-import { RoomContext } from "../../context/RoomContext.jsx";
 
 const DashboardPage = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const wsUrl = import.meta.env.VITE_WS_URL;
   const { user, logout } = useContext(UserContext);
-  const { roomId, setRoomId } = useContext(RoomContext);
+  const { roomId, setRoomId, playersOnRoom, setPlayersOnRoom } = useContext(RoomContext);
   const wsRef = useRef(null);
   const navigate = useNavigate();
   const [gameStatus, setGameStatus] = useState("Connecting to server...");
@@ -35,6 +35,8 @@ const DashboardPage = () => {
       switch (data.type) {
         case "roomCreated":
           setRoomId(data.matchId);
+          setPlayersOnRoom([{ id: data.players.players[0].playerId, name: data.players.players[0].playerName }]);
+          localStorage.setItem("roomId", data.matchId);
           handleEnterRoom(data.matchId);
           break;
       }
