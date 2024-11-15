@@ -939,6 +939,10 @@ export default function AlphaCombat() {
       window.audioTimeout = null;
     }
 
+    if (wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.close();
+    }
+
     navigate('/dashboard');
   };
   
