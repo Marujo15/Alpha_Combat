@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function AlphaCombat() {
-  const wsUrl = import.meta.env.WS_URL;
+  const wsUrl = import.meta.env.VITE_WS_URL;
   const canvasRef = useRef(null);
   const stateRef = useRef(null);
   const gameLoopRef = useRef(null);
