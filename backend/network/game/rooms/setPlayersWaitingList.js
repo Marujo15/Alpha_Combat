@@ -18,12 +18,17 @@ export const addPlayerToWaitingList = (matchId, playerId, playerName) => {
 export const removePlayerFromWaitingList = (matchId, playerId) => {
     const room = rooms.find(room => room.matchId === matchId);
 
-    if (room) {
-        room.players = room.players.filter(id => id !== playerId);
+    if (!room) {
+        console.error("Room not found for matchId:", matchId);
+        return [];
+    }
 
-        if (room.players.length === 0) {
-            rooms = rooms.filter(r => r.matchId !== matchId);
-        }
+    const filteredPlayers =  room.players = room.players.filter(player => player.playerId !== playerId);
+
+    room.players = filteredPlayers;
+
+    if (room.players.length === 0) {
+        rooms = rooms.filter(r => r.matchId !== matchId);
     }
 
     return room ? room.players : [];
