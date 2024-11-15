@@ -9,6 +9,7 @@ import "./WaitingPage.css";
 const audioRef = { current: null };
 
 const WaitingPage = () => {
+  const wsUrl = import.meta.env.VITE_WS_URL;
   const { user } = useContext(UserContext);
   const { roomId } = useContext(RoomContext);
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const WaitingPage = () => {
   const [updatePage, setUpdatePage] = useState(false);
 
   useEffect(() => {
-    wsRef.current = new WebSocket(`ws://208.167.252.106:3000`);
+    wsRef.current = new WebSocket(wsUrl);
 
     wsRef.current.onopen = () => {
       setGameStatus("Connected to server");
@@ -69,19 +70,19 @@ const WaitingPage = () => {
     console.log("userId", user.user.id);
     console.log("roomId", roomId);
 
-    if (!audioRef.current) {
-      audioRef.current = new Audio("../../public/sounds/background-music.mp3");
-      audioRef.current.volume = 0.3;
-      audioRef.current.loop = true;
-      audioRef.current.play();
+    if (!window.audioRef) {
+        window.audioRef = new Audio('../../public/sounds/background-music.mp3');
+        window.audioRef.volume = 0.5;
+        window.audioRef.loop = true;
+        window.audioRef.play();
 
-      setTimeout(() => {
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.currentTime = 0;
-          audioRef.current = null;
-        }
-      }, 300000);
+        window.audioTimeout = setTimeout(() => {
+            if (window.audioRef) {
+                window.audioRef.pause();
+                window.audioRef.currentTime = 0;
+                window.audioRef = null;
+            }
+        }, 300000);
     }
 
     if (isWsOpen) {

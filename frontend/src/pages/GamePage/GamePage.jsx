@@ -5,6 +5,7 @@ import "./GamePage.css";
 import { useNavigate } from "react-router-dom";
 
 export default function AlphaCombat() {
+  const wsUrl = import.meta.env.VITE_WS_URL;
   const canvasRef = useRef();
   const wsRef = useRef();
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export default function AlphaCombat() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    wsRef.current = new WebSocket("ws://208.167.252.106:3000");
+    wsRef.current = new WebSocket(wsUrl);
     const ws = wsRef.current;
 
     const playerSize = 50;
@@ -373,15 +374,15 @@ export default function AlphaCombat() {
         switch (update.type) {
           case "playerJoin":
             {
-              const isMe = localPlayer && localPlayer.id === update.id;
-              if (!isMe && !players.has(update.id)) {
+              const isMe = localPlayer && localPlayer.id === update.player.id;
+              if (!isMe && !players.has(update.player.id)) {
                 players.set(
-                  update.id,
+                  update.player.id,
                   new InterpolatedEntity(
-                    update.id,
-                    update.x,
-                    update.y,
-                    update.angle
+                    update.player.id,
+                    update.player.x,
+                    update.player.y,
+                    update.player.angle
                   )
                 );
               }
@@ -930,6 +931,25 @@ export default function AlphaCombat() {
     }
   }, []);
 
+  const handleGiveUpBtn = () => {
+    if (window.audioRef) {
+      window.audioRef.pause();
+      window.audioRef.currentTime = 0;
+      window.audioRef = null;
+    }
+
+    if (window.audioTimeout) {
+      clearTimeout(window.audioTimeout);
+      window.audioTimeout = null;
+    }
+
+    if (wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.close();
+    }
+
+    navigate('/dashboard');
+  };
+  
   return (
     <div className="game-main-div">
       <div>
@@ -938,17 +958,13 @@ export default function AlphaCombat() {
       <div>
         <canvas
           ref={canvasRef}
-          width={500}
-          height={500}
+          width={1000}
+          height={600}
           style={{ border: "1px solid black" }}
         />
       </div>
       <div>
-        <Button
-          type="submit"
-          className={"give-up-btn"}
-          onClick={() => navigate("/dashboard")}
-        ></Button>
+        <Button type="submit" className={"give-up-btn"} onClick={handleGiveUpBtn}></Button>
       </div>
     </div>
   );

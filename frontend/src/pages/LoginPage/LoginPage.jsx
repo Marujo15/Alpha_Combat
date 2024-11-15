@@ -22,7 +22,6 @@ const LoginPage = () => {
             navigate('/dashboard');
         }
     }, [user, navigate]);
-    //porque isso foi comentado?
 
     const handleLogin = async (event) => {
         event.preventDefault();

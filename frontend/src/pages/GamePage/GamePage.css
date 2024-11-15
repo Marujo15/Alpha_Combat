@@ -61,118 +61,51 @@
 }
 
 .give-up-btn {
-    background-image: url('../../../assets/red-btn-giv-up.png');
-    height: 78px;
-    width: 210px;
-}
-
-.give-up-btn-hover {
-    background-image: url('../../../assets/red-btn-giv-up-hover.png');
-}
-
-/* .game-page-container {
-    align-items: center;
-    background-image: url('../../../assets/main-background.png');
-    background-repeat: no-repeat;
-    background-size: cover;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    justify-content: center;
-    overflow: hidden;
-    width: 100vw;
-}
-
-.top-page-div {
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-    gap: 8vw;
-    justify-content: center;
-    width: 100%;
-}
-
-.player-img {
-    background-color: lightgray;
-    border-radius: calc(14vh / 2);
-    height: 12vh;
-    width: 12vh;
-}
-
-.player1-info-div, .player2-info-div {
-    align-items: center;
-    background-color: #093217;
-    border-radius: 4vw;
-    display: flex;
-    flex-direction: row;
-    font-size: 0.8vw;
-    gap: 2vw;
-    justify-content: center;
-    width: 20vw;
-}
-
-.player1-info, .player2-info {
-    padding: 2vh 0;
-}
-
-.match-info-div {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    justify-content: center;
-}
-
-.score-div {
-    align-items: center;
-    background-color: #C3C9CD;
-    border-radius: 20px;
-    color: black;
-    display: flex;
-    flex-direction: row;
-    font-size: 3vw;
-    height: 10vh;
-    justify-content: center;
-    width: 16vw;
-}
-
-.game-page-time-div {
-    align-items: center;
-    background-color: #C3C9CD;
-    border-radius: 10px;
-    color: black;
-    display: flex;
-    flex-direction: column;
-    font-size: 1.6vw;
-    height: 6vh;
-    justify-content: center;
-    width: 12vw;
-}
-
-.game-div {
-    background-color: darkgreen;
-    height: 70vh;
-    margin: 10px;
-    width: 80%;
-}
-
-.giveup-btn {
-    background-image: url('../../../assets/red-btn-desistir.png');
-    background-repeat: no-repeat;
+    background-image: url('../../../assets/red-btn-give-up.png');
     background-size: contain;
-    background-position: center;
-    font-size: 0.8vw;
-    height: 70px;
-    width: 165px;
+    height: 80px;
+    margin: 1rem;
+    width: 200px;
 }
 
-.giveup-btn:hover {
-    background-image: url('../../../assets/red-btn-desistir-hover.png');
-    background-repeat: no-repeat;
+.give-up-btn:hover {
+    background-image: url('../../../assets/red-btn-give-up-hover.png');
     background-size: contain;
-    background-position: center;
-    font-size: large;
-    height: 70px;
-    width: 180px;
+    height: 80px;
+    margin: 1rem;
+    width: 200px;
 }
-*/
+
+.modal {
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 10rem;
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    justify-content: space-around;
+    left: 20vw;
+    position: absolute;
+    text-align: center;
+    top: 5vh;
+    width: 60vw;
+}
+
+.gp-rankings-div {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 10rem;
+    justify-content: center;
+}
+
+.kills-div, .deaths-div {
+    align-items: center;
+    border: 1px solid white;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+    padding: 1rem 3rem;
+}
