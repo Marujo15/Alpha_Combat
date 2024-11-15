@@ -44,7 +44,6 @@ export async function onMessage(wss, ws, message /* roomManager */) {
                 );
                 response.players = getPlayersWaitingList(response.matchId);
             }
-
             break;
         case "removePlayerFromWaitingList":
             removePlayerFromWaitingList(data.playerId);
@@ -81,6 +80,14 @@ export async function onMessage(wss, ws, message /* roomManager */) {
                 type: "matchStarted",
                 message: "Match started successfully", 
                 players: getPlayersWaitingList(data.matchId) 
+            };
+            break;
+        case "playerLeftRoom":
+            await removePlayerFromWaitingList(data.match_id, data.player_id);
+            response = {
+                type: "roomUpdated",
+                message: "Player left the room",
+                matchInfo: getPlayersWaitingList(data.match_id)
             };
             break;
         default:

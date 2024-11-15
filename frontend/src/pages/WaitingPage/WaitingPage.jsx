@@ -9,9 +9,9 @@ import "./WaitingPage.css";
 const audioRef = { current: null };
 
 const WaitingPage = () => {
-  const wsUrl = import.meta.env.WS_URL;
+  const wsUrl = import.meta.env.VITE_WS_URL;
   const { user } = useContext(UserContext);
-  const { roomId } = useContext(RoomContext);
+  const { roomId, setRoomId } = useContext(RoomContext);
   const navigate = useNavigate();
   const wsRef = useRef(null);
   const [gameStatus, setGameStatus] = useState("Connecting to server...");
@@ -20,6 +20,12 @@ const WaitingPage = () => {
   const [updatePage, setUpdatePage] = useState(false);
 
   useEffect(() => {
+    const storedRoomId = localStorage.getItem("roomId");
+
+    if (storedRoomId) {
+      setRoomId(storedRoomId);
+    }
+    
     wsRef.current = new WebSocket(wsUrl);
 
     wsRef.current.onopen = () => {
@@ -65,11 +71,25 @@ const WaitingPage = () => {
     };
   }, [roomId, updatePage]);
 
-  const handleStartMatchBtn = () => {
-    console.log("Starting match...");
-    console.log("userId", user.user.id);
-    console.log("roomId", roomId);
+  const handleLeaveBtn = async () => {
+    try {
+      wsRef.current.send(
+        JSON.stringify({
+          type: "playerLeftRoom",
+          match_id: roomId,
+          player_id: user.user.id,
+          player_name: user.user.username,
+        })
+      );
+      setUpdatePage(true);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Failed to create room");
+      console.error(error);
+    }
+  };
 
+  const handleStartMatchBtn = () => {
     if (!window.audioRef) {
         window.audioRef = new Audio('../../public/sounds/background-music.mp3');
         window.audioRef.volume = 0.5;
@@ -118,14 +138,13 @@ const WaitingPage = () => {
           <Button
             type="submit"
             className={"leave-btn"}
-            onClick={() => navigate("/dashboard")}
+            onClick={handleLeaveBtn}
           ></Button>
           <Button
             type="submit"
             className={"start-match-btn"}
             onClick={handleStartMatchBtn}
           ></Button>
-          {/* <Button type="submit" className={"ready-btn"} onClick={() => {}}></Button> */}
         </div>
       </div>
     </div>
