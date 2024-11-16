@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import './Button.css';
-import clickSound from '../../../public/sounds/mouse-click.mp4';
+import clickSound from '../../../public/sounds/mouse-click.mp3';
 
 const Button = ({ className, onClick, children }) => {
     const audioRef = useRef(null);
