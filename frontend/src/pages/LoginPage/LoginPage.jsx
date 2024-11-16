@@ -21,7 +21,7 @@ const LoginPage = () => {
         if (user) {
             navigate('/dashboard');
         }
-    }, [user, navigate]);
+    }, [user]);
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -73,7 +73,7 @@ const LoginPage = () => {
             const data = await response.json();
         
             if (data.auth) {
-                login(data.user);
+                login(data);
         
                 localStorage.setItem('token', data.token);
         
