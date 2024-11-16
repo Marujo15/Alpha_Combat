@@ -11,8 +11,9 @@ export const initWebSocket = (wss) => {
     const bulletSpeed = 10;
     const bulletLifetime = 5000;
     const walls = new Map([
-        ["wall1", { x: 450, y: 200, width: 100, height: 600 }],  // Parede vertical
-        ["wall2", { x: 200, y: 450, width: 600, height: 100 }],  // Parede horizontal
+        ["wall1", { x: 500, y: 150, width: 50, height: 300 }],  // Parede vertical
+        ["wall2", { x: 300, y: 275, width: 450, height: 50 }],  // Parede horizontal
+        ["wall3", { x: 0, y: 600, width: 1000, height: 400 }],  // Limite inferior
     ]);
     const players = new Map();
     const bullets = new Map();
