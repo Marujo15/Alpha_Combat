@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 .login-page-container {
     align-items: center;
     background-image: url('../../../assets/main-background.png');
@@ -50,7 +52,13 @@
     width: 65%;
 }
 
+.register {
+    color: rgb(233, 233, 38);
+    font-family: 'Press Start 2P';
+    font-size: large;
+    margin-top: 10px;
+}
+
 .register:hover {
     color: rgb(173, 173, 29);
-
 }
