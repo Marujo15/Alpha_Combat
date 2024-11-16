@@ -1,23 +1,28 @@
-import { v4 as uuidv4 } from "uuid";
 import WebSocket from "ws";
 import { onMessage } from "./game/onMessage.js";
+import { SECRET_KEY } from "../config/index.js";
+import jwt from "jsonwebtoken";
+import { getRoomByRoomId, removePlayerOfTheRoom, rooms } from "./game/rooms/roomServices.js";
 // Remova ou ajuste a importação de onMessage se não estiver usando
 // import { onMessage } from "./game/onMessage.js";
 
 export const initWebSocket = (wss) => {
+    const clients = new Map()
+
     const mapSize = 1000;
     const playerSize = 50;
-    const bulletSize = 5; // Ajustado para corresponder ao frontend
+    const bulletSize = 5;
     const bulletSpeed = 10;
     const bulletLifetime = 5000;
+    const shotCooldown = 1000;
     const walls = new Map([
         ["wall1", { x: 450, y: 200, width: 100, height: 600 }],  // Parede vertical
         ["wall2", { x: 200, y: 450, width: 600, height: 100 }],  // Parede horizontal
     ]);
+
     const players = new Map();
     const bullets = new Map();
     const actionQueue = [];
-    const shotCooldown = 1000;
     let lastTimestamp = null;
 
     function resetPlayerPosition(player) {
@@ -355,7 +360,10 @@ export const initWebSocket = (wss) => {
         }
 
         if (updates.length > 0) {
-            broadcast({ type: "update", updates: updates });
+            broadcast({
+                type: "update",
+                updates: updates
+            });
         }
 
         const now = performance.now();
@@ -376,138 +384,195 @@ export const initWebSocket = (wss) => {
         }
     }
 
-    wss.on("connection", (ws) => {
-        let playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-        let playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-        walls.forEach((wall, id) => {
-            do {
-                playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-                playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-            } while (
-                playerX >= wall.x - 10 &&
-                playerX <= wall.x + wall.width + 10 &&
-                playerY >= wall.y - 10 &&
-                playerY <= wall.y + wall.height + 10
-            )
-        })
-        const player = {
-            id: uuidv4(),
-            x: playerX,
-            y: playerY,
-            speed: 5,
-            speedX: 0,
-            speedY: 0,
-            canMove: true,
-            canShoot: true,
-            lastShotTime: 0,
-            isRotating: false,
-            angle: Number((Math.random() * (2 * Math.PI)).toFixed(2)),
-            lastShotTime: 0,
-        };
+    wss.on("connection", (ws, req) => {
+        const token = req.headers.cookie?.split("; ").find((c) => c.startsWith("session_id="))?.split("=")[1];
 
-        players.set(player.id, player);
+        if (!token) {
+            ws.close(1008, "Unauthorized");
+            return;
+        }
 
-        const fullSnapshot = {
-            type: "fullSnapshot",
-            player: player,
-            players: Array.from(players.values()).filter(p => p.id !== player.id),
-            bullets: Array.from(bullets.values()),
-            walls: Array.from(walls.values())  // Adiciona as paredes ao snapshot
-        };
-
-        ws.send(JSON.stringify(fullSnapshot));
-
-        actionQueue.push({
-            type: "playerJoin",
-            player: {
-                id: player.id,
-                x: player.x,
-                y: player.y,
-                angle: player.angle,
-                speedX: player.speedX,
-                speedY: player.speedY,
-                canMove: player.canMove,
-                canShoot: player.canShoot,
-                isRotating: player.isRotating,
-            },
-        });
-
-        ws.on("message", (message) => {
-            let data;
-            try {
-                data = JSON.parse(message);
-            } catch (err) {
-                console.error("Erro ao analisar mensagem JSON:", err);
+        // Verificar o token JWT
+        jwt.verify(token, SECRET_KEY, (err, decoded) => {
+            if (err) {
+                ws.close(1008, "Unauthorized");
                 return;
             }
+            const clientId = decoded.id;
 
-            switch (data.action) {
-                case 'move': {
-                    actionQueue.push({
-                        type: "move",
-                        playerId: player.id, // Usar player.id definido acima
-                        direction: data.direction,
-                        sequenceNumber: data.sequenceNumber,
-                        canMove: data.canMove
-                    });
-                }
-                    break;
-                case 'shoot': {
-                    actionQueue.push({
-                        type: "shoot",
-                        playerId: player.id, // Usar player.id definido acima
-                        bulletId: data.bullet.id,
-                        angle: data.bullet.angle,
-                    });
-                }
-                    break;
-                case 'ping': {
-                    ws.send(JSON.stringify({
-                        type: "pong",
-                        id: data.id
-                    }));
-                }
-                    break;
-                case 'bulletHit': {
-                    actionQueue.push({
-                        type: "bulletHit",
-                        playerId: player.id, // Usar player.id definido acima
-                    });
-                }
-                    break;
-                case 'stopMoving': {
-                    actionQueue.push({
-                        type: "stopMoving",
-                        playerId: player.id, // Usar player.id definido acima
-                        playerAngle: data.playerAngle
-                    });
-                }
-                    break;
-                default:
-                    onMessage(wss, ws, message)
-                    break
-            }
-        });
+            clients.set(clientId, {
+                ws,
+                id: decoded.id,
+            })
 
-        ws.on("close", () => {
-            // Remover o jogador do mapa
-            players.delete(player.id);
+            ws.on("message", (message,) => {
+                let data;
+                const client = clients[clientId];
+                try {
+                    data = JSON.parse(message);
+                } catch (err) {
+                    console.error("Erro ao analisar mensagem JSON:", err);
+                    return;
+                }
 
-            // Notificar todos os clientes sobre a saída do jogador
-            actionQueue.push({
-                type: "playerLeave",
-                id: player.id,
+                switch (data.action) {
+                    case 'move': {
+                        const player = players.get(clientId)
+                        if (!player) {
+                            console.error("Player not found");
+                            return;
+                        }
+                        actionQueue.push({
+                            type: "move",
+                            playerId: player.id, // Usar player.id definido acima
+                            direction: data.direction,
+                            sequenceNumber: data.sequenceNumber,
+                            canMove: data.canMove
+                        });
+                    }
+                        break;
+                    case 'shoot': {
+                        const player = players.get(clientId)
+                        if (!player) {
+                            console.error("Player not found");
+                            return;
+                        }
+                        actionQueue.push({
+                            type: "shoot",
+                            playerId: player.id, // Usar player.id definido acima
+                            bulletId: data.bullet.id,
+                            angle: data.bullet.angle,
+                        });
+                    }
+                        break;
+                    case 'ping': {
+                        ws.send(JSON.stringify({
+                            type: "pong",
+                            id: data.id
+                        }));
+                    }
+                        break;
+                    case 'bulletHit': {
+                        const player = players.get(clientId)
+                        if (!player) {
+                            console.error("Player not found");
+                            return;
+                        }
+                        actionQueue.push({
+                            type: "bulletHit",
+                            playerId: player.id, // Usar player.id definido acima
+                        });
+                    }
+                        break;
+                    case 'stopMoving': {
+                        const player = players.get(clientId)
+                        if (!player) {
+                            console.error("Player not found");
+                            return;
+                        }
+                        actionQueue.push({
+                            type: "stopMoving",
+                            playerId: player.id, // Usar player.id definido acima
+                            playerAngle: data.playerAngle
+                        });
+                    }
+                    case "startMatch":
+                        // pegar jogadores da sala
+                        // avisar esses jogadores que sua sala esta pronta
+                        // usar os serviços de matchServices
+
+
+
+
+
+                        // const players = removePlayerOfTheRoom(data.matchId, data.playerId);
+                        // response = {
+                        //     type: "matchStarted",
+                        //     message: "Match started successfully",
+                        //     room: getRoomByRoomId(data.matchId)
+                        // };
+                        break;
+                    case 'startMatch': {
+                        let playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+                        let playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+                        walls.forEach((wall, id) => {
+                            while (
+                                // playerX >= wall.x - 10 &&
+                                // playerX <= wall.x + wall.width + 10 &&
+                                // playerY >= wall.y - 10 &&
+                                // playerY <= wall.y + wall.height + 10
+                                playerX + playerSize > wall.x &&
+                                playerX < wall.x + wall.width &&
+                                playerY + playerSize > wall.y &&
+                                playerY < wall.y + wall.height
+                            ) {
+                                playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+                                playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
+                            }
+                        })
+                        const player = {
+                            id: data.id,
+                            ws,
+                            x: playerX,
+                            y: playerY,
+                            angle: Number((Math.random() * (2 * Math.PI)).toFixed(2)),
+                            speed: 5,
+                            speedX: 0,
+                            speedY: 0,
+                            canMove: true,
+                            canShoot: true,
+                            isRotating: false,
+                            lastShotTime: 0,
+                        };
+
+                        players.set(clientId, player);
+
+                        const fullSnapshot = {
+                            type: "fullSnapshot",
+                            player: player,
+                            players: Array.from(players.values()).filter(p => p.id !== player.id),
+                            bullets: Array.from(bullets.values()),
+                            walls: Array.from(walls.values())  // Adiciona as paredes ao snapshot
+                        };
+
+                        ws.send(JSON.stringify(fullSnapshot));
+
+                        actionQueue.push({
+                            type: "playerJoin",
+                            player: {
+                                id: player.id,
+                                x: player.x,
+                                y: player.y,
+                                angle: player.angle,
+                                speedX: player.speedX,
+                                speedY: player.speedY,
+                                canMove: player.canMove,
+                                canShoot: player.canShoot,
+                                isRotating: player.isRotating,
+                            },
+                        });
+                    }
+                        break;
+                    default:
+                        onMessage(ws, message, clients)
+                        break
+                }
             });
-        });
 
-        // Opcional: Enviar uma mensagem de boas-vindas para o jogador
-        ws.send(JSON.stringify({
-            type: "welcome",
-            playerId: player.id,
-            x: player.x,
-            y: player.y,
-            angle: player.angle,
-        }));
+            ws.on("close", () => {
+                // Remover o jogador do mapa
+                // Notificar todos os clientes sobre a saída do jogador
+                const player = players.get(clientId)
+                if (!player) {
+                    console.error("Player not found");
+                    return;
+                }
+                actionQueue.push({
+                    type: "playerLeave",
+                    id: player.id,
+                });
+            });
+        })
     });
 
     gameLoop();

@@ -1,11 +1,16 @@
-let rooms = [];
+export let matchs = [];
+
+export const getMatchByMatchId = (roomId) => {
+    const room = matchs.find(room => room.matchId === roomId);
+    return room ? room : [];
+};
 
 export const addPlayerToWaitingList = (matchId, playerId, playerName) => {
-    let room = rooms.find(room => room.matchId === matchId);
+    let room = matchs.find(room => room.matchId === matchId);
 
     if (!room) {
         room = { matchId, players: [] };
-        rooms.push(room);
+        matchs.push(room);
     }
 
     if (room.players.length < 4 && !room.players.includes(playerId)) {
@@ -16,7 +21,7 @@ export const addPlayerToWaitingList = (matchId, playerId, playerName) => {
 };
 
 export const removePlayerFromWaitingList = (matchId, playerId) => {
-    const room = rooms.find(room => room.matchId === matchId);
+    const room = matchs.find(room => room.matchId === matchId);
 
     if (!room) {
         console.error("Room not found for matchId:", matchId);
@@ -28,13 +33,9 @@ export const removePlayerFromWaitingList = (matchId, playerId) => {
     room.players = filteredPlayers;
 
     if (room.players.length === 0) {
-        rooms = rooms.filter(r => r.matchId !== matchId);
+        matchs = matchs.filter(r => r.matchId !== matchId);
     }
 
     return room ? room.players : [];
 };
 
-export const getPlayersWaitingList = (matchId) => {
-    const room = rooms.find(room => room.matchId === matchId);
-    return room ? room : [];
-};

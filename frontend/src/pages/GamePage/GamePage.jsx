@@ -879,6 +879,7 @@ export default function AlphaCombat() {
       localBullets.clear();
       explosions.clear();
       gameLoopStarted = false;
+      navigate("/dashboard");
     };
 
     setInterval(() => {
@@ -927,6 +928,19 @@ export default function AlphaCombat() {
     }
   }, []);
 
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      e.preventDefault()
+      e.returnValue = ''
+      navigate('/dashboard')
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    // window.addEventListener("beforeunload", (event) => {
+    //   navigate("/dashboard");
+    //   ws.close();
+    // });
+  });
+
   const handleGiveUpBtn = () => {
     if (window.audioRef) {
       window.audioRef.pause();
@@ -943,7 +957,7 @@ export default function AlphaCombat() {
       wsRef.current.close();
     }
 
-    navigate('/dashboard');
+    navigate("/dashboard");
   };
   
   return (
@@ -960,7 +974,11 @@ export default function AlphaCombat() {
         />
       </div>
       <div>
-        <Button type="submit" className={"give-up-btn"} onClick={handleGiveUpBtn}></Button>
+        <Button
+          type="submit"
+          className={"give-up-btn"}
+          onClick={handleGiveUpBtn}
+        ></Button>
       </div>
     </div>
   );
