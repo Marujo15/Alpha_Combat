@@ -1,16 +1,26 @@
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import Clock from "../../components/Clock/Clock";
 import "./GamePage.css";
-import { useNavigate } from "react-router-dom";
+import shotSound from '../../../public/sounds/shot.mp3';
+import explosionSound from '../../../public/sounds/explosion.mp3';
+import respawnSound from '../../../public/sounds/respawn.mp3';
 
 export default function AlphaCombat() {
   const wsUrl = import.meta.env.VITE_WS_URL;
   const canvasRef = useRef();
   const wsRef = useRef();
+  const shotAudioRef = useRef(null);
+  const explosionAudioRef = useRef(null);
+  const respawnAudioRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
+    shotAudioRef.current = new Audio(shotSound);
+    explosionAudioRef.current = new Audio(explosionSound);
+    respawnAudioRef.current = new Audio(respawnSound);
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     wsRef.current = new WebSocket(wsUrl);
@@ -335,6 +345,7 @@ export default function AlphaCombat() {
             if (currentTime - lastShotTime > shotCooldown) {
               lastShotTime = currentTime;
               shootQueue.push({ angle: localPlayer.angle });
+              shotAudioRef.current.play();
             } else {
               console.log("Shot on cooldown. Please wait.");
             }
@@ -759,6 +770,7 @@ export default function AlphaCombat() {
           const hitPlayer = checkBulletCollisions(entity);
           if (hitPlayer) {
             localBullets.delete(id);
+            explosionAudioRef.current.play();
             ws.send(
               JSON.stringify({
                 type: "playerStopMoving",
@@ -771,6 +783,7 @@ export default function AlphaCombat() {
                   type: "bulletHit",
                 })
               );
+              respawnAudioRef.current.play();
             }, 3000);
           }
         });

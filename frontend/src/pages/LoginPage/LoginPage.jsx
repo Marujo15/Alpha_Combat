@@ -21,7 +21,7 @@ const LoginPage = () => {
         if (user) {
             navigate('/dashboard');
         }
-    }, [user, navigate]);
+    }, [user]);
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -73,7 +73,7 @@ const LoginPage = () => {
             const data = await response.json();
         
             if (data.auth) {
-                login(data.user);
+                login(data);
         
                 localStorage.setItem('token', data.token);
         
@@ -98,6 +98,10 @@ const LoginPage = () => {
     const handleGoogleLoginError = () => {
         console.log('Failed to login with Google');
         setError('Failed to login with Google');
+    };
+
+    const handleRegisterClick = () => {
+        navigate("/register");
     };
 
     return (
@@ -131,7 +135,7 @@ const LoginPage = () => {
                 </div>
                 <Button type="submit" className="login-btn"></Button>
                 {error && <p className="error-message">{error}</p>}
-                <a  className='register' href="/register">CRIAR CONTA</a>
+                <Button className='register' onClick={handleRegisterClick}>CRIAR CONTA</Button>
                 <div className="google-btn">
                     <GoogleLogin
                         onSuccess={handleGoogleLoginSuccess}
