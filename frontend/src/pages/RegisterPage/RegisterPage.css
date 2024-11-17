@@ -77,3 +77,8 @@
 .error-message {
     background-color: lightcoral;
 }
+
+.register-password {
+    color: rgb(233,233,38);
+    width: 70%;
+}

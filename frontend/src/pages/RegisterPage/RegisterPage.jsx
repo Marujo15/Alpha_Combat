@@ -16,6 +16,7 @@ const RegisterPage = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -56,7 +57,24 @@ const RegisterPage = () => {
             <Form title={"CRIAR CONTA"} onSubmit={handleRegister}>
                 <Input type="text" placeholder="APELIDO" onChange={(e) => setUsername(e.target.value)} />
                 <Input type="text" placeholder="EMAIL" onChange={(e) => setEmail(e.target.value)} />
-                <Input type="password" placeholder="SENHA" onChange={(e) => setPassword(e.target.value)} />
+                <div className="password-input-container">
+                    <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="SENHA"
+                        onChange={(e) => setPassword(e.target.value)} />
+                    <button
+                            type="button"
+                            className="toggle-password-visibility"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                        <img
+                            src={showPassword ? "./public/assets/Lock.svg" : "./public/assets/Lock_Open.svg"}
+                            alt={showPassword ? "Hide password" : "Show password"}
+                            className="password-visibility-icon"
+                        />
+                    </button>
+                </div>
+                <div className="register-password">A senha deve conter pelo menos 1 letra maiúscula, 1 número e 1 caractere especial.</div>
                 <div className="register-btns">
                     <Button type="submit" className={"register-btn"}></Button>
                     <Button type="submit" className={"r-back-btn"} onClick={() => {navigate('/login')}}></Button>
