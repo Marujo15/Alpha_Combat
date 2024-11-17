@@ -151,30 +151,28 @@
 }
 
 .player1-img, .player2-img, .player3-img, .player4-img {
-    background-image: url('../../../assets/ninja.png');
+    background-image: url('../../../assets/soldier3.png');
+    background-size: contain;
     border-radius: 2rem;
     height: 4rem;
     width: 4rem;
 }
 
-.player2-img, .player4-img {
+.player2-img {
+    background-image: url('../../../assets/soldier2.png');
+}
+
+.player3-img {
     background-image: url('../../../assets/soldier.png');
+    background-size:auto;
+}
+
+.player4-img {
+    background-image: url('../../../assets/ninja.png');
 }
 
 .player-info {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-}
-
-.player-name {
-
-}
-
-.player-kills {
-
-}
-
-.player-deaths {
-
 }
