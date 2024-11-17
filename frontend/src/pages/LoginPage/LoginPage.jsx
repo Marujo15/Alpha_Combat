@@ -100,6 +100,10 @@ const LoginPage = () => {
         setError('Failed to login with Google');
     };
 
+    const handleRegisterClick = () => {
+        navigate("/register");
+    };
+
     return (
         <div className='login-page-container'>
             <Logo />
@@ -131,7 +135,7 @@ const LoginPage = () => {
                 </div>
                 <Button type="submit" className="login-btn"></Button>
                 {error && <p className="error-message">{error}</p>}
-                <Button type="submit" className='register' onClick={navigate("/register")}>CRIAR CONTA</Button>
+                <Button className='register' onClick={handleRegisterClick}>CRIAR CONTA</Button>
                 <div className="google-btn">
                     <GoogleLogin
                         onSuccess={handleGoogleLoginSuccess}
