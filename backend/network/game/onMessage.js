@@ -1,18 +1,14 @@
 import { createNewRoom } from "./rooms/createNewRoom.js";
-import { addPlayerToWaitingList, getPlayersWaitingList, removePlayerFromWaitingList } from "./rooms/setPlayersWaitingList.js";
 import WebSocket from "ws";
+import { addPlayerToRoom, createRoom, getRoomByRoomId, removePlayerOfTheRoom } from "./rooms/roomServices.js";
+import { getMatchByPlayerId, startMatchByRoomId } from "./rooms/matchServices.js";
+import { clients } from "../index.js";
 
 const MAX_PLAYERS = 4;
 
-export async function onMessage(wss, ws, message /* roomManager */) {
-    function broadcast(wsserver, message) {
-        for (const client of wsserver.clients) {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(message));
-            }
-        }
-    }
+/*  */
 
+export async function onMessage(ws, message, clientId) {
     let data;
 
     try {
@@ -28,77 +24,209 @@ export async function onMessage(wss, ws, message /* roomManager */) {
         case "createNewRoom":
             response = await createNewRoom(data);
 
-            /* {
-                type: 'roomCreated',
-                message: 'Room created successfully',
-                matchId: result.data.id,
-                player1_id: result.data.player1_id,
-                player1_name: data.player1_name,
-            } */
+            // {
+            //     type: 'roomCreated',
+            //     message: 'Room created successfully',
+            //     matchId: result.data.id,
+            //     player1_id: result.data.player1_id,
+            //     player1_name: data.player1_name,
+            // } 
+            // ou
+            // {
+            //     type: 'error',
+            //     message: 'Error creating room',
+            // }
 
             if (response.type === "roomCreated") {
-                addPlayerToWaitingList(
+                const room = createRoom(
                     response.matchId,
-                    response.player1_id,
-                    response.player1_name
                 );
-                response.players = getPlayersWaitingList(response.matchId);
+
+                if (!room) {
+                    console.error("Erro ao criar sala");
+                    return;
+                }
+
+                const player = {
+                    id: response.player1_id,
+                    name: response.player1_name,
+                }
+
+                const playersInTheRoom = addPlayerToRoom(room.id, player)
+
+                response.players = playersInTheRoom;
+
+                console.log('response', response)
+                ws.send(JSON.stringify(response))
+            } else if (response.type === "error") {
+                ws.send(JSON.stringify({
+                    type: "errorMessage",
+                    message: response.message,
+                }))
+                console.error(response.message);
             }
+            break;
+        case "tryToEnterTheRoom":
+            console.log('RoomId: ', data.room_id)
+            const playersInsideTheRoom = addPlayerToRoom(
+                data.room_id,
+                data.player,
+            )
+            if (!playersInsideTheRoom) return
+
+            response = {
+                type: "currentPlayers",
+                players: playersInsideTheRoom,
+                roomId: data.room_id
+            };
+
+            ws.send(JSON.stringify(response));
+            break;
+        case "getRoom":
+            const room = getRoomByRoomId(data.matchId);
+            response = {
+                type: "waitingListUpdated",
+                players: room.players
+            };
+            ws.send(JSON.stringify(response));
             break;
         case "removePlayerFromWaitingList":
             removePlayerFromWaitingList(data.playerId);
-            response = { type: "waitingListUpdated", players: getPlayersWaitingList() };
+            response = { type: "waitingListUpdated", players: getRoomByRoomId() };
             if (response.players.length === 0) {
                 await deteleRoom(data.matchId);
             }
             break;
-        case "getWaitingList":
-            const waitingList = getPlayersWaitingList(data.matchId);
-            response = {
-                type: "waitingListUpdated",
-                matchInfo: waitingList
-            };
-            break;
-        case "updateRoom":
-            const match = getPlayersWaitingList(data.match_id);
-            if (match.players.length >= MAX_PLAYERS) {
-                response = { type: "error", message: "Room is full" };
-            } else {
-                addPlayerToWaitingList(data.match_id, data.player_id, data.player_name);
-                response = {
-                    type: "roomUpdated",
-                    message: "Room updated successfully",
-                    matchInfo: getPlayersWaitingList(data.match_id)
-                };
-            }
-            break;
         case "startMatch":
-            // pegar jogadores da sala
-            // avisar esses jogadores que sua sala esta pronta 
-            const players = removePlayerFromWaitingList(data.matchId, data.playerId);
-            response = {
-                type: "matchStarted",
-                message: "Match started successfully", 
-                players: getPlayersWaitingList(data.matchId) 
-            };
+            startMatchByRoomId(data.matchId)
             break;
         case "playerLeftRoom":
-            await removePlayerFromWaitingList(data.match_id, data.player_id);
-            response = {
-                type: "roomUpdated",
-                message: "Player left the room",
-                matchInfo: getPlayersWaitingList(data.match_id)
-            };
+            const remainingPlayers = removePlayerOfTheRoom(data.match_id, data.player_id);
+
+            if (remainingPlayers.length === 0) {
+                return
+            } else {
+                remainingPlayers.forEach(player => {
+                    const message = {
+                        type: "roomUpdated",
+                        players: remainingPlayers.map(p => ({
+                            id: p.id,
+                            name: p.name,
+                        }))
+                    }
+
+                    remainingPlayers.forEach(player => {
+                        const playerWs = clients.get(player.id)
+                        if (playerWs.readyState === WebSocket.OPEN) {
+                            playerWs.send(JSON.stringify(message));
+                        }
+                    })
+
+                });
+            }
+            break;
+        case 'playerMove': {
+            const game = getMatchByPlayerId(clientId)
+
+            if (!game) {
+                console.error("Player not found in a match");
+                return;
+            }
+
+            game.addAction({
+                type: "move",
+                playerId: clientId,
+                direction: data.direction,
+                sequenceNumber: data.sequenceNumber,
+                canMove: data.canMove
+            }, clientId)
+        }
+            break;
+        case 'playerShoot': {
+            const game = getMatchByPlayerId(clientId)
+
+            if (!game) {
+                console.error("Player not found in a match");
+                return;
+            }
+
+            game.addAction({
+                type: "shoot",
+                playerId: clientId,
+                bulletId: data.bullet.id,
+                angle: data.bullet.angle,
+            }, clientId)
+        }
+            break;
+        case 'ping': {
+            ws.send(JSON.stringify({
+                type: "pong",
+                id: data.id
+            }));
+        }
+            break;
+        case 'bulletHit': {
+            const game = getMatchByPlayerId(clientId)
+
+            if (!game) {
+                console.error("Player not found in a match");
+                return;
+            }
+
+            game.addAction({
+                type: "bulletHit",
+                playerId: clientId, // Usar player.id definido acima
+            }, clientId)
+        }
+            break;
+        case 'playerStopMoving': {
+            const game = getMatchByPlayerId(clientId)
+
+            if (!game) {
+                console.error("Player not found in a match");
+                return;
+            }
+
+            game.addAction({
+                type: "stopMoving",
+                playerId: clientId,
+                playerAngle: data.playerAngle
+            }, clientId)
+        }
+        case "getFullSnapshot":
+            console.log("getFullSnapshot", clientId)
+            const game = getMatchByPlayerId(clientId)
+            if (!game) {
+                console.error("Player not found in a match");
+                return;
+            }
+            game.players
+
+            console.log('MY PLAYER =>', game.players);
+
+            const myPlayer = game.players.get(clientId)
+
+            const otherPlayers = Array
+                .from(game.players.values())
+                .filter(player => player.id !== clientId)
+
+            console.log('FULLSNAPSHOT ', {
+                type: "fullSnapshot",
+                myPlayer,
+                players: otherPlayers,
+                walls: Array.from(game.walls.values()),
+                bullets: Array.from(game.bullets.values()),
+            })
+
+            ws.send(JSON.stringify({
+                type: "fullSnapshot",
+                myPlayer,
+                players: otherPlayers,
+                walls: Array.from(game.walls.values()),
+                bullets: Array.from(game.bullets.values()),
+            }))
             break;
         default:
-            console.log("Unknown message type:", data.type);
-    }
-
-    if (response) {
-        if (response.type === "roomUpdated") {
-            broadcast(wss, response);
-        } else {
-            ws.send(JSON.stringify(response));
-        }
+            console.log("Unknown message type:", data);
     }
 }

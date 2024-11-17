@@ -11,11 +11,10 @@ const audioRef = { current: null };
 const WaitingPage = () => {
   const wsUrl = import.meta.env.VITE_WS_URL;
   const { user } = useContext(UserContext);
-  const { roomId, setRoomId } = useContext(RoomContext);
+  const { roomId, setRoomId, playersOnRoom, setPlayersOnRoom } = useContext(RoomContext);
   const navigate = useNavigate();
   const wsRef = useRef(null);
   const [gameStatus, setGameStatus] = useState("Connecting to server...");
-  const [waitingPlayers, setWaitingPlayers] = useState([]);
   const [isWsOpen, setIsWsOpen] = useState(false);
   const [updatePage, setUpdatePage] = useState(false);
 
@@ -25,32 +24,47 @@ const WaitingPage = () => {
     if (storedRoomId) {
       setRoomId(storedRoomId);
     }
-    
-    wsRef.current = new WebSocket(wsUrl);
+
+    wsRef.current = wsRef.current || new WebSocket(wsUrl);
 
     wsRef.current.onopen = () => {
       setGameStatus("Connected to server");
       setIsWsOpen(true);
-      wsRef.current.send(
-        JSON.stringify({ type: "getWaitingList", matchId: roomId })
-      );
+      console.log('storedRoomId', storedRoomId)
+      if (!storedRoomId) navigate("/dashboard");
+      wsRef.current.send(JSON.stringify({ 
+        type: "getRoom", 
+        matchId: storedRoomId 
+      }));
     };
 
     wsRef.current.onmessage = async (message) => {
       const data = JSON.parse(message.data);
+      console.log("Data sent from the server", data);
       switch (data.type) {
+        case "errorMessage":
+          console.error("Error:", data.message);
+          break;
         case "waitingListUpdated":
-          setWaitingPlayers(data.matchInfo.players);
+          setPlayersOnRoom(data.players);
           break;
         case "matchStarted":
-          console.log("Players in the room:", data);
-          if (data.players.map((player) => player.id).includes(user.user.id)) {
+          console.log("room:", data);
+          console.log("players in the room:", data.players);
+          console.log("localPlayer id:", data.playerId);
+
+          if (
+            data.players.some(
+              (player) => player.id === user.user.id
+            )
+          ) {
             console.log("Match started successfully");
             navigate(`/game/${roomId}`);
           }
           break;
         case "roomUpdated":
-          setWaitingPlayers(data.matchInfo.players);
+          console.log("Room updated successfully", data);
+          setPlayersOnRoom(data.players);
           break;
         default:
           console.log("Unknown message type:", data.type);
@@ -64,11 +78,21 @@ const WaitingPage = () => {
       setIsWsOpen(false);
     };
 
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-    };
+    // window.addEventListener("beforeunload", () => {
+    //   try {
+    //     wsRef.current.send(
+    //       JSON.stringify({
+    //         type: "playerLeftRoom",
+    //         match_id: roomId,
+    //         player_id: user.user.id,
+    //       })
+    //     );
+    //     setUpdatePage(true);
+    //   } catch (error) {
+    //     console.error("Failed to create room");
+    //     console.error(error);
+    //   }
+    // });
   }, [roomId, updatePage]);
 
   const handleLeaveBtn = async () => {
@@ -78,7 +102,6 @@ const WaitingPage = () => {
           type: "playerLeftRoom",
           match_id: roomId,
           player_id: user.user.id,
-          player_name: user.user.username,
         })
       );
       setUpdatePage(true);
@@ -91,29 +114,32 @@ const WaitingPage = () => {
 
   const handleStartMatchBtn = () => {
     if (!window.audioRef) {
-        window.audioRef = new Audio('../../public/sounds/background-music.mp3');
-        window.audioRef.volume = 0.5;
-        window.audioRef.loop = true;
-        window.audioRef.play();
+      window.audioRef = new Audio("../../public/sounds/background-music.mp3");
+      window.audioRef.volume = 0.5;
+      window.audioRef.loop = true;
+      window.audioRef.play();
 
-        window.audioTimeout = setTimeout(() => {
-            if (window.audioRef) {
-                window.audioRef.pause();
-                window.audioRef.currentTime = 0;
-                window.audioRef = null;
-            }
-        }, 300000);
+      window.audioTimeout = setTimeout(() => {
+        if (window.audioRef) {
+          window.audioRef.pause();
+          window.audioRef.currentTime = 0;
+          window.audioRef = null;
+        }
+      }, 300000);
     }
 
     if (isWsOpen) {
-      // wsRef.current.send(
-      //   JSON.stringify({
-      //     type: "startMatch",
-      //     playerId: user.user.id,
-      //     matchId: roomId,
-      //   })
-      // );
-      navigate(`/game/${roomId}`);
+      try {
+        wsRef.current.send(
+          JSON.stringify({
+            type: "startMatch",
+            matchId: roomId,
+          })
+        );
+      } catch (error) {
+        console.error(error);
+      }
+      // navigate(`/game/${roomId}`);
     } else {
       console.log(
         "WebSocket is not open. Current state:",
@@ -129,8 +155,8 @@ const WaitingPage = () => {
         <div>
           <p className="waiting-players-title">Jogadores na sala:</p>
           <ul className="waiting-players-list">
-            {waitingPlayers?.map((player, index) => (
-              <li key={index}>{player.playerName}</li>
+            {playersOnRoom?.map((player, index) => (
+              <li key={index}>{player.name}</li>
             ))}
           </ul>
         </div>

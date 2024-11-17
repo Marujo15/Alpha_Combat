@@ -11,7 +11,7 @@ const DashboardPage = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const wsUrl = import.meta.env.VITE_WS_URL;
   const { user, logout } = useContext(UserContext);
-  const { roomId, setRoomId, playersOnRoom, setPlayersOnRoom } = useContext(RoomContext);
+  const { setRoomId, setPlayersOnRoom } = useContext(RoomContext);
   const wsRef = useRef(null);
   const navigate = useNavigate();
   const [gameStatus, setGameStatus] = useState("Connecting to server...");
@@ -20,7 +20,8 @@ const DashboardPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    wsRef.current = new WebSocket(wsUrl);
+    console.log("WebSocket url =>", wsUrl);
+    wsRef.current = wsRef.current || new WebSocket(wsUrl);
 
     wsRef.current.onopen = () => {
       setGameStatus("Connected to server");
@@ -33,11 +34,28 @@ const DashboardPage = () => {
       setMessages((prevMessages) => [...prevMessages, receivedMessage]);
 
       switch (data.type) {
+        case "errorMessage":
+          console.error("Error: " + data.message);
+          break;
         case "roomCreated":
+          console.log("Room created successfully", data);
           setRoomId(data.matchId);
-          setPlayersOnRoom([{ id: data.players.players[0].playerId, name: data.players.players[0].playerName }]);
+          setPlayersOnRoom([
+            {
+              id: data.players[0].id,
+              name: data.players[0].name,
+            },
+          ]);
           localStorage.setItem("roomId", data.matchId);
           handleEnterRoom(data.matchId);
+          break;
+        case "currentPlayers":
+          console.log("Room updated successfully", data);
+          setRoomId(data.roomId)
+          setPlayersOnRoom(data.players);
+          localStorage.setItem("roomId", data.roomId);
+          handleEnterRoom(data.roomId);
+
           break;
       }
     };
@@ -52,18 +70,17 @@ const DashboardPage = () => {
       console.error("WebSocket error:", error);
       setGameStatus("Error connecting to server.");
     };
-
-    return () => {
-      if (wsRef.current) wsRef.current.close();
-    };
   }, [setRoomId]);
 
   const handleCreateRoom = () => {
     if (wsRef.current.readyState === WebSocket.OPEN) {
       const message = JSON.stringify({
-        type: "greeting",
-        content: "Hello, server!",
+        type: "createNewRoom",
+        player1_id: user.user.id,
+        player1_name: user.user.username,
+        token: user.token,
       });
+
       wsRef.current.send(message);
     } else {
       console.log(
@@ -71,14 +88,6 @@ const DashboardPage = () => {
         wsRef.current.readyState
       );
     }
-    wsRef.current.send(
-      JSON.stringify({
-        type: "createNewRoom",
-        player1_id: user.user.id,
-        player1_name: user.user.username,
-        token: user.token,
-      })
-    );
   };
 
   const handleEnterRoom = async (roomId) => {
@@ -87,10 +96,7 @@ const DashboardPage = () => {
 
   const handleEnterRoomWithId = async () => {
     if (!inputedRoomId) {
-      setError("O código da sala deve ser preenchido");
-      setTimeout(() => {
-        setError("");
-      }, 3000);
+      handleError("O código da sala deve ser preenchido");
       return;
     }
 
@@ -106,15 +112,13 @@ const DashboardPage = () => {
       const data = await response.json();
       wsRef.current.send(
         JSON.stringify({
-          type: "updateRoom",
-          match_id: inputedRoomId,
-          player_id: user.user.id,
-          player_name: user.user.username,
+          type: "tryToEnterTheRoom",
+          room_id: inputedRoomId,
+          player: { id: user.user.id, name: user.user.username },
         })
       );
       if (response.ok) {
         setRoomId(inputedRoomId);
-        navigate(`/waiting/${inputedRoomId}`);
       } else {
         console.error(data.error || "An error occurred during room creation");
       }
@@ -148,6 +152,13 @@ const DashboardPage = () => {
       console.error("Failed to log out");
       console.error(error);
     }
+  };
+
+  const handleError = (message) => {
+    setError(message);
+    setTimeout(() => {
+      setError("");
+    }, 3000);
   };
 
   return (

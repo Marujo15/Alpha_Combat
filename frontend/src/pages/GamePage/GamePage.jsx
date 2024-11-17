@@ -26,17 +26,17 @@ export default function AlphaCombat() {
     wsRef.current = new WebSocket(wsUrl);
     const ws = wsRef.current;
 
-    const playerSize = 50;
     const mapSize = 1000;
+    const playerSize = 50;
     const bulletSize = 5;
-    const bulletSpeed = 10;
+    const bulletSpeed = 20;
     const players = new Map();
     const bullets = new Map();
     const localBullets = new Map();
     const walls = new Map();
     const explosions = new Map();
     const updateQueue = [];
-    const shotCooldown = 1200; // 1 second cooldown
+    const shotCooldown = 5200;
     const keyState = {
       ArrowUp: false,
       ArrowDown: false,
@@ -252,12 +252,12 @@ export default function AlphaCombat() {
           player.y -= player.speedY;
           break;
         case "left":
-          player.angle -= 0.03;
+          player.angle -= 0.06;
           player.speedX = player.speed * Math.cos(player.angle);
           player.speedY = player.speed * Math.sin(player.angle);
           break;
         case "right":
-          player.angle += 0.03;
+          player.angle += 0.06;
           player.speedX = player.speed * Math.cos(player.angle);
           player.speedY = player.speed * Math.sin(player.angle);
           break;
@@ -332,7 +332,7 @@ export default function AlphaCombat() {
             const sequenceNumber = movePlayer(localPlayer, direction);
             ws.send(
               JSON.stringify({
-                action: "move",
+                type: "playerMove",
                 direction,
                 sequenceNumber,
                 canMove: localPlayer.canMove,
@@ -371,7 +371,7 @@ export default function AlphaCombat() {
 
         ws.send(
           JSON.stringify({
-            action: "shoot",
+            type: "playerShoot",
             playerId: localPlayer.id,
             bullet,
           })
@@ -773,19 +773,14 @@ export default function AlphaCombat() {
             explosionAudioRef.current.play();
             ws.send(
               JSON.stringify({
-                action: "stopMoving",
-                playerId: hitPlayer.id,
+                type: "playerStopMoving",
                 playerAngle: hitPlayer.angle,
-                canMove: false,
-                canShoot: false,
               })
             ); //parte 1
             setTimeout(() => {
               ws.send(
                 JSON.stringify({
-                  //parte 9
-                  action: "bulletHit",
-                  playerId: hitPlayer.id,
+                  type: "bulletHit",
                 })
               );
               respawnAudioRef.current.play();
@@ -811,6 +806,10 @@ export default function AlphaCombat() {
 
     ws.onopen = () => {
       console.log("Connected to server");
+
+      ws.send(JSON.stringify({
+        type: "getFullSnapshot"
+      }))
     };
 
     ws.onmessage = (message) => {
@@ -819,11 +818,11 @@ export default function AlphaCombat() {
       switch (data.type) {
         case "fullSnapshot":
           localPlayer = new PredictedEntity(
-            data.player.id,
-            data.player.x,
-            data.player.y,
-            data.player.speed,
-            data.player.angle
+            data.myPlayer.id,
+            data.myPlayer.x,
+            data.myPlayer.y,
+            data.myPlayer.speed,
+            data.myPlayer.angle
           );
           players.clear();
           data.players.forEach((player) => {
@@ -856,7 +855,7 @@ export default function AlphaCombat() {
           });
           if (!gameLoopStarted) {
             gameLoopStarted = true;
-            runAtDefinedFPS(gameLoop, 60);
+            runAtDefinedFPS(gameLoop, 30);
           }
           console.log("game loop started", data);
           break;
@@ -892,11 +891,12 @@ export default function AlphaCombat() {
       localBullets.clear();
       explosions.clear();
       gameLoopStarted = false;
+      navigate("/dashboard");
     };
 
     setInterval(() => {
       if (ws.readyState === ws.OPEN) {
-        ws.send(JSON.stringify({ action: "ping", id: performance.now() }));
+        // ws.send(JSON.stringify({ action: "ping", id: performance.now() }));
       }
     }, 1000);
 
@@ -940,6 +940,19 @@ export default function AlphaCombat() {
     }
   }, []);
 
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      e.preventDefault()
+      e.returnValue = ''
+      navigate('/dashboard')
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    // window.addEventListener("beforeunload", (event) => {
+    //   navigate("/dashboard");
+    //   ws.close();
+    // });
+  });
+
   const handleGiveUpBtn = () => {
     if (window.audioRef) {
       window.audioRef.pause();
@@ -956,7 +969,7 @@ export default function AlphaCombat() {
       wsRef.current.close();
     }
 
-    navigate('/dashboard');
+    navigate("/dashboard");
   };
   
   return (
@@ -973,7 +986,11 @@ export default function AlphaCombat() {
         />
       </div>
       <div>
-        <Button type="submit" className={"give-up-btn"} onClick={handleGiveUpBtn}></Button>
+        <Button
+          type="submit"
+          className={"give-up-btn"}
+          onClick={handleGiveUpBtn}
+        ></Button>
       </div>
     </div>
   );
