@@ -1,10 +1,14 @@
 import { createNewRoom } from "./rooms/createNewRoom.js";
 import WebSocket from "ws";
 import { addPlayerToRoom, createRoom, getRoomByRoomId, removePlayerOfTheRoom } from "./rooms/roomServices.js";
+import { getMatchByPlayerId, startMatchByRoomId } from "./rooms/matchServices.js";
+import { clients } from "../index.js";
 
 const MAX_PLAYERS = 4;
 
-export async function onMessage(ws, message, clients) {
+/*  */
+
+export async function onMessage(ws, message, clientId) {
     let data;
 
     try {
@@ -48,7 +52,7 @@ export async function onMessage(ws, message, clients) {
                     name: response.player1_name,
                 }
 
-                const playersInTheRoom = addPlayerToRoom(room.id, player, clients)
+                const playersInTheRoom = addPlayerToRoom(room.id, player)
 
                 response.players = playersInTheRoom;
 
@@ -65,9 +69,8 @@ export async function onMessage(ws, message, clients) {
         case "tryToEnterTheRoom":
             console.log('RoomId: ', data.room_id)
             const playersInsideTheRoom = addPlayerToRoom(
-                data.room_id, 
-                data.player, 
-                clients
+                data.room_id,
+                data.player,
             )
             if (!playersInsideTheRoom) return
 
@@ -95,17 +98,10 @@ export async function onMessage(ws, message, clients) {
             }
             break;
         case "startMatch":
-            // pegar jogadores da sala
-            // avisar esses jogadores que sua sala esta pronta 
-            const players = removePlayerFromWaitingList(data.matchId, data.playerId);
-            response = {
-                type: "matchStarted",
-                message: "Match started successfully",
-                players: getRoomByRoomId(data.matchId)
-            };
+            startMatchByRoomId(data.matchId)
             break;
         case "playerLeftRoom":
-            const remainingPlayers = removePlayerOfTheRoom(data.match_id, data.player_id, clients);
+            const remainingPlayers = removePlayerOfTheRoom(data.match_id, data.player_id);
 
             if (remainingPlayers.length === 0) {
                 return
@@ -129,7 +125,108 @@ export async function onMessage(ws, message, clients) {
                 });
             }
             break;
+        case 'playerMove': {
+            const game = getMatchByPlayerId(clientId)
+
+            if (!game) {
+                console.error("Player not found in a match");
+                return;
+            }
+
+            game.addAction({
+                type: "move",
+                playerId: clientId,
+                direction: data.direction,
+                sequenceNumber: data.sequenceNumber,
+                canMove: data.canMove
+            }, clientId)
+        }
+            break;
+        case 'playerShoot': {
+            const game = getMatchByPlayerId(clientId)
+
+            if (!game) {
+                console.error("Player not found in a match");
+                return;
+            }
+
+            game.addAction({
+                type: "shoot",
+                playerId: clientId,
+                bulletId: data.bullet.id,
+                angle: data.bullet.angle,
+            }, clientId)
+        }
+            break;
+        case 'ping': {
+            ws.send(JSON.stringify({
+                type: "pong",
+                id: data.id
+            }));
+        }
+            break;
+        case 'bulletHit': {
+            const game = getMatchByPlayerId(clientId)
+
+            if (!game) {
+                console.error("Player not found in a match");
+                return;
+            }
+
+            game.addAction({
+                type: "bulletHit",
+                playerId: clientId, // Usar player.id definido acima
+            }, clientId)
+        }
+            break;
+        case 'playerStopMoving': {
+            const game = getMatchByPlayerId(clientId)
+
+            if (!game) {
+                console.error("Player not found in a match");
+                return;
+            }
+
+            game.addAction({
+                type: "stopMoving",
+                playerId: clientId,
+                playerAngle: data.playerAngle
+            }, clientId)
+        }
+        case "getFullSnapshot":
+            console.log("getFullSnapshot", clientId)
+            const game = getMatchByPlayerId(clientId)
+            if (!game) {
+                console.error("Player not found in a match");
+                return;
+            }
+            game.players
+
+            console.log('MY PLAYER =>', game.players);
+
+            const myPlayer = game.players.get(clientId)
+
+            const otherPlayers = Array
+                .from(game.players.values())
+                .filter(player => player.id !== clientId)
+
+            console.log('FULLSNAPSHOT ', {
+                type: "fullSnapshot",
+                myPlayer,
+                players: otherPlayers,
+                walls: Array.from(game.walls.values()),
+                bullets: Array.from(game.bullets.values()),
+            })
+
+            ws.send(JSON.stringify({
+                type: "fullSnapshot",
+                myPlayer,
+                players: otherPlayers,
+                walls: Array.from(game.walls.values()),
+                bullets: Array.from(game.bullets.values()),
+            }))
+            break;
         default:
-            console.log("Unknown message type:", data.type);
+            console.log("Unknown message type:", data);
     }
 }

@@ -50,10 +50,13 @@ const WaitingPage = () => {
           break;
         case "matchStarted":
           console.log("room:", data);
-          console.log("players in the room:", data.room.players);
-          console.log("localPlayer id:", user.user.id);
+          console.log("players in the room:", data.players);
+          console.log("localPlayer id:", data.playerId);
+
           if (
-            data.room.players.some((player) => player.playerId === user.user.id)
+            data.players.some(
+              (player) => player.id === user.user.id
+            )
           ) {
             console.log("Match started successfully");
             navigate(`/game/${roomId}`);

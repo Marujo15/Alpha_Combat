@@ -1,4 +1,5 @@
 import { WebSocket } from "ws";
+import { clients } from "../../index.js";
 
 export let rooms = new Map();
 
@@ -38,7 +39,6 @@ export const createRoom = (roomId/* string */) => {
 export const addPlayerToRoom = (
     roomId/* string */,
     player/* { id: string, name: string } */,
-    clients
 ) => {
     const room = rooms.get(roomId);
     console.log(room)
@@ -61,11 +61,9 @@ export const addPlayerToRoom = (
     room.players.push({ id, name });
     rooms.set(roomId, room);
 
-    console.log('room2', room)
+    console.log('room', room)
 
     room.players.forEach(p => {
-        // console.log(clients.get(p.id));
-
         const ws = clients.get(p.id).ws
         if (ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({
@@ -75,16 +73,15 @@ export const addPlayerToRoom = (
                     name: p.name,
                 }))
             }));
-        } else {
-            console.error(`Failed to send message to player ${p.id}`);
+            return
         }
-        console.log(p)
+        console.error(`Failed to send message to player ${p.id}`);
     });
 
     return room.players.map(player => ({ id: player.id, name: player.name }));
 };
 
-export const removePlayerOfTheRoom = (roomId, playerId, clients) => {
+export const removePlayerOfTheRoom = (roomId, playerId) => {
     const room = rooms.get(roomId);
 
     if (!room) {
@@ -107,6 +104,16 @@ export const removePlayerOfTheRoom = (roomId, playerId, clients) => {
 
     return room.players;
 };
+
+export const removeRoomByRoomId = (roomId) => {
+    if (!rooms.has(roomId)) {
+        return;
+    }
+
+    rooms.delete(roomId);
+
+    return [];
+}
 
 const isPlayerInAnyRoom = (playerId) => {
     let roomId = null;
