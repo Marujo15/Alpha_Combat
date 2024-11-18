@@ -977,7 +977,7 @@ export default function AlphaCombat() {
   return (
     <div className="game-main-div">
       <div>
-        <Clock />
+        <Clock gameData={gameData}/>
       </div>
       <div>
         <canvas
