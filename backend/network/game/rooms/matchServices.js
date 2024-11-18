@@ -18,6 +18,13 @@ const color = {
     3: 'yellow',
 }
 
+const cords = {
+    "red": [70, 70],
+    "blue": [70, 530],
+    "green": [930, 70],
+    "yellow": [930, 530]
+}
+
 /* 
 match: {
     rooId: string,
@@ -41,26 +48,15 @@ export const createGame = () => {
     let lastTimestamp = null;
 
     const addPlayer = (player, tankColor) => {
-        let playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-        let playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-        walls.forEach((wall) => {
-            while (
-                playerX + playerSize > wall.x &&
-                playerX < wall.x + wall.width &&
-                playerY + playerSize > wall.y &&
-                playerY < wall.y + wall.height
-            ) {
-                playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-                playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-            }
-        })
+        const [x, y] = cords[tankColor];
+
         const newPlayer = {
             id: player.id,
             name: player.name,
             kills: 0,
             deaths: 0,
-            x: playerX,
-            y: playerY,
+            x,
+            y,
             angle: Number((Math.random() * (2 * Math.PI)).toFixed(2)),
             speed: playerSpeed,
             speedX: 0,
@@ -316,19 +312,8 @@ export const createGame = () => {
     }
 
     function resetPlayerPosition() {
-        let playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-        let playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-        walls.forEach((wall) => {
-            do {
-                playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-                playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-            } while (
-                playerX >= wall.x &&
-                playerX <= wall.x + wall.width &&
-                playerY >= wall.y &&
-                playerY <= wall.y + wall.height
-            )
-        })
+        const randomNumber = Math.floor(Math.random() * 4)
+        const [playerX, playerY] = cords[color[randomNumber]]
         return [playerX, playerY]
     }
 
