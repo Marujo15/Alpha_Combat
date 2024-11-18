@@ -30,7 +30,6 @@ const WaitingPage = () => {
     wsRef.current.onopen = () => {
       setGameStatus("Connected to server");
       setIsWsOpen(true);
-      console.log('storedRoomId', storedRoomId)
       if (!storedRoomId) navigate("/dashboard");
       wsRef.current.send(JSON.stringify({ 
         type: "getRoom", 
@@ -40,7 +39,6 @@ const WaitingPage = () => {
 
     wsRef.current.onmessage = async (message) => {
       const data = JSON.parse(message.data);
-      console.log("Data sent from the server", data);
       switch (data.type) {
         case "errorMessage":
           console.error("Error:", data.message);
@@ -49,21 +47,15 @@ const WaitingPage = () => {
           setPlayersOnRoom(data.players);
           break;
         case "matchStarted":
-          console.log("room:", data);
-          console.log("players in the room:", data.players);
-          console.log("localPlayer id:", data.playerId);
-
           if (
             data.players.some(
               (player) => player.id === user.user.id
             )
           ) {
-            console.log("Match started successfully");
             navigate(`/game/${roomId}`);
           }
           break;
         case "roomUpdated":
-          console.log("Room updated successfully", data);
           setPlayersOnRoom(data.players);
           break;
         default:

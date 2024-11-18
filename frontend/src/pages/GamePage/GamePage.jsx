@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import Clock from "../../components/Clock/Clock";
 import "./GamePage.css";
-import shotSound from '../../../public/sounds/shot.mp3';
-import explosionSound from '../../../public/sounds/explosion.mp3';
-import respawnSound from '../../../public/sounds/respawn.mp3';
+import shotSound from "../../../public/sounds/shot.mp3";
+import explosionSound from "../../../public/sounds/explosion.mp3";
+import respawnSound from "../../../public/sounds/respawn.mp3";
 
 export default function AlphaCombat() {
   const wsUrl = import.meta.env.VITE_WS_URL;
@@ -58,16 +58,25 @@ export default function AlphaCombat() {
     blueTank.src = "../../assets/blueTank.png";
 
     class PredictedEntity {
-      constructor(id, x, y, speed = 5, angle = 0) {
+      constructor(
+        id,
+        x,
+        y,
+        speed = 5,
+        angle = 0,
+        isRotating = false,
+        canMove = true,
+        canShoot = true
+      ) {
         this.id = id;
         this.x = x;
         this.y = y;
         this.speed = speed;
         this.angle = angle; // rad
         this.moveHistory = [];
-        this.canMove = true;
-        this.canShoot = true;
-        this.isRotating = false;
+        this.canMove = canMove;
+        this.canShoot = canShoot;
+        this.isRotating = isRotating;
         this.sequenceNumber = 0;
         this.speedX = this.speed * Math.cos(this.angle);
         this.speedY = this.speed * Math.sin(this.angle);
@@ -109,7 +118,15 @@ export default function AlphaCombat() {
     }
 
     class InterpolatedEntity {
-      constructor(id, x, y, angle) {
+      constructor(
+        id,
+        x,
+        y,
+        angle,
+        isRotating = false,
+        canMove = true,
+        canShoot = true
+      ) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -117,7 +134,9 @@ export default function AlphaCombat() {
         this.toX = x;
         this.toY = y;
         this.toAngle = angle;
-        this.isRotating = false;
+        this.isRotating = isRotating;
+        this.canMove = canMove;
+        this.canShoot = canShoot;
       }
 
       updateTarget(x, y, angle, isRotating) {
@@ -267,11 +286,8 @@ export default function AlphaCombat() {
 
       player.y = Math.max(playerSize, Math.min(mapSize, player.y));
 
-      // console.log(player)
-
       const wallCollision = checkWallCollisions(player, playerSize, true);
       if (wallCollision) {
-        // Se colidir, reverte o movimento
         player.x = oldX;
         player.y = oldY;
         player.angle = oldAngle;
@@ -327,8 +343,6 @@ export default function AlphaCombat() {
         if (key !== " ") {
           if (keyState[key]) {
             const direction = key.toLowerCase().replace("arrow", "");
-            // console.log('localPlayer', localPlayer)
-            // console.log('direction', direction)
             const sequenceNumber = movePlayer(localPlayer, direction);
             ws.send(
               JSON.stringify({
@@ -347,7 +361,6 @@ export default function AlphaCombat() {
               shootQueue.push({ angle: localPlayer.angle });
               shotAudioRef.current.play();
             } else {
-              console.log("Shot on cooldown. Please wait.");
             }
           }
         }
@@ -397,12 +410,10 @@ export default function AlphaCombat() {
                   )
                 );
               }
-              console.log("UPDATE: playerJoin", update);
             }
             break;
           case "playerLeave":
             players.delete(update.id);
-            console.log("UPDATE: playerLeave", update);
             break;
           case "playerUpdate": //parte 7 e parte 13
             if (update.id === localPlayer.id) {
@@ -439,7 +450,6 @@ export default function AlphaCombat() {
                 )
               );
             }
-            console.log("UPDATE: playerUpdate", update);
             break;
           case "bulletUpdate":
             {
@@ -465,20 +475,90 @@ export default function AlphaCombat() {
                   );
                 }
               }
-              // console.log("UPDATE: bulletUpdate", update)
             }
             break;
           case "bulletRemove":
             bullets.delete(update.id);
             localBullets.delete(update.id);
-            console.log("UPDATE: bulletRemove", update);
             break;
           case "explosion":
             createExplosion(
               update.x - playerSize / 2,
               update.y - playerSize / 2
             );
-            console.log("UPDATE: explosion", update);
+            break;
+          case "bulletHit":
+            {
+              const hittedPlayer =
+                localPlayer.id === update.playerId
+                  ? localPlayer
+                  : players.get(update.playerId);
+
+              if (hittedPlayer.id === localPlayer.id) {
+                localPlayer = new PredictedEntity(
+                  localPlayer.id,
+                  localPlayer.x,
+                  localPlayer.y,
+                  localPlayer.speed,
+                  localPlayer.angle,
+                  true,
+                  false,
+                  false
+                );
+                break;
+              }
+              players.set(
+                hittedPlayer.id,
+
+                new InterpolatedEntity(
+                  hittedPlayer.id,
+                  hittedPlayer.x,
+                  hittedPlayer.y,
+                  hittedPlayer.angle,
+                  true,
+                  false,
+                  false
+                )
+              );
+            }
+            break;
+          case "respawn":
+            {
+              const playerRespawned =
+                localPlayer.id === update.playerId
+                  ? localPlayer
+                  : players.get(update.playerId);
+
+              if (playerRespawned.id === localPlayer.id) {
+                localPlayer = new PredictedEntity(
+                  playerRespawned.id,
+                  update.playerX,
+                  update.playerY,
+                  playerRespawned.speed,
+                  update.playerAngle,
+                  false,
+                  true,
+                  true
+                );
+                break;
+              }
+              players.set(
+                playerRespawned.id,
+
+                new InterpolatedEntity(
+                  playerRespawned.id,
+                  update.playerX,
+                  update.playerY,
+                  update.playerAngle,
+                  false,
+                  true,
+                  true
+                )
+              );
+            }
+            break;
+          case "matchStatus":
+            // console.log("matchStatus", update);
             break;
           default:
             console.error(`Unknown update type: ${update}`);
@@ -489,8 +569,6 @@ export default function AlphaCombat() {
 
     function validateAndReconcile(entity, serverUpdate) {
       const serverSequenceNumber = serverUpdate.sequenceNumber;
-      // console.log(serverUpdate)
-      // console.log(JSON.stringify(entity.moveHistory, null, 2))
       const localMove = entity.getMoveFromSequenceNumber(serverSequenceNumber);
       if (localMove) {
         if (
@@ -498,10 +576,6 @@ export default function AlphaCombat() {
           localMove.y !== serverUpdate.y ||
           localMove.angle !== serverUpdate.angle
         ) {
-          console.log(
-            "Starting reconciliation from sequence number:",
-            serverSequenceNumber
-          );
           entity.x = serverUpdate.x;
           entity.y = serverUpdate.y;
           entity.angle = serverUpdate.angle;
@@ -519,7 +593,6 @@ export default function AlphaCombat() {
           });
 
           isReconciling = false;
-          console.log("Reconciliation complete");
         } else {
           entity.keepUnacknowledgedMoves(serverSequenceNumber);
         }
@@ -771,20 +844,20 @@ export default function AlphaCombat() {
           if (hitPlayer) {
             localBullets.delete(id);
             explosionAudioRef.current.play();
-            ws.send(
-              JSON.stringify({
-                type: "playerStopMoving",
-                playerAngle: hitPlayer.angle,
-              })
-            ); //parte 1
-            setTimeout(() => {
-              ws.send(
-                JSON.stringify({
-                  type: "bulletHit",
-                })
-              );
-              respawnAudioRef.current.play();
-            }, 3000);
+            // ws.send(
+            //   JSON.stringify({
+            //!     type: "playerStopMoving",
+            //     playerAngle: hitPlayer.angle,
+            //   })
+            // ); //parte 1
+            // setTimeout(() => {
+            //   ws.send(
+            //     JSON.stringify({
+            //!       type: "bulletHit",
+            //     })
+            //   );
+            //   respawnAudioRef.current.play();
+            // }, 3000);
           }
         });
       }
@@ -807,9 +880,11 @@ export default function AlphaCombat() {
     ws.onopen = () => {
       console.log("Connected to server");
 
-      ws.send(JSON.stringify({
-        type: "getFullSnapshot"
-      }))
+      ws.send(
+        JSON.stringify({
+          type: "getFullSnapshot",
+        })
+      );
     };
 
     ws.onmessage = (message) => {
@@ -857,30 +932,18 @@ export default function AlphaCombat() {
             gameLoopStarted = true;
             runAtDefinedFPS(gameLoop, 30);
           }
-          console.log("game loop started", data);
           break;
         case "update": //parte 6
           {
-            const now = performance.now();
-
-            if (lastServerUpdateTimestamp) {
-              // const delta = Math.round(now - lastServerUpdateTimestamp);
-              // console.log(`last server update delta: ${delta}ms`);
-            }
-
-            lastServerUpdateTimestamp = now;
-
             data.updates.forEach((update) => {
               updateQueue.push(update);
             });
-            // console.log(`Updates: ${data.updates.length} updates completed`, data);
           }
           break;
         case "pong":
           {
             // const delta = Math.round(performance.now() - data.id);
           }
-          // console.log(`ping: ${delta}ms`);
           break;
       }
     };
@@ -942,11 +1005,11 @@ export default function AlphaCombat() {
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
-      e.preventDefault()
-      e.returnValue = ''
-      navigate('/dashboard')
-    }
-    window.addEventListener("beforeunload", handleBeforeUnload)
+      e.preventDefault();
+      e.returnValue = "";
+      navigate("/dashboard");
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
     // window.addEventListener("beforeunload", (event) => {
     //   navigate("/dashboard");
     //   ws.close();
@@ -971,7 +1034,7 @@ export default function AlphaCombat() {
 
     navigate("/dashboard");
   };
-  
+
   return (
     <div className="game-main-div">
       <div>

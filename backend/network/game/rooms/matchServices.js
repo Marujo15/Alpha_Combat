@@ -56,6 +56,9 @@ export const createGame = () => {
         })
         const newPlayer = {
             id: player.id,
+            name: player.name,
+            kills: 0,
+            deaths: 0,
             x: playerX,
             y: playerY,
             angle: Number((Math.random() * (2 * Math.PI)).toFixed(2)),
@@ -95,6 +98,10 @@ export const createGame = () => {
         //         isRotating: player.isRotating,
         //     },
         // });
+    }
+
+    function getRandomAngle() {
+        return Math.random() * 2 * Math.PI;
     }
 
     function gameLoop() {
@@ -159,50 +166,12 @@ export const createGame = () => {
                     updates.push(action);
                     break;
                 case "bulletHit":
-                    {
-                        const player = players.get(action.playerId);
-                        if (player) {
-                            player.canMove = true;
-                            player.canShoot = true;
-                            resetPlayerPosition(player);
-                            const playerUpdate = {
-                                type: "playerUpdate",
-                                id: player.id,
-                                x: player.x,
-                                y: player.y,
-                                canMove: true,
-                                canShoot: true,
-                                isRotating: false,
-                                angle: player.angle,
-                                speedX: player.speedX,
-                                speedY: player.speedY,
-                            };
-                            players.set(player.id, { ...player, isRotating: false });
-                            updates.push(playerUpdate);
-                        }
-                    }
+                    updates.push(action);
                     break;
-                case "stopMoving":
-                    {
-                        const player = players.get(action.playerId);
-                        if (player) {
-                            player.canMove = false;
-                            player.canShoot = false;
-                            updates.push({
-                                type: "playerUpdate",
-                                id: player.id,
-                                x: player.x,
-                                y: player.y,
-                                canMove: false,
-                                canShoot: false,
-                                isRotating: true,
-                                angle: action.playerAngle,
-                                speedX: player.speedX,
-                                speedY: player.speedY,
-                            });
-                        }
-                    }
+                case "respawn":
+                    updates.push(action);
                     break;
+
                 default:
                     console.error("Unknown action type:", action.type);
                     break;
@@ -214,18 +183,79 @@ export const createGame = () => {
 
             const hitPlayer = checkBulletCollisions(bullet);
             if (hitPlayer) {
+                bullets.delete(bulletId);
+
+                const bulletOwner = players.get(bullet.playerId)
+
+                players.set(hitPlayer.id, {
+                    ...hitPlayer,
+                    deaths: hitPlayer.deaths + 1,
+                });
+                players.set(bullet.playerId, {
+                    ...bulletOwner,
+                    kills: bulletOwner.kills + 1,
+                });
+
                 updates.push({
+                    type: "matchStatus",
+                    players: Array.from(players.values()),
+                })
+
+                const explosion = {
                     type: "explosion",
                     x: hitPlayer.x,
                     y: hitPlayer.y,
-                }, {
-                    type: "stopMoving",
+                }
+                const bulletHit = {
+                    type: "bulletHit",
                     playerId: hitPlayer.id,
-                    playerAngle: hitPlayer.angle,
+                }
+                const [playerX, playerY] = resetPlayerPosition()
+                const respawn = {
+                    type: "respawn",
+                    playerId: hitPlayer.id,
+                    playerAngle: getRandomAngle(),
+                    playerX,
+                    playerY,
+                }
+
+                const bulletRemove = {
+                    type: "bulletRemove",
+                    id: bulletId
+                }
+
+                updates.push(bulletRemove);
+                updates.push(explosion);
+
+
+                actionQueue.push(bulletHit);
+                players.set(hitPlayer.id, {
+                    ...hitPlayer,
+                    isRotating: true,
+                    canShoot: false,
+                    canMove: false,
                 });
-                bullets.delete(bulletId);
-                updates.push({ type: "bulletRemove", id: bulletId });
-                players.set(hitPlayer.id, { ...hitPlayer, isRotating: true });
+
+                setTimeout(() => {
+
+
+                    actionQueue.push(respawn);
+                    players.set(hitPlayer.id, {
+                        ...hitPlayer,
+                        isRotating: false,
+                        canShoot: true,
+                        canMove: true,
+                        x: respawn.playerX,
+                        y: respawn.playerY,
+                        angle: respawn.playerAngle,
+                    });
+                    // ws.send(
+                    //     JSON.stringify({
+                    //         type: "bulletHit",
+                    //     })
+                    // );
+                    // respawnAudioRef.current.play();
+                }, 3000);
             } else if (Date.now() - bullet.createdAt > bulletLifetime) {
                 bullets.delete(bulletId);
                 updates.push({ type: "bulletRemove", id: bulletId });
@@ -254,7 +284,7 @@ export const createGame = () => {
         const now = performance.now();
         if (lastTimestamp) {
             const delta = Math.round(now - lastTimestamp);
-            // console.log(delta);
+            // 
         }
         lastTimestamp = now;
 
@@ -285,11 +315,10 @@ export const createGame = () => {
         actionQueue.push(action);
     }
 
-    function resetPlayerPosition(player) {
-        player.canMove = true;
+    function resetPlayerPosition() {
         let playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
         let playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
-        walls.forEach((wall, id) => {
+        walls.forEach((wall) => {
             do {
                 playerX = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
                 playerY = Math.floor(Math.random() * (mapSize - playerSize)) + playerSize / 2;
@@ -300,8 +329,7 @@ export const createGame = () => {
                 playerY <= wall.y + wall.height
             )
         })
-        player.x = playerX;
-        player.y = playerY;
+        return [playerX, playerY]
     }
 
     function movePlayer(player, direction) {
@@ -309,7 +337,7 @@ export const createGame = () => {
         const oldY = player.y;
         const oldAngle = player.angle;
 
-        if (player.canMove === false) {
+        if (!player.canMove) {
             return;
         }
 
@@ -417,11 +445,16 @@ export const createGame = () => {
                 const translatedX = bullet.x - (player.x - playerSize / 2);
                 const translatedY = bullet.y - (player.y - playerSize / 2);
 
-                const rotatedX = translatedX * Math.cos(-player.angle) - translatedY * Math.sin(-player.angle);
-                const rotatedY = translatedX * Math.sin(-player.angle) + translatedY * Math.cos(-player.angle);
+                const rotatedX =
+                    translatedX * Math.cos(-player.angle) -
+                    translatedY * Math.sin(-player.angle);
+                const rotatedY =
+                    translatedX * Math.sin(-player.angle) +
+                    translatedY * Math.cos(-player.angle);
 
                 const halfWidth = playerSize / 2;
                 const halfHeight = playerSize / 2;
+
                 if (
                     rotatedX >= -halfWidth - bulletSize &&
                     rotatedX <= halfWidth + bulletSize &&
@@ -549,7 +582,6 @@ export const startMatchByRoomId = (roomId) => {
 };
 
 export const getMatchByPlayerId = (playerId) => {
-    console.log(matchs)
     for (const match of matchs.values()) {
         for (const player of match.players.values()) {
             if (player.id === playerId) {

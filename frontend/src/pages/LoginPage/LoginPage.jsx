@@ -78,14 +78,11 @@ const LoginPage = () => {
                 localStorage.setItem('token', data.token);
         
                 if (data.needsPassword) {
-                    console.log('User needs to set password. Redirecting to /set-password');
                     navigate('/set-password');
                 } else {
-                    console.log('User does not need to set password. Redirecting to /dashboard');
                     navigate('/dashboard');
                 }
             } else {
-                console.log('Authentication failure:', data.error);
                 setError(data.error || 'Failed to login with Google');
             }
         } catch (error) {
@@ -96,7 +93,6 @@ const LoginPage = () => {
     };
 
     const handleGoogleLoginError = () => {
-        console.log('Failed to login with Google');
         setError('Failed to login with Google');
     };
 

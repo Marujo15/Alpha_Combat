@@ -51,8 +51,6 @@ const SetPass = ({ title, children, onSubmit }) => {
           console.error('Erro na requisição:', error);
           setError('Erro ao definir a senha.');
       }
-
-        console.log('Form submitted');
     };
 
 

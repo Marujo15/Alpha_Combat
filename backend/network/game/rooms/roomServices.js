@@ -41,7 +41,7 @@ export const addPlayerToRoom = (
     player/* { id: string, name: string } */,
 ) => {
     const room = rooms.get(roomId);
-    console.log(room)
+
     const { id, name } = player // Just to know what are into player
 
     if (!room) {
@@ -61,7 +61,6 @@ export const addPlayerToRoom = (
     room.players.push({ id, name });
     rooms.set(roomId, room);
 
-    console.log('room', room)
 
     room.players.forEach(p => {
         const ws = clients.get(p.id).ws

@@ -20,7 +20,6 @@ const DashboardPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log("WebSocket url =>", wsUrl);
     wsRef.current = wsRef.current || new WebSocket(wsUrl);
 
     wsRef.current.onopen = () => {
@@ -38,7 +37,6 @@ const DashboardPage = () => {
           console.error("Error: " + data.message);
           break;
         case "roomCreated":
-          console.log("Room created successfully", data);
           setRoomId(data.matchId);
           setPlayersOnRoom([
             {
@@ -50,7 +48,6 @@ const DashboardPage = () => {
           handleEnterRoom(data.matchId);
           break;
         case "currentPlayers":
-          console.log("Room updated successfully", data);
           setRoomId(data.roomId)
           setPlayersOnRoom(data.players);
           localStorage.setItem("roomId", data.roomId);

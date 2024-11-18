@@ -18,7 +18,6 @@ function Clock() {
 
   useEffect(() => {
     if (timeLeft === 0) {
-      console.log('Time is up!');
       if (window.audioRef) {
         window.audioRef.pause();
         window.audioRef.currentTime = 0;
