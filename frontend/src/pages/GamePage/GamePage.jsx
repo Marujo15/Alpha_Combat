@@ -57,6 +57,19 @@ export default function AlphaCombat() {
     redTank.src = "../../assets/redTank.png";
     const blueTank = new Image();
     blueTank.src = "../../assets/blueTank.png";
+    const greenTank = new Image();
+    greenTank.src = "../../assets/greyTank.png";
+    const yellowTank = new Image();
+    yellowTank.src = "../../assets/yellowTank.png";
+    const grass = new Image();
+    grass.src = "../../assets/grassPixel.png";
+
+    const colors = {
+      red: redTank,
+      blue: blueTank,
+      green: greenTank,
+      yellow: yellowTank,
+    };
 
     class PredictedEntity {
       constructor(
@@ -67,7 +80,8 @@ export default function AlphaCombat() {
         angle = 0,
         isRotating = false,
         canMove = true,
-        canShoot = true
+        canShoot = true,
+        tankColor
       ) {
         this.id = id;
         this.x = x;
@@ -81,6 +95,7 @@ export default function AlphaCombat() {
         this.sequenceNumber = 0;
         this.speedX = this.speed * Math.cos(this.angle);
         this.speedY = this.speed * Math.sin(this.angle);
+        this.tankColor = tankColor;
       }
 
       addMove(direction, x, y, speed = this.speed, angle = this.angle) {
@@ -126,7 +141,8 @@ export default function AlphaCombat() {
         angle,
         isRotating = false,
         canMove = true,
-        canShoot = true
+        canShoot = true,
+        tankColor
       ) {
         this.id = id;
         this.x = x;
@@ -138,6 +154,7 @@ export default function AlphaCombat() {
         this.isRotating = isRotating;
         this.canMove = canMove;
         this.canShoot = canShoot;
+        this.tankColor = tankColor;
       }
 
       updateTarget(x, y, angle, isRotating) {
@@ -397,49 +414,21 @@ export default function AlphaCombat() {
       while (updateQueue.length > 0) {
         const update = updateQueue.shift();
         switch (update.type) {
-          case "playerJoin":
-            {
-              const isMe = localPlayer && localPlayer.id === update.player.id;
-              if (!isMe && !players.has(update.player.id)) {
-                players.set(
-                  update.player.id,
-                  new InterpolatedEntity(
-                    update.player.id,
-                    update.player.x,
-                    update.player.y,
-                    update.player.angle
-                  )
-                );
-              }
-            }
-            break;
-          case "playerLeave":
-            players.delete(update.id);
-            break;
           case "playerUpdate": //parte 7 e parte 13
             if (update.id === localPlayer.id) {
               validateAndReconcile(localPlayer, update);
             } else if (players.has(update.id)) {
-              if (update.isRotating) {
-                const interval = setInterval(() => {
-                  update.angle = update.angle + 0.5;
-                  players
-                    .get(update.id)
-                    .rotateTarget(update.angle, update.isRotating);
-                }, 100);
-                setTimeout(() => {
-                  clearInterval(interval);
-                }, 3000);
-              } else {
-                players
-                  .get(update.id)
-                  .updateTarget(
-                    update.x,
-                    update.y,
-                    update.angle,
-                    update.isRotating
-                  );
-              }
+              players
+                .get(update.id)
+                .updateTarget(
+                  update.x,
+                  update.y,
+                  update.angle,
+                  false,
+                  true, 
+                  true,
+                  update.tankColor
+                );
             } else {
               players.set(
                 update.id,
@@ -447,7 +436,11 @@ export default function AlphaCombat() {
                   update.id,
                   update.x,
                   update.y,
-                  update.angle
+                  update.angle,
+                  false,
+                  true,
+                  true,
+                  update.tankColor
                 )
               );
             }
@@ -504,7 +497,8 @@ export default function AlphaCombat() {
                   localPlayer.angle,
                   true,
                   false,
-                  false
+                  false,
+                  tankColor
                 );
                 break;
               }
@@ -518,7 +512,8 @@ export default function AlphaCombat() {
                   hittedPlayer.angle,
                   true,
                   false,
-                  false
+                  false,
+                  hittedPlayer.tankColor,
                 )
               );
             }
@@ -539,7 +534,8 @@ export default function AlphaCombat() {
                   update.playerAngle,
                   false,
                   true,
-                  true
+                  true,
+                  playerRespawned.tankColor
                 );
                 break;
               }
@@ -553,13 +549,14 @@ export default function AlphaCombat() {
                   update.playerAngle,
                   false,
                   true,
-                  true
+                  true,
+                  playerRespawned.tankColor
                 )
               );
             }
             break;
           case "matchStatus":
-            // console.log("matchStatus", update);
+            console.log("matchStatus", update);
             break;
           default:
             console.error(`Unknown update type: ${update}`);
@@ -690,13 +687,14 @@ export default function AlphaCombat() {
         ctx.rotate(localPlayer.angle);
 
         // Draw tank body
-        ctx.fillStyle = "red";
-        ctx.fillRect(
-          -(playerSize * (canvas.width / mapSize)) / 2,
-          -(playerSize * (canvas.width / mapSize)) / 2,
-          playerSize * (canvas.width / mapSize),
-          playerSize * (canvas.width / mapSize)
-        );
+        // console.log("localPlayer.tankColor", localPlayer.tankColor);
+        // ctx.fillStyle = localPlayer.tankColor;
+        // ctx.fillRect(
+        //   -(playerSize * (canvas.width / mapSize)) / 2,
+        //   -(playerSize * (canvas.width / mapSize)) / 2,
+        //   playerSize * (canvas.width / mapSize),
+        //   playerSize * (canvas.width / mapSize)
+        // );
 
         // Draw tank turret
         // ctx.fillStyle = "darkred";
@@ -709,7 +707,7 @@ export default function AlphaCombat() {
 
         // Draw tank cannon
         ctx.drawImage(
-          redTank,
+          colors[localPlayer.tankColor],
           -playerSize / 2,
           -playerSize / 3,
           playerSize,
@@ -735,6 +733,7 @@ export default function AlphaCombat() {
 
       // Draw other players
       players.forEach((player) => {
+        console.log("players colors", player.tankColor);
         ctx.save();
 
         ctx.translate(
@@ -746,27 +745,16 @@ export default function AlphaCombat() {
 
         ctx.rotate(player.angle);
 
-        // Draw tank body
-        ctx.fillStyle = "blue";
-        ctx.fillRect(
-          -(playerSize * (canvas.width / mapSize)) / 2,
-          -(playerSize * (canvas.width / mapSize)) / 2,
-          playerSize * (canvas.width / mapSize),
-          playerSize * (canvas.width / mapSize)
-        );
-
-        // // Draw tank turret
-        // ctx.fillStyle = "darkblue";
+        // ctx.fillStyle = player.tankColor;
         // ctx.fillRect(
-        //   -(playerSize * (canvas.width / mapSize)) / 4,
-        //   -(playerSize * (canvas.width / mapSize)) / 4,
-        //   (playerSize * (canvas.width / mapSize)) / 2,
-        //   (playerSize * (canvas.width / mapSize)) / 2
+        //   -(playerSize * (canvas.width / mapSize)) / 2,
+        //   -(playerSize * (canvas.width / mapSize)) / 2,
+        //   playerSize * (canvas.width / mapSize),
+        //   playerSize * (canvas.width / mapSize)
         // );
 
-        // Draw tank cannon
         ctx.drawImage(
-          blueTank,
+          colors[player.tankColor],
           -playerSize / 2,
           -playerSize / 3,
           playerSize,
@@ -803,7 +791,7 @@ export default function AlphaCombat() {
         ctx.beginPath();
         ctx.arc(
           (explosion.x / mapSize) * canvas.width,
-          (explosion.y / mapSize) * canvas.height,
+          (explosion.y / mapSize) * canvas.width,
           (radius / mapSize) * canvas.width,
           0,
           2 * Math.PI
@@ -812,10 +800,10 @@ export default function AlphaCombat() {
         // Create gradient
         const gradient = ctx.createRadialGradient(
           (explosion.x / mapSize) * canvas.width,
-          (explosion.y / mapSize) * canvas.height,
+          (explosion.y / mapSize) * canvas.width,
           0,
           (explosion.x / mapSize) * canvas.width,
-          (explosion.y / mapSize) * canvas.height,
+          (explosion.y / mapSize) * canvas.width,
           (radius / mapSize) * canvas.width
         );
 
@@ -898,7 +886,11 @@ export default function AlphaCombat() {
             data.myPlayer.x,
             data.myPlayer.y,
             data.myPlayer.speed,
-            data.myPlayer.angle
+            data.myPlayer.angle,
+            false,
+            true,
+            true,
+            data.myPlayer.tankColor
           );
           players.clear();
           data.players.forEach((player) => {
@@ -910,7 +902,10 @@ export default function AlphaCombat() {
                   player.x,
                   player.y,
                   player.angle,
-                  player.isRotating
+                  player.isRotating,
+                  true,
+                  true,
+                  player.tankColor
                 )
               );
             }
@@ -1040,7 +1035,7 @@ export default function AlphaCombat() {
   return (
     <div className="game-main-div">
       <div>
-        <Clock gameData={gameData}/>
+        <Clock gameData={gameData} />
       </div>
       <div>
         <canvas
@@ -1058,16 +1053,20 @@ export default function AlphaCombat() {
         ></Button>
       </div>
       <div className="players-info-div">
-        {gameData &&
+        {gameData && (
           <div className="player-info-div player1">
             <div className="player1-img"></div>
             <div className="player-info">
-            <div className="player-name">#{gameData.myPlayer.name}</div>
-            <div className="player-kills">Kills: {gameData.myPlayer.kills}</div>
-            <div className="player-deaths">Deaths: {gameData.myPlayer.deaths}</div>
+              <div className="player-name">#{gameData.myPlayer.name}</div>
+              <div className="player-kills">
+                Kills: {gameData.myPlayer.kills}
+              </div>
+              <div className="player-deaths">
+                Deaths: {gameData.myPlayer.deaths}
+              </div>
             </div>
           </div>
-        }
+        )}
         {gameData &&
           gameData.players.map((player, index) => (
             <div key={index} className={`player-info-div player${index + 2}`}>
@@ -1078,8 +1077,7 @@ export default function AlphaCombat() {
                 <div className="player-deaths">Deaths: {player.deaths}</div>
               </div>
             </div>
-          ))
-        }
+          ))}
       </div>
     </div>
   );

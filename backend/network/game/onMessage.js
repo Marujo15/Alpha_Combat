@@ -142,6 +142,7 @@ export async function onMessage(ws, message, clientId) {
                     playerId: clientId,
                     bulletId: data.bullet.id,
                     angle: data.bullet.angle,
+                    tankColor: data.bullet.tankColor,
                 }, clientId)
             }
             break;
