@@ -1065,7 +1065,7 @@ export default function AlphaCombat() {
               </div>
             </div>
           </div>
-        )}
+        }
         {gameData &&
           gameData.players.map((player, index) => (
             <div key={index} className={`player-info-div tank${player.tankColor}`}>
