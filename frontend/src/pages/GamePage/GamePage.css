@@ -130,22 +130,25 @@
 }
 
 .player1 {
-    background-color: #ce3b21;
+    background-color: #ff0000;
     left: 20px;
     top: 20px;
 }
 
 .player2 {
+    background-color: #0018ff;
     right: 20px;
     top: 20px;
 }
 
 .player3 {
+    background-color: #4e4d4d;
     bottom: 20px;
     left: 20px;
 }
 
 .player4 {
+    background-color: #ff8d00;
     bottom: 20px;
     right: 20px;
 }
