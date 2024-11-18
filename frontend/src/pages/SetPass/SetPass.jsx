@@ -59,7 +59,7 @@ const SetPass = ({ title, children, onSubmit }) => {
             <Logo />
             <Form title={"CRIAR SENHA"} onSubmit={handleSubmit}>
 
-            <label>"Defina uma senha para conseguir, também, logar de maneira local:</label>
+            <label className='set-password-text'>Defina uma senha para conseguir, também, logar de maneira local:</label>
             <Input
                 type="password"
                 placeholder="Nova senha"
