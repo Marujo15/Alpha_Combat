@@ -75,9 +75,9 @@
 }
 
 .copy-room-id-btn {
-    background-image: url('../../../assets/yellow-btn-copy-url.png');
+    background-image: url('../../../assets/yellow-btn-copy-id.png');
 }
 
 .copy-room-id-btn:hover {
-    background-image: url('../../../assets/yellow-btn-copy-url-hover.png');
+    background-image: url('../../../assets/yellow-btn-copy-id-hover.png');
 }
