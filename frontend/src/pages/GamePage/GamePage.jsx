@@ -1065,7 +1065,7 @@ export default function AlphaCombat() {
       </div>
       <div className="players-info-div">
         {gameData &&
-          <div className="player-info-div player1">
+          <div className={`player-info-div tank${gameData.myPlayer.tankColor}`}>
             <div className="player1-img"></div>
             <div className="player-info">
             <div className="player-name">#{gameData.myPlayer.name}</div>
@@ -1076,7 +1076,7 @@ export default function AlphaCombat() {
         }
         {gameData &&
           gameData.players.map((player, index) => (
-            <div key={index} className={`player-info-div player${index + 2}`}>
+            <div key={index} className={`player-info-div tank${player.tankColor}`}>
               <div className={`player${index + 2}-img`}></div>
               <div className="player-info">
                 <div className="player-name">#{player.name}</div>
