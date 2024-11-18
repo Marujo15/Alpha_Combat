@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button/Button";
 import Clock from "../../components/Clock/Clock";
@@ -15,6 +15,7 @@ export default function AlphaCombat() {
   const explosionAudioRef = useRef(null);
   const respawnAudioRef = useRef(null);
   const navigate = useNavigate();
+  const [gameData, setGameData] = useState(null);
 
   useEffect(() => {
     shotAudioRef.current = new Audio(shotSound);
@@ -932,6 +933,7 @@ export default function AlphaCombat() {
             gameLoopStarted = true;
             runAtDefinedFPS(gameLoop, 30);
           }
+          setGameData(data);
           break;
         case "update": //parte 6
           {
@@ -1038,7 +1040,7 @@ export default function AlphaCombat() {
   return (
     <div className="game-main-div">
       <div>
-        <Clock />
+        <Clock gameData={gameData}/>
       </div>
       <div>
         <canvas
@@ -1054,6 +1056,30 @@ export default function AlphaCombat() {
           className={"give-up-btn"}
           onClick={handleGiveUpBtn}
         ></Button>
+      </div>
+      <div className="players-info-div">
+        {gameData &&
+          <div className="player-info-div player1">
+            <div className="player1-img"></div>
+            <div className="player-info">
+            <div className="player-name">#{gameData.myPlayer.name}</div>
+            <div className="player-kills">Kills: {gameData.myPlayer.kills}</div>
+            <div className="player-deaths">Deaths: {gameData.myPlayer.deaths}</div>
+            </div>
+          </div>
+        }
+        {gameData &&
+          gameData.players.map((player, index) => (
+            <div key={index} className={`player-info-div player${index + 2}`}>
+              <div className={`player${index + 2}-img`}></div>
+              <div className="player-info">
+                <div className="player-name">#{player.name}</div>
+                <div className="player-kills">Kills: {player.kills}</div>
+                <div className="player-deaths">Deaths: {player.deaths}</div>
+              </div>
+            </div>
+          ))
+        }
       </div>
     </div>
   );
