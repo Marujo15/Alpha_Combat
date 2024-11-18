@@ -78,3 +78,8 @@
 .error-message {
     background-color: lightcoral;
 }
+
+.set-password-text {
+    padding: 0 4rem;
+    text-align: center;
+}
