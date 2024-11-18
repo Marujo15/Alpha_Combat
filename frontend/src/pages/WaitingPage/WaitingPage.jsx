@@ -87,6 +87,10 @@ const WaitingPage = () => {
     // });
   }, [roomId, updatePage]);
 
+  const handleCopyRoomId = () => {
+    navigator.clipboard.writeText(roomId);
+  };
+
   const handleLeaveBtn = async () => {
     try {
       wsRef.current.send(
@@ -157,6 +161,11 @@ const WaitingPage = () => {
             type="submit"
             className={"leave-btn"}
             onClick={handleLeaveBtn}
+          ></Button>
+          <Button
+            type="submit"
+            className={"copy-room-id-btn"}  
+            onClick={handleCopyRoomId}
           ></Button>
           <Button
             type="submit"
