@@ -11,7 +11,8 @@ const audioRef = { current: null };
 const WaitingPage = () => {
   const wsUrl = import.meta.env.VITE_WS_URL;
   const { user } = useContext(UserContext);
-  const { roomId, setRoomId, playersOnRoom, setPlayersOnRoom } = useContext(RoomContext);
+  const { roomId, setRoomId, playersOnRoom, setPlayersOnRoom } =
+    useContext(RoomContext);
   const navigate = useNavigate();
   const wsRef = useRef(null);
   const [gameStatus, setGameStatus] = useState("Connecting to server...");
@@ -31,10 +32,12 @@ const WaitingPage = () => {
       setGameStatus("Connected to server");
       setIsWsOpen(true);
       if (!storedRoomId) navigate("/dashboard");
-      wsRef.current.send(JSON.stringify({ 
-        type: "getRoom", 
-        matchId: storedRoomId 
-      }));
+      wsRef.current.send(
+        JSON.stringify({
+          type: "getRoom",
+          matchId: storedRoomId,
+        })
+      );
     };
 
     wsRef.current.onmessage = async (message) => {
@@ -47,11 +50,7 @@ const WaitingPage = () => {
           setPlayersOnRoom(data.players);
           break;
         case "matchStarted":
-          if (
-            data.players.some(
-              (player) => player.id === user.user.id
-            )
-          ) {
+          if (data.players.some((player) => player.id === user.user.id)) {
             navigate(`/game/${roomId}`);
           }
           break;
@@ -86,6 +85,10 @@ const WaitingPage = () => {
     //   }
     // });
   }, [roomId, updatePage]);
+
+  const handleCopyRoomId = () => {
+    navigator.clipboard.writeText(roomId);
+  };
 
   const handleLeaveBtn = async () => {
     try {
@@ -143,7 +146,14 @@ const WaitingPage = () => {
   return (
     <div className="waiting-page-container">
       <div className="waiting-page-div">
-        <p className="room-id-title">Sala {roomId}</p>
+        <div className="room-id-div">
+          <p className="room-id-title">Sala {roomId}</p>
+          <Button
+            type="submit"
+            className={"copy-room-id-btn"}
+            onClick={handleCopyRoomId}
+          ></Button>
+        </div>
         <div>
           <p className="waiting-players-title">Jogadores na sala:</p>
           <ul className="waiting-players-list">

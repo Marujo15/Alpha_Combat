@@ -76,12 +76,6 @@ const LoginPage = () => {
                 login(data);
         
                 localStorage.setItem('token', data.token);
-        
-                if (data.needsPassword) {
-                    navigate('/set-password');
-                } else {
-                    navigate('/dashboard');
-                }
             } else {
                 setError(data.error || 'Failed to login with Google');
             }
