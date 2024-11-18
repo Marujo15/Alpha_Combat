@@ -4,7 +4,7 @@ import Button from '../Button/Button';
 import './Clock.css';
 
 function Clock({ gameData }) {
-  const [timeLeft, setTimeLeft] = useState(10);
+  const [timeLeft, setTimeLeft] = useState(300);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
