@@ -69,31 +69,6 @@ export const createGame = () => {
         };
 
         players.set(player.id, newPlayer);
-
-        // const fullSnapshot = {
-        //     type: "fullSnapshot",
-        //     player: player,
-        //     players: Array.from(players.values()).filter(p => p.id !== player.id),
-        //     bullets: Array.from(bullets.values()),
-        //     walls: Array.from(walls.values())  // Adiciona as paredes ao snapshot
-        // };
-
-        // ws.send(JSON.stringify(fullSnapshot));
-
-        // actionQueue.push({
-        //     type: "playerJoin",
-        //     player: {
-        //         id: player.id,
-        //         x: player.x,
-        //         y: player.y,
-        //         angle: player.angle,
-        //         speedX: player.speedX,
-        //         speedY: player.speedY,
-        //         canMove: player.canMove,
-        //         canShoot: player.canShoot,
-        //         isRotating: player.isRotating,
-        //     },
-        // });
     }
 
     function getRandomAngle() {
@@ -121,6 +96,7 @@ export const createGame = () => {
                                 speedX: player.speedX,
                                 speedY: player.speedY,
                                 sequenceNumber: action.sequenceNumber,
+                                tankColor: player.tankColor,
                             });
                         }
                     }
@@ -549,9 +525,6 @@ export const startMatchByRoomId = (roomId) => {
     players.forEach(player => {
         const ws = clients.get(player.id).ws
         const allPlayers = Array.from(game.players.values());
-
-        const myPlayer = game.players.get(player.id);
-        const otherPlayers = allPlayers.filter(p => p.id !== player.id)
 
         if (ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({
