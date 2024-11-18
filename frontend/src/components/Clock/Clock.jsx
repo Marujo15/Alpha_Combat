@@ -69,12 +69,6 @@ function Clock({ gameData }) {
                 <p key={index}>{player.name}: {player.kills}</p>
               ))}
             </div>
-            <div className='deaths-div'>
-              <p>Mortes</p>
-              {sortedByDeaths.map((player, index) => (
-                <p key={index}>{player.name}: {player.deaths}</p>
-              ))}
-            </div>
           </div>
           <Button type='submit' className={'menu-btn'} onClick={() => navigate('/dashboard')}></Button>
         </div>
