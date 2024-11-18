@@ -57,6 +57,12 @@ export default function AlphaCombat() {
     redTank.src = "../../assets/redTank.png";
     const blueTank = new Image();
     blueTank.src = "../../assets/blueTank.png";
+    const greenTank = new Image();
+    greenTank.src = "../../assets/greenTank.png";
+    const yellowTank = new Image();
+    yellowTank.src = "../../assets/yellowTank.png";
+    const grass = new Image();
+    grass.src = "../../assets/grassPixel.png";
 
     class PredictedEntity {
       constructor(
