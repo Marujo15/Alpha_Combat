@@ -424,7 +424,7 @@ export default function AlphaCombat() {
                   update.y,
                   update.angle,
                   false,
-                  true, 
+                  true,
                   true,
                   update.tankColor
                 );
@@ -497,7 +497,7 @@ export default function AlphaCombat() {
                   true,
                   false,
                   false,
-                  tankColor
+                  localPlayer.tankColor
                 );
                 break;
               }
@@ -512,7 +512,7 @@ export default function AlphaCombat() {
                   true,
                   false,
                   false,
-                  hittedPlayer.tankColor,
+                  hittedPlayer.tankColor
                 )
               );
             }
@@ -556,6 +556,63 @@ export default function AlphaCombat() {
             break;
           case "matchStatus":
             console.log("matchStatus", update);
+            const playersWithNewStatus = update.players;
+            const updatedPlayers = [];
+            let myPlayerUpdated = null;
+            const allPlayers = [localPlayer, ...Array.from(players.values())]
+
+            allPlayers.forEach((player) => {
+              console.log('================================')
+              // Busca o jogador atualizado correspondente
+              const updatedPlayer = playersWithNewStatus.find(
+                (p) => p.id === player.id
+              );
+
+              // Se o jogador foi atualizado
+              if (updatedPlayer) {
+                console.log(
+                  "updatedPlayer.id === localPlayer.id",
+                  updatedPlayer.id === localPlayer.id
+                );
+                console.log("updatedPlayer", updatedPlayer);
+                console.log("localPlayer", localPlayer);
+
+                // Atualiza o estado do jogador local
+                if (updatedPlayer.id === localPlayer.id) {
+                  myPlayerUpdated = updatedPlayer;
+                  return
+                }
+
+                // Adiciona o jogador atualizado à lista
+                updatedPlayers.push({
+                  deaths: updatedPlayer.deaths,
+                  id: updatedPlayer.id,
+                  kills: updatedPlayer.kills,
+                  name: updatedPlayer.name,
+                  tankColor: updatedPlayer.tankColor,
+                });
+              } else {
+                // Se o jogador não foi atualizado, mantém o estado atual
+                updatedPlayers.push({
+                  deaths: player.deaths,
+                  id: player.id,
+                  kills: player.kills,
+                  name: player.name,
+                  tankColor: player.tankColor,
+                });
+              }
+            });
+
+            console.log("updatedPlayers", updatedPlayers);
+            console.log("myPlayerUpdated", myPlayerUpdated);
+
+            // Atualiza os dados do jogo com os novos estados
+            setGameData((prev) => ({
+              ...prev,
+              myPlayer: myPlayerUpdated || prev.myPlayer,
+              players: updatedPlayers,
+            }));
+
             break;
           default:
             console.error(`Unknown update type: ${update}`);
@@ -685,26 +742,6 @@ export default function AlphaCombat() {
         );
         ctx.rotate(localPlayer.angle);
 
-        // Draw tank body
-        // console.log("localPlayer.tankColor", localPlayer.tankColor);
-        // ctx.fillStyle = localPlayer.tankColor;
-        // ctx.fillRect(
-        //   -(playerSize * (canvas.width / mapSize)) / 2,
-        //   -(playerSize * (canvas.width / mapSize)) / 2,
-        //   playerSize * (canvas.width / mapSize),
-        //   playerSize * (canvas.width / mapSize)
-        // );
-
-        // Draw tank turret
-        // ctx.fillStyle = "darkred";
-        // ctx.fillRect(
-        //   -(playerSize * (canvas.width / mapSize)) / 4,
-        //   -(playerSize * (canvas.width / mapSize)) / 4,
-        //   (playerSize * (canvas.width / mapSize)) / 2,
-        //   (playerSize * (canvas.width / mapSize)) / 2
-        // );
-
-        // Draw tank cannon
         ctx.drawImage(
           colors[localPlayer.tankColor],
           -playerSize / 2,
@@ -715,7 +752,6 @@ export default function AlphaCombat() {
 
         ctx.restore();
 
-        // Draw local bullets
         localBullets.forEach((entity) => {
           ctx.fillStyle = "rgba(0, 0, 0, 1)";
           ctx.beginPath();
@@ -730,9 +766,7 @@ export default function AlphaCombat() {
         });
       }
 
-      // Draw other players
       players.forEach((player) => {
-        console.log("players colors", player.tankColor);
         ctx.save();
 
         ctx.translate(
@@ -743,14 +777,6 @@ export default function AlphaCombat() {
         );
 
         ctx.rotate(player.angle);
-
-        // ctx.fillStyle = player.tankColor;
-        // ctx.fillRect(
-        //   -(playerSize * (canvas.width / mapSize)) / 2,
-        //   -(playerSize * (canvas.width / mapSize)) / 2,
-        //   playerSize * (canvas.width / mapSize),
-        //   playerSize * (canvas.width / mapSize)
-        // );
 
         ctx.drawImage(
           colors[player.tankColor],
@@ -763,7 +789,6 @@ export default function AlphaCombat() {
         ctx.restore();
       });
 
-      // Draw bullets
       bullets.forEach((entity) => {
         ctx.fillStyle = "rgba(0, 0, 0, 1)";
         ctx.beginPath();
@@ -1052,7 +1077,7 @@ export default function AlphaCombat() {
         ></Button>
       </div>
       <div className="players-info-div">
-        {gameData &&
+        {gameData && (
           <div className={`player-info-div tank${gameData.myPlayer.tankColor}`}>
             <div className="player1-img"></div>
             <div className="player-info">
@@ -1060,20 +1085,19 @@ export default function AlphaCombat() {
               <div className="player-kills">
                 Kills: {gameData.myPlayer.kills}
               </div>
-              <div className="player-deaths">
-                Deaths: {gameData.myPlayer.deaths}
-              </div>
             </div>
           </div>
-        }
+        )}
         {gameData &&
           gameData.players.map((player, index) => (
-            <div key={index} className={`player-info-div tank${player.tankColor}`}>
+            <div
+              key={index}
+              className={`player-info-div tank${player.tankColor}`}
+            >
               <div className={`player${index + 2}-img`}></div>
               <div className="player-info">
                 <div className="player-name">#{player.name}</div>
                 <div className="player-kills">Kills: {player.kills}</div>
-                <div className="player-deaths">Deaths: {player.deaths}</div>
               </div>
             </div>
           ))}
