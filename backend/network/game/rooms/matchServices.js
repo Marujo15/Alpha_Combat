@@ -56,6 +56,9 @@ export const createGame = () => {
         })
         const newPlayer = {
             id: player.id,
+            name: player.name,
+            kills: 0,
+            deaths: 0,
             x: playerX,
             y: playerY,
             angle: Number((Math.random() * (2 * Math.PI)).toFixed(2)),
