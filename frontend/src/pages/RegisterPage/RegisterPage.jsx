@@ -24,13 +24,16 @@ const RegisterPage = () => {
 
     const handleRegister = async (event) => {
         event.preventDefault()
+
+        const trimmedUsername = username.trim().replace(/\s+/g, '');
+
         try {
             const response = await fetch(`${apiUrl}/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ username, email, password }),
+                body: JSON.stringify({ username: trimmedUsername, email, password }),
             });
 
             if (!response.ok) {
@@ -74,7 +77,12 @@ const RegisterPage = () => {
                         />
                     </button>
                 </div>
-                <div className="register-password">A senha deve conter pelo menos 1 letra maiúscula, 1 número e 1 caractere especial.</div>
+                <ul className="register-password">A senha deve conter:
+                    <li>8 caracteres</li>
+                    <li>1 letra maiúscula</li>
+                    <li>1 número</li>
+                    <li>1 caractere especial</li>
+                </ul>
                 <div className="register-btns">
                     <Button type="submit" className={"register-btn"}></Button>
                     <Button type="submit" className={"r-back-btn"} onClick={() => {navigate('/login')}}></Button>
